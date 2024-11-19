@@ -1,0 +1,6 @@
+@WebCinema_HostAddress = http://localhost:5081
+
+GET {{WebCinema_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
