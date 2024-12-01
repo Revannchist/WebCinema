@@ -1,4 +1,8 @@
 
+using Microsoft.EntityFrameworkCore;
+using WebCinema.Interfaces;
+using WebCinema.Services;
+
 namespace WebCinema
 {
     public class Program
@@ -6,14 +10,14 @@ namespace WebCinema
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddScoped<ICountryService,CountryService>(); //za svaki par interface-service
             // Add services to the container.
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddDbContext<WebCinemaDBContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -27,6 +31,7 @@ namespace WebCinema
 
             app.UseAuthorization();
 
+            app.UseRouting();
 
             app.MapControllers();
 
