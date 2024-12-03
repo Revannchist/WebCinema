@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -10,9 +11,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241203194924_Genres2.1")]
+    partial class Genres21
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,33 +56,6 @@ namespace WebCinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Genres");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Horror"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Action"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Thriller"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Western"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Romance"
-                        });
                 });
 #pragma warning restore 612, 618
         }

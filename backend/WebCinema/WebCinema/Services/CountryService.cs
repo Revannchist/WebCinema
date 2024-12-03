@@ -29,7 +29,7 @@ namespace WebCinema.Services
 
         public Country GetCountryById(int id) 
         {
-            var country = _dbContext.Countries.FirstOrDefault(o => o.Id == id);
+            var country = _dbContext.Countries.FirstOrDefault(x => x.Id == id);
             return country;
         }
         public Country DeleteCountryById(int id)

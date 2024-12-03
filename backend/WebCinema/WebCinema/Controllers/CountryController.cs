@@ -54,7 +54,7 @@ namespace WebCinema.Controllers
             var country = _countryService.GetCountryById(id);
             if(country == null)
             {
-                return BadRequest("Greska!");
+                return BadRequest("Error | Bad Request!");
             }
             return Ok(country);
         }
@@ -65,7 +65,7 @@ namespace WebCinema.Controllers
             var countries = _countryService.GetAllCountries();
             if(countries == null)
             {
-                return BadRequest("Greska!");
+                return BadRequest("Error | Bad Request!");
             }
             return Ok(countries);
 
