@@ -3,14 +3,14 @@ using WebCinema.Models;
 
 namespace WebCinema.Services
 {
-    public class CountriesService : ICountriesService
+    public class CountryService : ICountryService
     {
         private readonly WebCinemaDBContext _dbContext;
-        public CountriesService(WebCinemaDBContext dbContext)
+        public CountryService(WebCinemaDBContext dbContext)
         {
             _dbContext = dbContext;
         }
-        public Countries CreateCountry(Countries country)
+        public Country CreateCountry(Country country)
         {
             if(country == null)
             {
@@ -21,18 +21,18 @@ namespace WebCinema.Services
             return country;
         }
 
-        public List<Countries> GetAllCountries()
+        public List<Country> GetAllCountries()
         {
             var countries =  _dbContext.Countries.ToList();
             return countries;
         }
 
-        public Countries GetCountryById(int id) 
+        public Country GetCountryById(int id) 
         {
             var country = _dbContext.Countries.FirstOrDefault(x => x.Id == id);
             return country;
         }
-        public Countries DeleteCountryById(int id)
+        public Country DeleteCountryById(int id)
         {
             var country = GetCountryById(id);
             if(country != null)
@@ -43,7 +43,7 @@ namespace WebCinema.Services
             return country;
         }
 
-        public Countries UpdateCountry(int id, Countries country)
+        public Country UpdateCountry(int id, Country country)
         {
             var _country = GetCountryById(id);
             if(country!= null)

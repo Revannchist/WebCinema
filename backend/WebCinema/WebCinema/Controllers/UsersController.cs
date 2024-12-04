@@ -16,40 +16,40 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddUser(Users users)
+        public IActionResult AddUsers(Users users)
         {
             var createdUsers = _usersService.CreateUsers(users);
             if (createdUsers == null)
             {
-                return BadRequest("Error | Bad Request!");
+                return BadRequest("Greska!");
             }
             return Ok(createdUsers);
         }
 
         [HttpPost]
-        public IActionResult DeleteUserById(int id)
+        public IActionResult DeleteUsersById(int id)
         {
             var deletedUsers = _usersService.DeleteUsersById(id);
             if (deletedUsers == null)
             {
-                return BadRequest("Error | Bad Request!");
+                return BadRequest("Greska!");
             }
             return Ok(deletedUsers);
         }
 
         [HttpPost]
-        public IActionResult UpdateUser(int id, Users users)
+        public IActionResult UpdateUsers(int id, Users users)
         {
             var updatedUsers= _usersService.UpdateUsers(id, users);
             if (updatedUsers == null)
             {
-                return BadRequest("Error | Bad Request!");
+                return BadRequest("Greska!");
             }
             return Ok(updatedUsers);
         }
 
         [HttpGet]
-        public IActionResult GetUserById(int id)
+        public IActionResult GetUsersById(int id)
         {
             var users = _usersService.GetUsersById(id);
             if (users == null)

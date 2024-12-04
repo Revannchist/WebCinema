@@ -7,9 +7,14 @@ namespace WebCinema
     {
         public WebCinemaDBContext(DbContextOptions<WebCinemaDBContext> options) : base(options) { }
 
+        public DbSet<Country> Countries { get; set; }
+
+        public DbSet<Genres> Genres { get; set; }
+        public DbSet<Users> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //base.OnModelCreating(modelBuilder); --nez treba li nam ovo
+            //base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Genres>().HasData(
                 new Genres { Id = 1, Name = "Horror" },
@@ -20,14 +25,5 @@ namespace WebCinema
                 //dodat ostale zanrove pa samo onda: add-migration GenreData2 -> update-database
                 );
         }
-
-        //pisem DbSet ovdje dole zato jer je tako bilo u Pr3
-
-        public DbSet<Countries> Countries { get; set; }
-        public DbSet<Genres> Genres { get; set; }
-        public DbSet<Users> Users { get; set; }
-        public DbSet<Directors> Directors { get; set; }
-
-        public DbSet<Actors> Actors { get; set; }
     }
 }
