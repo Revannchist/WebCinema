@@ -10,6 +10,7 @@ namespace WebCinema
         public DbSet<Country> Countries { get; set; }
 
         public DbSet<Genres> Genres { get; set; }
+        public DbSet<Users> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
