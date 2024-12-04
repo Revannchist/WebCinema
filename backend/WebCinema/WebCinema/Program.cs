@@ -10,9 +10,11 @@ namespace WebCinema
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddScoped<ICountryService,CountryService>(); //za svaki par interface-service
+            builder.Services.AddScoped<ICountriesService,CountriesService>(); //za svaki par interface-service
             builder.Services.AddScoped<IGenresService, GenresService>();
             builder.Services.AddScoped<IUsersService, UsersService>();
+            builder.Services.AddScoped<IDirectorsService,DirectorsService>();
+            builder.Services.AddScoped<IActorsService, ActorsService>();
             // Add services to the container.
 
             builder.Services.AddControllers();
