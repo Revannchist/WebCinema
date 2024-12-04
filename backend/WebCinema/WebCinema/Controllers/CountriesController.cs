@@ -6,16 +6,16 @@ namespace WebCinema.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class CountryController : ControllerBase
+    public class CountriesController : ControllerBase
     {
-        private readonly ICountryService _countryService;
-        public CountryController(ICountryService countryService)
+        private readonly ICountriesService _countryService;
+        public CountriesController(ICountriesService countryService)
         {
             _countryService = countryService;
         }
 
         [HttpPost]
-        public IActionResult AddCountry(Country country)
+        public IActionResult AddCountry(Countries country)
         {
             var createdCountry = _countryService.CreateCountry(country);
             if(createdCountry == null)
@@ -38,7 +38,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateCountry(int id, Country country) 
+        public IActionResult UpdateCountry(int id, Countries country) 
         {
             var updatedCountry = _countryService.UpdateCountry(id, country);
             if (updatedCountry == null)
