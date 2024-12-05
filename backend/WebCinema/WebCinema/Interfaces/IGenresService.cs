@@ -4,8 +4,8 @@ namespace WebCinema.Interfaces
 {
     public interface IGenresService
     {
-        Genres GetGenresById(int id);
+        Task<Genres> GetGenresByIdAsync(int id);
 
-        List<Genres> GetAllGenres() ;
+        Task<List<Genres>> GetAllGenresAsync() ;
     }
 }

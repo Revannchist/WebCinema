@@ -15,9 +15,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddDirector(Directors director)
+        public async Task<IActionResult> AddDirector(Directors director)
         {
-            var createdDirector = _directorsService.CreateDirector(director);
+            var createdDirector = await _directorsService.CreateDirectorAsync(director);
             if (createdDirector == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -26,9 +26,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteDirectorById(int id)
+        public async Task<IActionResult> DeleteDirectorById(int id)
         {
-            var deletedDirector = _directorsService.DeleteDirectorById(id);
+            var deletedDirector = await _directorsService.DeleteDirectorByIdAsync(id);
             if (deletedDirector == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -37,9 +37,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateDirector(int id, Directors director)
+        public async Task<IActionResult> UpdateDirector(int id, Directors director)
         {
-            var updatedDirector = _directorsService.UpdateDirector(id, director);
+            var updatedDirector = await _directorsService.UpdateDirectorAsync(id, director);
             if (updatedDirector == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -48,9 +48,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetDirectorById(int id)
+        public async Task<IActionResult> GetDirectorById(int id)
         {
-            var director = _directorsService.GetDirectorById(id);
+            var director = await _directorsService.GetDirectorByIdAsync(id);
             if (director == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -59,15 +59,14 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllDirectors()
+        public async Task<IActionResult> GetAllDirectors()
         {
-            var directors = _directorsService.GetAllDirectors();
+            var directors = await _directorsService.GetAllDirectorsAsync();
             if (directors == null)
             {
                 return BadRequest("Error | Bad Request!");
             }
             return Ok(directors);
-
         }
     }
 }

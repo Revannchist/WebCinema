@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 using WebCinema.Services;
 
 namespace WebCinema.Controllers
@@ -68,7 +69,17 @@ namespace WebCinema.Controllers
                 return BadRequest("Error | Bad Request!");
             }
             return Ok(users);
+        }
 
+        [HttpPost]
+        public IActionResult UpdateUserBasicInfo(int id, UsersEditDTO dto)
+        {
+            var user = _usersService.UpdateUserBasicInfo(id, dto);
+            if(user == null)
+            {
+                return BadRequest("Error | Bad Request!");
+            }
+            return Ok(user);
         }
     }
 }

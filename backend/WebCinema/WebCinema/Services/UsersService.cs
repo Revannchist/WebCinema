@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Services
 {
@@ -12,6 +13,7 @@ namespace WebCinema.Services
         {
             _dbContext = dbContext;
         }
+
         public Users CreateUsers(Users users)
         {
             if (users == null)
@@ -34,6 +36,7 @@ namespace WebCinema.Services
             var users = _dbContext.Users.FirstOrDefault(x => x.Id == id);
             return users;
         }
+
         public Users DeleteUsersById(int id)
         {
             var users = GetUsersById(id);
@@ -61,6 +64,19 @@ namespace WebCinema.Services
                 _dbContext.SaveChanges();
             }
             return _users;
+        }
+
+        public Users UpdateUserBasicInfo(int id, UsersEditDTO dto) //DTO for editing
+        {
+            var user = _dbContext.Users.Find(id);
+            if (user != null)
+            {
+                user.Username = dto.Username;
+                user.Email = dto.Email;
+                user.Password = dto.Password;
+            }
+            _dbContext.SaveChanges();
+            return user;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using WebCinema.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using WebCinema.Interfaces;
 using WebCinema.Models;
 
 namespace WebCinema.Services
@@ -6,55 +7,54 @@ namespace WebCinema.Services
     public class ActorsService : IActorsService
     {
         private readonly WebCinemaDBContext _dbContext;
-
         public ActorsService(WebCinemaDBContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public Actors CreateActor(Actors actor)
+        public async Task<Actors> CreateActorAsync(Actors actor)
         {
             if (actor == null)
             {
                 return null;
             }
-            _dbContext.Actors.Add(actor);
-            _dbContext.SaveChanges();
+            await _dbContext.Actors.AddAsync(actor);
+            await _dbContext.SaveChangesAsync();
             return actor;
         }
 
-        public List<Actors> GetAllActors()
+        public async Task<List<Actors>> GetAllActorsAsync()
         {
-            var actors = _dbContext.Actors.ToList();
+            var actors = await _dbContext.Actors.ToListAsync();
             return actors;
         }
 
-        public Actors GetActorById(int id)
+        public async Task<Actors> GetActorByIdAsync(int id)
         {
-            var actor = _dbContext.Actors.FirstOrDefault(x => x.Id == id);
+            var actor = await _dbContext.Actors.FirstOrDefaultAsync(x => x.Id == id);
             return actor;
         }
 
-        public Actors DeleteActorById(int id)
+        public async Task<Actors> DeleteActorByIdAsync(int id)
         {
-            var actor = GetActorById(id);
+            var actor = await GetActorByIdAsync(id);
             if (actor != null)
             {
                 _dbContext.Actors.Remove(actor);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return actor;
         }
 
-        public Actors UpdateActor(int id, Actors actor)
+        public async Task<Actors> UpdateActorsAsync(int id, Actors actor)
         {
-            var _actor = GetActorById(id);
+            var _actor = await GetActorByIdAsync(id);
             if (actor != null)
             {
                 _actor.FirstName = actor.FirstName;
                 _actor.LastName = actor.LastName;
                 _dbContext.Actors.Update(_actor);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return _actor;
         }

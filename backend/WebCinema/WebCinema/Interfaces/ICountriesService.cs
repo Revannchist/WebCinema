@@ -4,14 +4,14 @@ namespace WebCinema.Interfaces
 {
     public interface ICountriesService
     {
-        Countries CreateCountry(Countries country);
+        Task<Countries> CreateCountryAsync(Countries country);
 
-        List<Countries> GetAllCountries();
+        Task<List<Countries>> GetAllCountriesAsync();
 
-        Countries GetCountryById(int id);
+        Task<Countries> GetCountryByIdAsync(int id);
 
-        Countries DeleteCountryById(int id);
+        Task<Countries> DeleteCountryByIdAsync(int id);
 
-        Countries UpdateCountry(int id, Countries country);
+        Task<Countries> UpdateCountryAsync(int id, Countries country);
     }
 }

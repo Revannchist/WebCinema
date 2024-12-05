@@ -1,4 +1,5 @@
-﻿using WebCinema.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using WebCinema.Interfaces;
 using WebCinema.Models;
 
 namespace WebCinema.Services
@@ -12,15 +13,15 @@ namespace WebCinema.Services
             _dbContext = dbContext;
         }
 
-        public Genres GetGenresById(int id)
+        public async Task<Genres> GetGenresByIdAsync(int id)
         {
-            var genre = _dbContext.Genres.FirstOrDefault(x => x.Id == id);
+            var genre = await _dbContext.Genres.FirstOrDefaultAsync(x => x.Id == id);
             return genre;
         }
 
-        public List<Genres> GetAllGenres() 
+        public async Task<List<Genres>> GetAllGenresAsync() 
         {
-            var genres = _dbContext.Genres.ToList();
+            var genres = await _dbContext.Genres.ToListAsync();
             return genres;
         }
     }

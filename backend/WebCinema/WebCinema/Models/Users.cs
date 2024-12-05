@@ -10,5 +10,7 @@
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
         public DateTime RegistrationTime { get; set; }
+
+        //public Roles RoleId { get; set; }
     }
 }

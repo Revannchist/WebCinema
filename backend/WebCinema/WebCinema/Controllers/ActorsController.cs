@@ -16,9 +16,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddActor(Actors actor)
+        public async Task<IActionResult> AddActor(Actors actor)
         {
-            var createdActor = _actorsService.CreateActor(actor);
+            var createdActor = await _actorsService.CreateActorAsync(actor);
             if (createdActor == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -27,9 +27,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteActorById(int id)
+        public async Task<IActionResult> DeleteActorById(int id)
         {
-            var deletedActor = _actorsService.DeleteActorById(id);
+            var deletedActor = await _actorsService.DeleteActorByIdAsync(id);
             if (deletedActor == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -38,9 +38,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateActor(int id, Actors actor)
+        public async Task<IActionResult> UpdateActor(int id, Actors actor)
         {
-            var updatedActor = _actorsService.UpdateActor(id, actor);
+            var updatedActor = await _actorsService.UpdateActorsAsync(id, actor);
             if (updatedActor == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -49,9 +49,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetActorById(int id)
+        public async Task<IActionResult> GetActorById(int id)
         {
-            var actor = _actorsService.GetActorById(id);
+            var actor = await _actorsService.GetActorByIdAsync(id);
             if (actor == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -60,9 +60,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllActors()
+        public async Task<IActionResult> GetAllActors()
         {
-            var actors = _actorsService.GetAllActors();
+            var actors = await _actorsService.GetAllActorsAsync();
             if (actors == null)
             {
                 return BadRequest("Error | Bad Request!");

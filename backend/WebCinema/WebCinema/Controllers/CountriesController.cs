@@ -15,9 +15,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddCountry(Countries country)
+        public async Task<IActionResult> AddCountry(Countries country)
         {
-            var createdCountry = _countryService.CreateCountry(country);
+            var createdCountry = await _countryService.CreateCountryAsync(country);
             if(createdCountry == null)
             {
                 return BadRequest("Greska!");
@@ -25,11 +25,10 @@ namespace WebCinema.Controllers
             return Ok(createdCountry);
         }
 
-
         [HttpPost]
-        public IActionResult DeleteCountryById(int id)
+        public async Task<IActionResult> DeleteCountryById(int id)
         {
-            var deletedCountry = _countryService.DeleteCountryById(id);
+            var deletedCountry = await _countryService.DeleteCountryByIdAsync(id);
             if(deletedCountry == null)
             {
                 return BadRequest("Greska!");
@@ -38,9 +37,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateCountry(int id, Countries country) 
+        public async Task<IActionResult> UpdateCountry(int id, Countries country) 
         {
-            var updatedCountry = _countryService.UpdateCountry(id, country);
+            var updatedCountry = await _countryService.UpdateCountryAsync(id, country);
             if (updatedCountry == null)
             {
                 return BadRequest("Greska!");
@@ -49,9 +48,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetCountryById(int id)
+        public async Task<IActionResult> GetCountryById(int id)
         {
-            var country = _countryService.GetCountryById(id);
+            var country = await _countryService.GetCountryByIdAsync(id);
             if(country == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -60,16 +59,14 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllCountries() 
+        public async Task<IActionResult> GetAllCountries() 
         {
-            var countries = _countryService.GetAllCountries();
+            var countries = await _countryService.GetAllCountriesAsync();
             if(countries == null)
             {
                 return BadRequest("Error | Bad Request!");
             }
             return Ok(countries);
-
         }
-
     }
 }

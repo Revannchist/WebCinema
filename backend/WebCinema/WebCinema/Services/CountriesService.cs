@@ -1,4 +1,5 @@
-﻿using WebCinema.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using WebCinema.Interfaces;
 using WebCinema.Models;
 
 namespace WebCinema.Services
@@ -10,47 +11,47 @@ namespace WebCinema.Services
         {
             _dbContext = dbContext;
         }
-        public Countries CreateCountry(Countries country)
+        public async Task<Countries> CreateCountryAsync(Countries country)
         {
             if(country == null)
             {
                 return null;
             }
-            _dbContext.Countries.Add(country);
-            _dbContext.SaveChanges();
+            await _dbContext.Countries.AddAsync(country);
+            await _dbContext.SaveChangesAsync();
             return country;
         }
 
-        public List<Countries> GetAllCountries()
+        public async Task<List<Countries>> GetAllCountriesAsync()
         {
-            var countries =  _dbContext.Countries.ToList();
+            var countries =  await _dbContext.Countries.ToListAsync();
             return countries;
         }
 
-        public Countries GetCountryById(int id) 
+        public async Task<Countries> GetCountryByIdAsync(int id) 
         {
-            var country = _dbContext.Countries.FirstOrDefault(x => x.Id == id);
+            var country = await _dbContext.Countries.FirstOrDefaultAsync(x => x.Id == id);
             return country;
         }
-        public Countries DeleteCountryById(int id)
+        public async Task<Countries> DeleteCountryByIdAsync(int id)
         {
-            var country = GetCountryById(id);
+            var country = await GetCountryByIdAsync(id);
             if(country != null)
             {
                 _dbContext.Countries.Remove(country);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return country;
         }
 
-        public Countries UpdateCountry(int id, Countries country)
+        public async Task<Countries> UpdateCountryAsync(int id, Countries country)
         {
-            var _country = GetCountryById(id);
+            var _country = await GetCountryByIdAsync(id);
             if(country!= null)
             {
                 _country.Name = country.Name;
                 _dbContext.Countries.Update(_country);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return _country;
         }

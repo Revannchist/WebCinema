@@ -4,14 +4,14 @@ namespace WebCinema.Interfaces
 {
     public interface IActorsService
     {
-        Actors CreateActor(Actors actors);
+        Task<Actors> CreateActorAsync(Actors actors);
 
-        List<Actors> GetAllActors();
+        Task<List<Actors>> GetAllActorsAsync();
 
-        Actors GetActorById(int id);
+        Task<Actors> GetActorByIdAsync(int id);
 
-        Actors DeleteActorById(int id);
+        Task<Actors> DeleteActorByIdAsync(int id);
 
-        Actors UpdateActor(int id, Actors actors);
+        Task<Actors> UpdateActorsAsync(int id, Actors actors);
     }
 }

@@ -1,4 +1,5 @@
-﻿using WebCinema.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using WebCinema.Interfaces;
 using WebCinema.Models;
 
 namespace WebCinema.Services
@@ -12,48 +13,48 @@ namespace WebCinema.Services
             _dbContext = dbContext;
         }
 
-        public Directors CreateDirector(Directors director)
+        public async Task<Directors> CreateDirectorAsync(Directors director)
         {
             if (director == null)
             {
                 return null;
             }
-            _dbContext.Directors.Add(director);
-            _dbContext.SaveChanges();
+            await _dbContext.Directors.AddAsync(director);
+            await _dbContext.SaveChangesAsync();
             return director;
         }
 
-        public List<Directors> GetAllDirectors()
+        public async Task<List<Directors>> GetAllDirectorsAsync()
         {
-            var directors = _dbContext.Directors.ToList();
+            var directors = await _dbContext.Directors.ToListAsync();
             return directors;
         }
 
-        public Directors GetDirectorById(int id)
+        public async Task<Directors> GetDirectorByIdAsync(int id)
         {
-            var director = _dbContext.Directors.FirstOrDefault(x => x.Id == id);
+            var director = await _dbContext.Directors.FirstOrDefaultAsync(x => x.Id == id);
             return director;
         }
-        public Directors DeleteDirectorById(int id)
+        public async Task<Directors> DeleteDirectorByIdAsync(int id)
         {
-            var director = GetDirectorById(id);
+            var director = await GetDirectorByIdAsync(id);
             if (director != null)
             {
                 _dbContext.Directors.Remove(director);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return director;
         }
 
-        public Directors UpdateDirector(int id, Directors director)
+        public async Task<Directors> UpdateDirectorAsync(int id, Directors director)
         {
-            var _director = GetDirectorById(id);
+            var _director = await GetDirectorByIdAsync(id);
             if (director != null)
             {
                 _director.FirstName = director.FirstName;
                 _director.LastName = director.LastName;
                 _dbContext.Directors.Update(_director);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return _director;
         }

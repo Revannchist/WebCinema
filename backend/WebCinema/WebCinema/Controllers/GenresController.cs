@@ -9,16 +9,15 @@ namespace WebCinema.Controllers
     public class GenresController : ControllerBase
     {
         private readonly IGenresService _genresService;
-
         public GenresController(IGenresService genresService)
         {
             _genresService = genresService;
         }
 
         [HttpGet]
-        public IActionResult GetGenresById(int id)
+        public async Task<IActionResult> GetGenresById(int id)
         {
-            var genre = _genresService.GetGenresById(id);
+            var genre = await _genresService.GetGenresByIdAsync(id);
             if (genre == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -27,15 +26,14 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllGenres()
+        public async Task<IActionResult> GetAllGenres()
         {
-            var genres = _genresService.GetAllGenres();
+            var genres = await _genresService.GetAllGenresAsync();
             if (genres == null)
             {
                 return BadRequest("Error | Bad Request!");
             }
             return Ok(genres);
-
         }
     }
 }

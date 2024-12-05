@@ -4,14 +4,14 @@ namespace WebCinema.Interfaces
 {
     public interface IDirectorsService
     {
-        Directors CreateDirector(Directors director);
+        Task<Directors> CreateDirectorAsync(Directors director);
 
-        List<Directors> GetAllDirectors();
+        Task<List<Directors>> GetAllDirectorsAsync();
 
-        Directors GetDirectorById(int id);
+        Task<Directors> GetDirectorByIdAsync(int id);
 
-        Directors DeleteDirectorById(int id);
+        Task<Directors> DeleteDirectorByIdAsync(int id);
 
-        Directors UpdateDirector(int id, Directors directors);
+        Task<Directors> UpdateDirectorAsync(int id, Directors directors);
     }
 }
