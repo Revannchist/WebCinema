@@ -5,16 +5,16 @@ namespace WebCinema.Interfaces
 {
     public interface IUsersService
     {
-        Users CreateUsers(Users users);
+        Task<Users> CreateUsersAsync(Users users);
 
-        List<Users> GetAllUsers();
+        Task<List<Users>> GetAllUsersAsync();
 
-        Users GetUsersById(int id);
+        Task<Users> GetUsersByIdAsync(int id);
 
-        Users DeleteUsersById(int id);
+        Task<Users> DeleteUsersByIdAsync(int id);
 
-        Users UpdateUsers(int id, Users users);
+        Task<Users> UpdateUsersAsync(int id, Users users);
 
-        Users UpdateUserBasicInfo(int id, UsersEditDTO dto);
+        Task<Users> UpdateUserBasicInfoAsync(int id, UsersEditDTO dto);
     }
 }

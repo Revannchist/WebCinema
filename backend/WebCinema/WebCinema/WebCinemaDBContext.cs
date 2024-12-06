@@ -19,6 +19,12 @@ namespace WebCinema
                 new Genres { Id = 5, Name = "Romance" }
                 //dodat ostale zanrove pa samo onda: add-migration GenreData2 -> update-database
                 );
+
+            modelBuilder.Entity<Cities>().HasData(
+                new Cities { Id = 1, Name = "Mostar" },
+                new Cities { Id = 2, Name = "Sarajevo" }
+
+                );
         }
         //pisem DbSet ovdje dole zato jer je tako bilo u Pr3
 
@@ -27,5 +33,7 @@ namespace WebCinema
         public DbSet<Users> Users { get; set; }
         public DbSet<Directors> Directors { get; set; }
         public DbSet<Actors> Actors { get; set; }
+        public DbSet<Cities> Cities { get; set; }
+        public DbSet<Theaters>Theaters { get; set; }
     }
 }

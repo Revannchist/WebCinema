@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Metrics;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 using WebCinema.Interfaces;
 using WebCinema.Models;
 using WebCinema.Models.DTO;
@@ -14,43 +15,43 @@ namespace WebCinema.Services
             _dbContext = dbContext;
         }
 
-        public Users CreateUsers(Users users)
+        public async Task<Users> CreateUsersAsync(Users users)
         {
             if (users == null)
             {
                 return null;
             }
-            _dbContext.Users.Add(users);
-            _dbContext.SaveChanges();
+            await _dbContext.Users.AddAsync(users);
+            await _dbContext.SaveChangesAsync();
             return users;
         }
 
-        public List<Users> GetAllUsers()
+        public async Task<List<Users>> GetAllUsersAsync()
         {
-            var users = _dbContext.Users.ToList();
+            var users = await _dbContext.Users.ToListAsync();
             return users;
         }
 
-        public Users GetUsersById(int id)
+        public async Task<Users> GetUsersByIdAsync(int id)
         {
-            var users = _dbContext.Users.FirstOrDefault(x => x.Id == id);
+            var users = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
             return users;
         }
 
-        public Users DeleteUsersById(int id)
+        public async Task<Users> DeleteUsersByIdAsync(int id)
         {
-            var users = GetUsersById(id);
+            var users = await GetUsersByIdAsync(id);
             if (users != null)
             {
                 _dbContext.Users.Remove(users);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return users;
         }
 
-        public Users UpdateUsers(int id, Users users)
+        public async Task<Users> UpdateUsersAsync(int id, Users users)
         {
-            var _users = GetUsersById(id);
+            var _users = await GetUsersByIdAsync(id);
             if (users != null)
             {
                 _users.Username = users.Username;
@@ -61,21 +62,21 @@ namespace WebCinema.Services
                 _users.DateOfBirth = users.DateOfBirth;
                 _users.RegistrationTime = users.RegistrationTime;
                 _dbContext.Users.Update(_users);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return _users;
         }
 
-        public Users UpdateUserBasicInfo(int id, UsersEditDTO dto) //DTO for editing
+        public async Task<Users> UpdateUserBasicInfoAsync(int id, UsersEditDTO dto) //DTO for editing
         {
-            var user = _dbContext.Users.Find(id);
+            var user = await _dbContext.Users.FindAsync(id);
             if (user != null)
             {
                 user.Username = dto.Username;
                 user.Email = dto.Email;
                 user.Password = dto.Password;
             }
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return user;
         }
     }
