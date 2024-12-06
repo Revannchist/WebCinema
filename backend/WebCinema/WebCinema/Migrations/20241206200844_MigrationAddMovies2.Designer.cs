@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241206200844_MigrationAddMovies2")]
+    partial class MigrationAddMovies2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,15 +169,9 @@ namespace WebCinema.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DirectorId")
-                        .HasColumnType("int");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
@@ -191,10 +188,6 @@ namespace WebCinema.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
-
-                    b.HasIndex("DirectorId");
 
                     b.ToTable("Movies");
                 });
@@ -300,25 +293,6 @@ namespace WebCinema.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Movies", b =>
-                {
-                    b.HasOne("WebCinema.Models.Countries", "Country")
-                        .WithMany("Movie")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Directors", "Director")
-                        .WithMany("Movie")
-                        .HasForeignKey("DirectorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Country");
-
-                    b.Navigation("Director");
-                });
-
             modelBuilder.Entity("WebCinema.Models.MoviesActors", b =>
                 {
                     b.HasOne("WebCinema.Models.Actors", "Actor")
@@ -371,16 +345,6 @@ namespace WebCinema.Migrations
             modelBuilder.Entity("WebCinema.Models.Actors", b =>
                 {
                     b.Navigation("MoviesActors");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Countries", b =>
-                {
-                    b.Navigation("Movie");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Directors", b =>
-                {
-                    b.Navigation("Movie");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Genres", b =>

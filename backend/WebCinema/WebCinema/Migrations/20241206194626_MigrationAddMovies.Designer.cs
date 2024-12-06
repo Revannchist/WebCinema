@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241206194626_MigrationAddMovies")]
+    partial class MigrationAddMovies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,15 +169,9 @@ namespace WebCinema.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DirectorId")
-                        .HasColumnType("int");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
@@ -192,39 +189,20 @@ namespace WebCinema.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryId");
-
-                    b.HasIndex("DirectorId");
-
                     b.ToTable("Movies");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.MoviesActors", b =>
-                {
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ActorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MovieId", "ActorId");
-
-                    b.HasIndex("ActorId");
-
-                    b.ToTable("MoviesActors");
                 });
 
             modelBuilder.Entity("WebCinema.Models.MoviesGenres", b =>
                 {
-                    b.Property<int>("MovieId")
+                    b.Property<int>("MoviesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("GenreId")
+                    b.Property<int>("GenresId")
                         .HasColumnType("int");
 
-                    b.HasKey("MovieId", "GenreId");
+                    b.HasKey("MoviesId", "GenresId");
 
-                    b.HasIndex("GenreId");
+                    b.HasIndex("GenresId");
 
                     b.ToTable("MoviesGenres");
                 });
@@ -300,55 +278,17 @@ namespace WebCinema.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Movies", b =>
-                {
-                    b.HasOne("WebCinema.Models.Countries", "Country")
-                        .WithMany("Movie")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Directors", "Director")
-                        .WithMany("Movie")
-                        .HasForeignKey("DirectorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Country");
-
-                    b.Navigation("Director");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.MoviesActors", b =>
-                {
-                    b.HasOne("WebCinema.Models.Actors", "Actor")
-                        .WithMany("MoviesActors")
-                        .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Movies", "Movie")
-                        .WithMany("MoviesActors")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Actor");
-
-                    b.Navigation("Movie");
-                });
-
             modelBuilder.Entity("WebCinema.Models.MoviesGenres", b =>
                 {
                     b.HasOne("WebCinema.Models.Genres", "Genre")
                         .WithMany("MoviesGenres")
-                        .HasForeignKey("GenreId")
+                        .HasForeignKey("GenresId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WebCinema.Models.Movies", "Movie")
                         .WithMany("MoviesGenres")
-                        .HasForeignKey("MovieId")
+                        .HasForeignKey("MoviesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -368,21 +308,6 @@ namespace WebCinema.Migrations
                     b.Navigation("City");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Actors", b =>
-                {
-                    b.Navigation("MoviesActors");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Countries", b =>
-                {
-                    b.Navigation("Movie");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Directors", b =>
-                {
-                    b.Navigation("Movie");
-                });
-
             modelBuilder.Entity("WebCinema.Models.Genres", b =>
                 {
                     b.Navigation("MoviesGenres");
@@ -390,8 +315,6 @@ namespace WebCinema.Migrations
 
             modelBuilder.Entity("WebCinema.Models.Movies", b =>
                 {
-                    b.Navigation("MoviesActors");
-
                     b.Navigation("MoviesGenres");
                 });
 #pragma warning restore 612, 618

@@ -1,4 +1,6 @@
-﻿namespace WebCinema.Models
+﻿using System.Data;
+
+namespace WebCinema.Models
 {
     public class Users
     {
@@ -11,6 +13,10 @@
         public DateTime DateOfBirth { get; set; }
         public DateTime RegistrationTime { get; set; }
 
-        //public Roles RoleId { get; set; }
+        //public int RoleId { get; set; }
+        //public Role? Role { get; set; }
+
+        //public string Token { get; set; }
+        //public string? VerificationToken { get; set; }
     }
 }
