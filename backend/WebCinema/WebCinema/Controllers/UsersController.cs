@@ -41,7 +41,7 @@ namespace WebCinema.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateUser(int id, Users users)
         {
-            var updatedUsers= await _usersService.UpdateUsersAsync(id, users);
+            var updatedUsers = await _usersService.UpdateUsersAsync(id, users);
             if (updatedUsers == null)
             {
                 return BadRequest("Error | Bad Request!");

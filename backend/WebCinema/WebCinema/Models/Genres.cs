@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebCinema.Models
 {
@@ -8,7 +9,8 @@ namespace WebCinema.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public ICollection<MoviesGenres> MoviesGenres { get; set; }
+        [JsonIgnore]
+        public ICollection<MoviesGenres>? MoviesGenres { get; set; }
 
         //[NotMapped] //nez treba li ovo
         //public int MoviesId { get; set; }

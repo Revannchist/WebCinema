@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebCinema.Models
 {
@@ -10,6 +11,7 @@ namespace WebCinema.Models
 
         public string LastName { get; set; }
 
-        public ICollection<MoviesActors> MoviesActors { get; set; }
+        [JsonIgnore]
+        public ICollection<MoviesActors>? MoviesActors { get; set; }
     }
 }

@@ -51,21 +51,18 @@ namespace WebCinema
                 .HasOne(sc => sc.Actor)
                 .WithMany(c => c.MoviesActors)
                 .HasForeignKey(sc => sc.ActorId);
-
-
             //------------------------------------------------------//
             modelBuilder.Entity<Movies>()
                 .HasOne(b => b.Director)
                 .WithMany(a => a.Movie)
                 .HasForeignKey(b => b.DirectorId);
             //------------------------------------------------------//
-            modelBuilder.Entity<Movies>()
-                .HasOne(b => b.Country)
-                .WithMany(a => a.Movie)
-                .HasForeignKey(b => b.CountryId);
+            modelBuilder.Entity<Directors>()
+                .HasMany(d => d.Movie)
+                .WithOne(m => m.Director)
+                .HasForeignKey(m => m.DirectorId)
+                .OnDelete(DeleteBehavior.Restrict);
             //------------------------------------------------------//
-
-
 
 
         }
@@ -78,6 +75,10 @@ namespace WebCinema
         public DbSet<Actors> Actors { get; set; }
         public DbSet<Cities> Cities { get; set; }
         public DbSet<Theaters>Theaters { get; set; }
+        public DbSet<Movies> Movies { get; set; }
+        public DbSet<MoviesGenres> MoviesGenres { get; set; }
+        public DbSet<MoviesActors> MoviesActors { get; set; }
+
         public DbSet<Halls>Halls { get; set; }
         public DbSet<Seats>Seats { get; set; }
     }
