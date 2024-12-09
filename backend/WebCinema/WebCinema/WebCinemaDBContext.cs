@@ -78,5 +78,7 @@ namespace WebCinema
         public DbSet<Actors> Actors { get; set; }
         public DbSet<Cities> Cities { get; set; }
         public DbSet<Theaters>Theaters { get; set; }
+        public DbSet<Halls>Halls { get; set; }
+        public DbSet<Seats>Seats { get; set; }
     }
 }

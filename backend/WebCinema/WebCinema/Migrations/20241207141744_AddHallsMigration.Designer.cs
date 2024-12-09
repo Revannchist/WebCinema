@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241207141744_AddHallsMigration")]
+    partial class AddHallsMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,31 +261,6 @@ namespace WebCinema.Migrations
                     b.ToTable("MoviesGenres");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Seats", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("HallsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SeatNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SeatType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HallsId");
-
-                    b.ToTable("Seats");
-                });
-
             modelBuilder.Entity("WebCinema.Models.Theaters", b =>
                 {
                     b.Property<int>("Id")
@@ -422,17 +400,6 @@ namespace WebCinema.Migrations
                     b.Navigation("Genre");
 
                     b.Navigation("Movie");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Seats", b =>
-                {
-                    b.HasOne("WebCinema.Models.Halls", "Hall")
-                        .WithMany()
-                        .HasForeignKey("HallsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Hall");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Theaters", b =>

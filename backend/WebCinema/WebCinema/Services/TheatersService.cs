@@ -8,9 +8,11 @@ namespace WebCinema.Services
     public class TheatersService : ITheatersService
     {
         private readonly WebCinemaDBContext _dbContext;
-        public TheatersService(WebCinemaDBContext dbContext)
+        private readonly ICitiesService _citiesService;
+        public TheatersService(WebCinemaDBContext dbContext,ICitiesService citiesService)
         {
             _dbContext = dbContext;
+            _citiesService = citiesService;
         }
         public async Task<Theaters> CreateTheatersAsync(Theaters theaters)
         {
@@ -37,12 +39,16 @@ namespace WebCinema.Services
         public async Task<List<Theaters>> GetAllTheatersAsync()
         {
             var theaters = await _dbContext.Theaters.ToListAsync();
+
             return theaters;
         }
+
+
 
         public async Task<Theaters> GetTheatersByIdAsync(int id)
         {
             var theaters = await _dbContext.Theaters.FirstOrDefaultAsync(x => x.Id == id);
+            theaters.City = await _citiesService.GetCitiesByIdAsync(theaters.CityId);
             return theaters;
         }
 
@@ -52,6 +58,9 @@ namespace WebCinema.Services
             if (theaters != null)
             {
                 _theaters.Name = theaters.Name;
+                _theaters.Adress=theaters.Adress;
+                _theaters.PostalCode = theaters.PostalCode;
+                _theaters.PhoneNumber= theaters.PhoneNumber;
                 _dbContext.Theaters.Update(_theaters);
                 await _dbContext.SaveChangesAsync();
             }

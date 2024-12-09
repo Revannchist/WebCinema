@@ -11,7 +11,7 @@ namespace WebCinema.Models
         [ForeignKey("CityId")]
         public Cities? City { get; set; }
         public string Adress { get; set; }
-        public int PostalCode { get; set; } //stavit da je string
-        public int PhoneNumber { get; set; } //stavit da je string
+        public string PostalCode { get; set; } 
+        public string PhoneNumber { get; set; } 
     }
 }
