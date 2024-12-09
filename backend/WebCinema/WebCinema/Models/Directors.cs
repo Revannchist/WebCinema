@@ -1,4 +1,6 @@
-﻿namespace WebCinema.Models
+﻿using System.Text.Json.Serialization;
+
+namespace WebCinema.Models
 {
     public class Directors
     {
@@ -6,6 +8,7 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public ICollection<Movies> Movie { get; set; }
+        [JsonIgnore]
+        public ICollection<Movies>? Movie { get; set; }
     }
 }

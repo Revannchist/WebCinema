@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace WebCinema.Models
+namespace WebCinema.Models.DTO
 {
-    public class Movies
+    public class MoviesGetDTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -25,12 +25,7 @@ namespace WebCinema.Models
         [JsonIgnore]
         public Countries? Country { get; set; }
 
-        [JsonIgnore]
-        public ICollection<MoviesGenres>? MoviesGenres { get; set; }
-
-        [JsonIgnore]
-        public ICollection<MoviesActors>? MoviesActors { get; set; }
-
-        //treba jos dodat Id od Ratings, ali kasnije kada napravimo tu tabelu
+        public List<int>? MoviesGenresIds { get; set; }
+        public List<int>? MoviesActorsIds { get; set; }
     }
 }
