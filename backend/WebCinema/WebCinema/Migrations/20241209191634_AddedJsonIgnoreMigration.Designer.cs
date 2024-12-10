@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241209191634_AddedJsonIgnoreMigration")]
+    partial class AddedJsonIgnoreMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,54 +44,6 @@ namespace WebCinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Actors");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Booked_Seats", b =>
-                {
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SeatsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BookingId", "SeatsId");
-
-                    b.HasIndex("SeatsId");
-
-                    b.ToTable("Booked_Seats");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Bookings", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("BookingDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("BookingStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ShowTimesId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShowTimesId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Cities", b =>
@@ -306,74 +261,6 @@ namespace WebCinema.Migrations
                     b.ToTable("MoviesGenres");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Payments", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("PaymentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TransactionID")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Ratings", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RatingDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Review")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MoviesId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("Ratings");
-                });
-
             modelBuilder.Entity("WebCinema.Models.Seats", b =>
                 {
                     b.Property<int>("Id")
@@ -397,35 +284,6 @@ namespace WebCinema.Migrations
                     b.HasIndex("HallsId");
 
                     b.ToTable("Seats");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.ShowTimes", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("HallsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MoviesId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ShowDateTieme")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("TicketPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HallsId");
-
-                    b.HasIndex("MoviesId");
-
-                    b.ToTable("ShowTimes");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Theaters", b =>
@@ -501,44 +359,6 @@ namespace WebCinema.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Booked_Seats", b =>
-                {
-                    b.HasOne("WebCinema.Models.Bookings", "Bookings")
-                        .WithMany("Booked_Seats")
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Seats", "Seats")
-                        .WithMany("Booked_Seats")
-                        .HasForeignKey("SeatsId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Bookings");
-
-                    b.Navigation("Seats");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Bookings", b =>
-                {
-                    b.HasOne("WebCinema.Models.ShowTimes", "ShowTimes")
-                        .WithMany()
-                        .HasForeignKey("ShowTimesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Users", "User")
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ShowTimes");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WebCinema.Models.Halls", b =>
                 {
                     b.HasOne("WebCinema.Models.Theaters", "Theater")
@@ -607,36 +427,6 @@ namespace WebCinema.Migrations
                     b.Navigation("Movie");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Payments", b =>
-                {
-                    b.HasOne("WebCinema.Models.Bookings", "Bookings")
-                        .WithMany()
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bookings");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Ratings", b =>
-                {
-                    b.HasOne("WebCinema.Models.Movies", "Movies")
-                        .WithMany()
-                        .HasForeignKey("MoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Users", "Users")
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movies");
-
-                    b.Navigation("Users");
-                });
-
             modelBuilder.Entity("WebCinema.Models.Seats", b =>
                 {
                     b.HasOne("WebCinema.Models.Halls", "Hall")
@@ -646,25 +436,6 @@ namespace WebCinema.Migrations
                         .IsRequired();
 
                     b.Navigation("Hall");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.ShowTimes", b =>
-                {
-                    b.HasOne("WebCinema.Models.Halls", "Halls")
-                        .WithMany()
-                        .HasForeignKey("HallsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Movies", "Movies")
-                        .WithMany()
-                        .HasForeignKey("MoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Halls");
-
-                    b.Navigation("Movies");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Theaters", b =>
@@ -681,11 +452,6 @@ namespace WebCinema.Migrations
             modelBuilder.Entity("WebCinema.Models.Actors", b =>
                 {
                     b.Navigation("MoviesActors");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Bookings", b =>
-                {
-                    b.Navigation("Booked_Seats");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Countries", b =>
@@ -708,11 +474,6 @@ namespace WebCinema.Migrations
                     b.Navigation("MoviesActors");
 
                     b.Navigation("MoviesGenres");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Seats", b =>
-                {
-                    b.Navigation("Booked_Seats");
                 });
 #pragma warning restore 612, 618
         }

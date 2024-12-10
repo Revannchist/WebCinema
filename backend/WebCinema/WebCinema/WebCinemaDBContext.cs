@@ -51,7 +51,7 @@ namespace WebCinema
                 .HasOne(sc => sc.Actor)
                 .WithMany(c => c.MoviesActors)
                 .HasForeignKey(sc => sc.ActorId);
-            //------------------------------------------------------//
+            //------------------------------------------------------//dva naredna nisu neophodna
             modelBuilder.Entity<Movies>()
                 .HasOne(b => b.Director)
                 .WithMany(a => a.Movie)
@@ -62,6 +62,23 @@ namespace WebCinema
                 .WithOne(m => m.Director)
                 .HasForeignKey(m => m.DirectorId)
                 .OnDelete(DeleteBehavior.Restrict);
+            //------------------------------------------------------//
+
+            modelBuilder.Entity<Booked_Seats>()
+                .HasKey(bs => new { bs.BookingId, bs.SeatsId });
+
+            modelBuilder.Entity<Booked_Seats>()
+                .HasOne(bs => bs.Bookings)
+                .WithMany(b => b.Booked_Seats)
+                .HasForeignKey(bs => bs.BookingId)
+                .OnDelete(DeleteBehavior.Restrict); // Ovdje Restrict umjesto CASCADE
+
+            modelBuilder.Entity<Booked_Seats>()
+                .HasOne(bs => bs.Seats)
+                .WithMany(s => s.Booked_Seats)
+                .HasForeignKey(bs => bs.SeatsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             //------------------------------------------------------//
 
 
@@ -78,8 +95,11 @@ namespace WebCinema
         public DbSet<Movies> Movies { get; set; }
         public DbSet<MoviesGenres> MoviesGenres { get; set; }
         public DbSet<MoviesActors> MoviesActors { get; set; }
-
         public DbSet<Halls>Halls { get; set; }
         public DbSet<Seats>Seats { get; set; }
+        public DbSet<ShowTimes>ShowTimes { get; set; }
+        public DbSet<Ratings> Ratings { get; set; }
+        public DbSet<Bookings> Bookings { get; set; }
+        public DbSet<Payments>Payments { get; set; }
     }
 }

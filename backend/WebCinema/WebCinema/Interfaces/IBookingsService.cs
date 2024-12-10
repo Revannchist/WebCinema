@@ -1,0 +1,20 @@
+﻿using WebCinema.Models;
+using WebCinema.Models.DTO;
+
+namespace WebCinema.Interfaces
+{
+    public interface IBookingsService
+    {
+        Task<Bookings> CreateBookingsAsync(Bookings bookings);
+
+        Task<List<Bookings>> GetAllBookingsAsync();
+
+        Task<Bookings> GetBookingsByIdAsync(int id);
+
+        Task<Bookings> DeleteBookingsByIdAsync(int id);
+
+        Task<Bookings> UpdateBookingsAsync(int id, Bookings bookings);
+
+        Task<Bookings>UpdateBookingsBasicInfoAsync(int id,BookingsEditDTO dto);
+    }
+}

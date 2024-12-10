@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebCinema.Models
 {
@@ -7,8 +8,14 @@ namespace WebCinema.Models
         public int Id { get; set; }
         public int HallsId { get; set; }
         [ForeignKey("HallsId")]
+
+        [JsonIgnore]
         public Halls? Hall { get; set; }
         public int SeatNumber { get; set; }
         public string SeatType { get; set; }
+        [JsonIgnore]
+        public ICollection<Booked_Seats>? Booked_Seats { get; set; }
+
+
     }
 }
