@@ -15,7 +15,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCountry(Countries country)
+        public async Task<IActionResult> AddCountry([FromBody]Countries country)
         {
             var createdCountry = await _countryService.CreateCountryAsync(country);
             if(createdCountry == null)

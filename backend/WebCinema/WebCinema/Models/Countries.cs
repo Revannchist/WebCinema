@@ -8,6 +8,6 @@ namespace WebCinema.Models
         public string Name { get; set; }
 
         [JsonIgnore]
-        public ICollection<Movies> Movie { get; set; }
+        public ICollection<Movies>? Movie { get; set; }
     }
 }

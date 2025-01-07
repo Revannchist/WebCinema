@@ -1,0 +1,24 @@
+<p>genres works!</p>
+
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Genres</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of genres">
+        <td>{{item.name}}</td>
+        <td>
+          <button class="btn btn-outline-danger">Obriši</button>
+        </td>
+        <td>
+          <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#detalji">Detalji</button>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+
+<button class="btn btn-outline-danger">Dodaj</button>
