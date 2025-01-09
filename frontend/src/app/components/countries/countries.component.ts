@@ -20,8 +20,7 @@ export class CountriesComponent {
       this.countries = x;
       this.filteredCountries = x;
       console.log(this.countries);
-  }
-)
+  })
 }
 
 deleteCountry(country:any):void{
