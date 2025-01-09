@@ -11,10 +11,10 @@ export class GenresComponent {
   constructor(private http:HttpClient){}
   public genres:any
 
-ngOnInit():void{
-  this.http.get(MyConfig.APIurl + '/api/Genres/GetAllGenres').subscribe(x=>{
-    this.genres = x;
-    console.log(this.genres);
-  })
-}
+  ngOnInit():void{
+    this.http.get(MyConfig.APIurl + '/api/Genres/GetAllGenres').subscribe(x=>{
+      this.genres = x;
+      console.log(this.genres);
+    })
+  }
 }

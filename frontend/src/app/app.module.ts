@@ -8,11 +8,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { GenresComponent } from './components/genres/genres.component';
 import { CountriesComponent } from './components/countries/countries.component';
 import { FormsModule } from '@angular/forms';
+import { MoviesComponent } from './components/movies/movies.component';
 
 const routes:Routes=[
   //{path:'test',component:TestComponent},
   {path:'genres',component:GenresComponent},
-  {path:'countries',component:CountriesComponent}
+  {path:'countries',component:CountriesComponent},
+  {path:'movies',component:MoviesComponent}
 ]
 @NgModule({
   declarations: [
@@ -20,6 +22,7 @@ const routes:Routes=[
     //TestComponent,
     GenresComponent,
     CountriesComponent,
+    MoviesComponent,
   ],
   imports: [
     BrowserModule,

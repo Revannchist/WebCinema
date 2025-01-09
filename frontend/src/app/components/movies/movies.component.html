@@ -1,0 +1,60 @@
+<p>movies works!</p>
+
+<input type="text" placeholder="Pretraga..." id="search" name="search" [(ngModel)]="search" (ngModelChange)="filteredMovies()">
+
+
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">movies</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of filteredMovies">
+        <td>{{item.name}}</td>
+        <td>
+          <button (click)="deleteMovie(item)" class="btn btn-outline-danger">Obriši</button>
+        </td>
+        <td>
+          <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#detalji">Uredi</button>
+        </td>
+      </tr>
+    </tbody>
+</table>
+
+  <button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#kreiraj">Create movie</button>
+  <div class="modal fade" id="detalji" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit movie</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Movie: <input><br>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zatvori</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Spasi promjene</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="kreiraj" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Kreiraj državu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Naziv: <br><input [(ngModel)]="addMovie.title">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zatvori</button>
+          <button (click)="addMovie()" type="button" class="btn btn-primary" data-bs-dismiss="modal">Kreiraj</button>
+        </div>
+      </div>
+    </div>
+  </div>
