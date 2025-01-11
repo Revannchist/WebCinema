@@ -15,6 +15,6 @@ namespace WebCinema.Interfaces
 
         Task<Users> UpdateUsersAsync(int id, Users users);
 
-        Task<Users> UpdateUserBasicInfoAsync(int id, UsersEditDTO dto);
+        Task<Users> UpdateUserBasicInfoAsync(int id, UsersEditDto dto);
     }
 }

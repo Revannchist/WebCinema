@@ -15,6 +15,6 @@ namespace WebCinema.Interfaces
 
         Task<Bookings> UpdateBookingsAsync(int id, Bookings bookings);
 
-        Task<Bookings>UpdateBookingsBasicInfoAsync(int id,BookingsEditDTO dto);
+        Task<Bookings>UpdateBookingsBasicInfoAsync(int id,BookingsEditDto dto);
     }
 }

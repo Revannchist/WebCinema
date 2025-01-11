@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace WebCinema.Models.DTO
 {
-    public class MoviesGetDTO
+    public class MoviesGetDto
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -12,20 +12,9 @@ namespace WebCinema.Models.DTO
         public int Duration { get; set; } //in minutes
         public string Language { get; set; }
         public string AgeRating { get; set; }
-
-        public int DirectorId { get; set; }
-        [ForeignKey("DirectorId")]
-
-        [JsonIgnore]
-        public Directors? Director { get; set; }
-
-        public int CountryId { get; set; }
-        [ForeignKey("CountryId")]
-
-        [JsonIgnore]
-        public Countries? Country { get; set; }
-
-        public List<int>? MoviesGenresIds { get; set; }
-        public List<int>? MoviesActorsIds { get; set; }
+        public DirectorDto DirectorId { get; set; }
+        public CountryDto CountryId { get; set; }
+        public List<int> MoviesGenresIds { get; set; }
+        public List<int> MoviesActorsIds { get; set; }
     }
 }

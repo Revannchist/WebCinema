@@ -25,6 +25,20 @@ namespace WebCinema
                 new Cities { Id = 2, Name = "Sarajevo" }
                 );
 
+            modelBuilder.Entity<Countries>().HasData(
+                new Countries { Id = 1, Name = "BiH" },
+                new Countries { Id = 2, Name = "Germany" }
+                );
+
+            modelBuilder.Entity<Actors>().HasData(
+                new Actors { Id = 1, FirstName = "Brad", LastName = "Pitt" },
+                new Actors { Id = 2, FirstName = "Angelina", LastName = "Jolie" }
+                );
+
+            modelBuilder.Entity<Directors>().HasData(
+                new Directors { Id = 1, FirstName = "Hilk", LastName = "Hogan" },
+                new Directors { Id = 2, FirstName = "Christopher", LastName = "Nolan" }
+                );
             //------------------------------------------------------//
             modelBuilder.Entity<MoviesGenres>()
                 .HasKey(sc => new { sc.MovieId, sc.GenreId });
@@ -33,6 +47,7 @@ namespace WebCinema
                 .HasOne(sc => sc.Movie)
                 .WithMany(s => s.MoviesGenres)
                 .HasForeignKey(sc => sc.MovieId);
+
 
             modelBuilder.Entity<MoviesGenres>()
                 .HasOne(sc => sc.Genre)
@@ -51,17 +66,18 @@ namespace WebCinema
                 .HasOne(sc => sc.Actor)
                 .WithMany(c => c.MoviesActors)
                 .HasForeignKey(sc => sc.ActorId);
-            //------------------------------------------------------//dva naredna nisu neophodna
+            //------------------------------------------------------//-------------------//
+
             modelBuilder.Entity<Movies>()
                 .HasOne(b => b.Director)
                 .WithMany(a => a.Movie)
-                .HasForeignKey(b => b.DirectorId);
+                .HasForeignKey(b => b.DirectorId)
+                .OnDelete(DeleteBehavior.SetNull);
             //------------------------------------------------------//
             modelBuilder.Entity<Directors>()
                 .HasMany(d => d.Movie)
                 .WithOne(m => m.Director)
-                .HasForeignKey(m => m.DirectorId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(m => m.DirectorId);
             //------------------------------------------------------//
 
             modelBuilder.Entity<Booked_Seats>()
@@ -83,7 +99,6 @@ namespace WebCinema
 
 
         }
-        //pisem DbSet ovdje dole zato jer je tako bilo u Pr3
 
         public DbSet<Countries> Countries { get; set; }
         public DbSet<Genres> Genres { get; set; }

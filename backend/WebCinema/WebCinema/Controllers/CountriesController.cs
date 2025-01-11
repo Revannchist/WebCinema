@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Controllers
 {
@@ -15,7 +16,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCountry([FromBody]Countries country)
+        public async Task<IActionResult> AddCountry(Countries country)
         {
             var createdCountry = await _countryService.CreateCountryAsync(country);
             if(createdCountry == null)

@@ -1,6 +1,6 @@
 ﻿namespace WebCinema.Models.DTO
 {
-    public class UsersEditDTO
+    public class UsersEditDto
     {
         public string Username { get; set; }
         public string Email { get; set; }

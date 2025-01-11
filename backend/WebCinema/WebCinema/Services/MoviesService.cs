@@ -10,72 +10,97 @@ namespace WebCinema.Services
 
         private readonly WebCinemaDBContext _dbContext;
         private readonly ILogger<MoviesService> _logger;
-        private readonly ICountriesService _countriesService;
-        private readonly IDirectorsService _directorsService;
 
-        public MoviesService(WebCinemaDBContext dbContext, ILogger<MoviesService> logger,
-            ICountriesService countriesService, IDirectorsService directorsService)
+        public MoviesService(WebCinemaDBContext dbContext, ILogger<MoviesService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
-            _countriesService = countriesService;
-            _directorsService = directorsService;
         }
 
-        public async Task<Movies> CreateMovieAsync(Movies movie)
+        public async Task<MovieResponseDto> CreateMovieAsync(MovieCreateDto movieDto)
+        {
+            var movie = new Movies
+            {
+                Title = movieDto.Title,
+                Description = movieDto.Description,
+                ReleaseDate = movieDto.ReleaseDate,
+                Duration = movieDto.Duration,
+                Language = movieDto.Language,
+                AgeRating = movieDto.AgeRating,
+                DirectorId = movieDto.DirectorId,
+                CountryId = movieDto.CountryId,
+                MoviesGenres = movieDto.GenreIds?.Select(genreId => new MoviesGenres { GenreId = genreId }).ToList(),
+                MoviesActors = movieDto.ActorIds?.Select(actorId => new MoviesActors { ActorId = actorId }).ToList()
+            };
+
+            await _dbContext.Movies.AddAsync(movie);
+            await _dbContext.SaveChangesAsync();
+
+            // Load related data for response
+            await _dbContext.Entry(movie)
+                .Reference(m => m.Director)
+                .LoadAsync();
+
+            await _dbContext.Entry(movie)
+                .Reference(m => m.Country)
+                .LoadAsync();
+
+            await _dbContext.Entry(movie)
+                .Collection(m => m.MoviesGenres)
+                .Query()
+                .Include(mg => mg.Genre)
+                .LoadAsync();
+
+            await _dbContext.Entry(movie)
+                .Collection(m => m.MoviesActors)
+                .Query()
+                .Include(ma => ma.Actor)
+                .LoadAsync();
+
+            return new MovieResponseDto
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Description = movie.Description,
+                ReleaseDate = movie.ReleaseDate,
+                Duration = movie.Duration,
+                Language = movie.Language,
+                AgeRating = movie.AgeRating,
+                Director = movie.Director != null ? new DirectorDto
+                {
+                    Id = movie.Director.Id,
+                    FirstName = movie.Director.FirstName,
+                    LastName = movie.Director.LastName
+                } : null,
+
+                Country = movie.Country != null ? new CountryDto
+                {
+                    Id = movie.Country.Id,
+                    Name = movie.Country.Name
+                } : null,
+                Genres = movie.MoviesGenres?.Select(mg => new GenreDto
+                {
+                    Id = mg.Genre.Id,
+                    Name = mg.Genre.Name
+                }).ToList(),
+
+                Actors = movie.MoviesActors?.Select(ma => new ActorDto
+                {
+                    Id = ma.Actor.Id,
+                    FirstName = ma.Actor.FirstName, 
+                    LastName = ma.Actor.LastName
+                }).ToList()
+            };
+        }
+
+        public async Task<MoviesGetDto> GetMovieByIdAsync(int id)
         {
             try
             {
-                if (movie == null)//validacija inputa
-                {
-                    _logger.LogWarning("Attempt to add NULL Movie!");
-                    return null;
-                }
-
-                // Validira foreign key reference za Directors 
-                if (movie.DirectorId != 0 && !await _dbContext.Directors.AnyAsync(d => d.Id == movie.DirectorId))
-                {
-                    _logger.LogWarning($"Invalid DirectorId: {movie.DirectorId}");
-                    throw new InvalidOperationException("Invalid DirectorId");
-                }
-
-                //Validira foreign key referenc za Countries
-                if (movie.CountryId != 0 && !await _dbContext.Countries.AnyAsync(c => c.Id == movie.CountryId))
-                {
-                    _logger.LogWarning($"Invalid CountryId: {movie.CountryId}");
-                    throw new InvalidOperationException("Invalid CountryId");
-                }
-
-                var existingMovie = await _dbContext.Movies
-                    .FirstOrDefaultAsync(m => m.Title == movie.Title && m.ReleaseDate == movie.ReleaseDate);
-                //Ova validacija za release date vjv nije potrebna jer moze bit vise filmova da izadju na isti datum
-
-                if (existingMovie != null)
-                {
-                    _logger.LogWarning($"Movie with title: '{movie.Title}' already exists");
-                    throw new InvalidOperationException("Movie with the same title already exists!");
-                }
-
-                await _dbContext.Movies.AddAsync(movie);
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation($"Movie created successfully: {movie.Id} - {movie.Title}");
-                return movie;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error creating movie: {ex.Message}");
-                throw;
-            }
-        }
-
-        public async Task<List<MoviesGetDTO>> GetAllMoviesAsync()
-        {
-            try
-            {
-                var movies = await _dbContext.Movies
+                var movie = await _dbContext.Movies
                     .AsNoTracking()
-                    .Select(m => new MoviesGetDTO
+                    .Where(m => m.Id == id)
+                    .Select(m => new MoviesGetDto
                     {
                         Id = m.Id,
                         Title = m.Title,
@@ -84,12 +109,72 @@ namespace WebCinema.Services
                         Duration = m.Duration,
                         Language = m.Language,
                         AgeRating = m.AgeRating,
-                        DirectorId = m.Director != null ? m.Director.Id : 0,
-                        Director = m.Director,
-                        CountryId = m.Country != null ? m.Country.Id : 0,
-                        Country = m.Country,
-                        MoviesGenresIds = m.MoviesGenres.Select(mg => mg.GenreId).ToList(),
-                        MoviesActorsIds = m.MoviesActors.Select(ma => ma.ActorId).ToList()
+                        DirectorId = m.Director != null ? new DirectorDto 
+                        {                                                 
+                            Id = m.Director.Id,
+                            FirstName = m.Director.FirstName,
+                            LastName = m.Director.LastName
+                        } : null,
+                        CountryId = new CountryDto
+                        {
+                            Id = m.Country.Id,
+                            Name = m.Country.Name
+                        },
+                        MoviesGenresIds = m.MoviesGenres
+                            .Select(mg => mg.GenreId)
+                            .ToList(),
+                        MoviesActorsIds = m.MoviesActors
+                            .Select(ma => ma.ActorId)
+                            .ToList()
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (movie == null)
+                {
+                    throw new KeyNotFoundException($"Movie with ID {id} not found");
+                }
+
+                return movie;
+            }
+            catch (Exception ex) when (ex is not KeyNotFoundException)
+            {
+                _logger.LogError(ex, "Error retrieving movie with ID {MovieId}", id);
+                throw;
+            }
+        }
+
+        public async Task<List<MoviesGetDto>> GetAllMoviesAsync()
+        {
+            try
+            {
+                var movies = await _dbContext.Movies
+                    .AsNoTracking()
+                    .Select(m => new MoviesGetDto
+                    {
+                        Id = m.Id,
+                        Title = m.Title,
+                        Description = m.Description,
+                        ReleaseDate = m.ReleaseDate,
+                        Duration = m.Duration,
+                        Language = m.Language,
+                        AgeRating = m.AgeRating,
+                        DirectorId = m.Director != null ? new DirectorDto //U slucaju da korisnik izbrise direktora
+                        {                                                 //ovo omogucava da film bude prikazan iako nema direktora
+                            Id = m.Director.Id,
+                            FirstName = m.Director.FirstName,
+                            LastName = m.Director.LastName
+                        } : null,
+                        CountryId = new CountryDto
+                        {
+                            Id = m.Country.Id,
+                            Name = m.Country.Name
+                        },
+                        MoviesGenresIds = m.MoviesGenres
+                            .Select(mg => mg.GenreId)
+                            .ToList(),
+                        MoviesActorsIds = m.MoviesActors
+                            .Select(ma => ma.ActorId)
+                            .ToList()
                     })
                     .ToListAsync();
 
@@ -98,46 +183,6 @@ namespace WebCinema.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all movies");
-                throw;
-            }
-        }
-
-        public async Task<MoviesGetDTO?> GetMovieByIdAsync(int id)
-        {
-            try
-            {
-                var movie = await _dbContext.Movies
-                   //.Include(m => m.Ratings) --Kada napravimo Ratings model ovo cemo dodat
-                   .AsNoTracking()
-                   .Where(x =>  x.Id == id)
-                   .Select(m => new MoviesGetDTO
-                   {
-                       Id = m.Id,
-                       Title = m.Title,
-                       Description = m.Description,
-                       ReleaseDate = m.ReleaseDate,
-                       Duration = m.Duration,
-                       Language = m.Language,
-                       AgeRating = m.AgeRating,
-                       DirectorId = m.Director != null ? m.Director.Id : 0,
-                       Director = m.Director,
-                       CountryId = m.Country != null ? m.Country.Id : 0,
-                       Country = m.Country,
-                       MoviesGenresIds = m.MoviesGenres.Select(mg => mg.GenreId).ToList(),
-                       MoviesActorsIds = m.MoviesActors.Select(ma => ma.ActorId).ToList()
-                   })
-                   .FirstOrDefaultAsync();
-
-                if (movie == null)
-                {
-                    _logger.LogWarning($"Movie not found with ID: {id}");
-                }
-
-                return movie;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving movie with ID: {id}");
                 throw;
             }
         }
@@ -166,64 +211,127 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<Movies> UpdateMovieAsync(int id, Movies movie)
+        public async Task<MovieResponseDto> UpdateMovieAsync(int id, MoviesUpdateDto movieDto)
         {
-            try
+            var existingMovie = await _dbContext.Movies
+                .Include(m => m.MoviesGenres)
+                .Include(m => m.MoviesActors)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (existingMovie == null)
             {
-                var existingMovie = await _dbContext.Movies.FindAsync(id);
-
-                if (existingMovie == null)
-                {
-                    _logger.LogWarning($"Movie not found for update: {id}");
-                    return null;
-                }
-
-                if (movie.DirectorId != 0 && !await _dbContext.Directors.AnyAsync(d => d.Id == movie.DirectorId))
-                {
-                    _logger.LogWarning($"Invalid DirectorId during update: {movie.DirectorId}");
-                    throw new InvalidOperationException("Invalid DirectorId");
-                }
-
-                if (movie.CountryId != 0 && !await _dbContext.Countries.AnyAsync(c => c.Id == movie.CountryId))
-                {
-                    _logger.LogWarning($"Invalid CountryId during update: {movie.CountryId}");
-                    throw new InvalidOperationException("Invalid CountryId");
-                }
-
-                var duplicateMovie = await _dbContext.Movies
-                    .FirstOrDefaultAsync(m =>
-                        m.Title == movie.Title &&
-                        m.ReleaseDate == movie.ReleaseDate &&
-                        m.Id != id);
-
-                if (duplicateMovie != null)
-                {
-                    _logger.LogWarning($"Update failed: Movie with same title and release date already exists");
-                    throw new InvalidOperationException("Movie with same title and release date already exists");
-                }
-
-                existingMovie.Title = movie.Title;
-                existingMovie.Description = movie.Description;
-                existingMovie.ReleaseDate = movie.ReleaseDate;
-                existingMovie.Duration = movie.Duration;
-                existingMovie.Language = movie.Language;
-                existingMovie.AgeRating = movie.AgeRating;
-                existingMovie.DirectorId = movie.DirectorId;
-                existingMovie.CountryId = movie.CountryId;
-
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation($"Movie updated successfully: {id}");
-                return existingMovie;
+                _logger.LogWarning($"Movie not found for update: {id}");
+                throw new InvalidOperationException($"Movie with ID {id} not found");
             }
-            catch (Exception ex)
+
+            // Check for duplicate movie
+            var duplicateExists = await _dbContext.Movies
+                .AnyAsync(m => m.Title == movieDto.Title
+                    && m.ReleaseDate == movieDto.ReleaseDate
+                    && m.Id != id);
+
+            if (duplicateExists)
             {
-                _logger.LogError(ex, $"Error updating movie with ID: {id}");
-                throw;
+                _logger.LogWarning($"Update failed: Movie with same title and release date already exists");
+                throw new InvalidOperationException("Movie with same title and release date already exists");
             }
+
+            // Update basic properties
+            existingMovie.Title = movieDto.Title;
+            existingMovie.Description = movieDto.Description;
+            existingMovie.ReleaseDate = movieDto.ReleaseDate;
+            existingMovie.Duration = movieDto.Duration;
+            existingMovie.Language = movieDto.Language;
+            existingMovie.AgeRating = movieDto.AgeRating;
+            existingMovie.DirectorId = movieDto.DirectorId;
+            existingMovie.CountryId = movieDto.CountryId;
+
+            // Update genres
+            if (movieDto.GenreIds != null)
+            {
+                // Remove existing genres
+                existingMovie.MoviesGenres.Clear();
+
+                // Add new genres
+                existingMovie.MoviesGenres = movieDto.GenreIds
+                    .Select(genreId => new MoviesGenres { MovieId = id, GenreId = genreId })
+                    .ToList();
+            }
+
+            // Update actors
+            if (movieDto.ActorIds != null)
+            {
+                // Remove existing actors
+                existingMovie.MoviesActors.Clear();
+
+                // Add new actors
+                existingMovie.MoviesActors = movieDto.ActorIds
+                    .Select(actorId => new MoviesActors { MovieId = id, ActorId = actorId })
+                    .ToList();
+            }
+
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation($"Movie updated successfully: {id}");
+
+            // Load related data for response
+            await _dbContext.Entry(existingMovie)
+                .Reference(m => m.Director)
+                .LoadAsync();
+
+            await _dbContext.Entry(existingMovie)
+                .Reference(m => m.Country)
+                .LoadAsync();
+
+            await _dbContext.Entry(existingMovie)
+                .Collection(m => m.MoviesGenres)
+                .Query()
+                .Include(mg => mg.Genre)
+                .LoadAsync();
+
+            await _dbContext.Entry(existingMovie)
+                .Collection(m => m.MoviesActors)
+                .Query()
+                .Include(ma => ma.Actor)
+                .LoadAsync();
+
+            // Map to response DTO
+            return new MovieResponseDto
+            {
+                Id = existingMovie.Id,
+                Title = existingMovie.Title,
+                Description = existingMovie.Description,
+                ReleaseDate = existingMovie.ReleaseDate,
+                Duration = existingMovie.Duration,
+                Language = existingMovie.Language,
+                AgeRating = existingMovie.AgeRating,
+                Director = existingMovie.Director != null ? new DirectorDto
+                {
+                    Id = existingMovie.Director.Id,
+                    FirstName = existingMovie.Director.FirstName,
+                    LastName = existingMovie.Director.LastName,
+                } : null,
+
+                Country = existingMovie.Country != null ? new CountryDto
+                {
+                    Id = existingMovie.Country.Id,
+                    Name = existingMovie.Country.Name
+                } : null,
+
+                Genres = existingMovie.MoviesGenres?.Select(mg => new GenreDto
+                {
+                    Id = mg.Genre.Id,
+                    Name = mg.Genre.Name
+                }).ToList(),
+
+                Actors = existingMovie.MoviesActors?.Select(ma => new ActorDto
+                {
+                    Id = ma.Actor.Id,
+                    FirstName = ma.Actor.FirstName,
+                    LastName = ma.Actor.LastName
+                }).ToList()
+            };
         }
-
-        public async Task<Movies> UpdateMovieBasicInfoAsync(int id, MoviesEditDTO dto)
+        public async Task<Movies> UpdateMovieBasicInfoAsync(int id, MoviesUpdateBasicDto dto)
         {
             try
             {
@@ -263,228 +371,5 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<Movies> AddGenreToMovieAsync(int genreId, int movieId)
-        {
-            try
-            {
-                // Find the movie with its existing genres
-                var movie = await _dbContext.Movies
-                    .Include(m => m.MoviesGenres)
-                    .FirstOrDefaultAsync(m => m.Id == movieId); 
-
-                if (movie == null)
-                {
-                    throw new InvalidOperationException($"Movie with ID {movieId} not found.");
-                }
-
-                // Find the genre
-                var genre = await _dbContext.Genres
-                    .FirstOrDefaultAsync(g => g.Id == genreId);
-
-                if (genre == null)
-                {
-                    throw new InvalidOperationException($"Genre with ID {genreId} not found.");
-                }
-
-                // Check if the genre is already associated with the movie
-                if (movie.MoviesGenres == null)
-                {
-                    movie.MoviesGenres = new List<MoviesGenres>();
-                }
-
-                if (movie.MoviesGenres.Any(mg => mg.GenreId == genreId))
-                {
-                    throw new InvalidOperationException($"Genre {genreId} is already associated with this movie.");
-                }
-
-                // Create and add the new MoviesGenres relationship
-                var movieGenre = new MoviesGenres
-                {
-                    MovieId = movieId,
-                    GenreId = genreId
-                };
-
-                movie.MoviesGenres.Add(movieGenre);
-
-                await _dbContext.SaveChangesAsync();
-
-                return movie;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error adding genre to movie. MovieId: {movieId}, GenreId: {genreId}");
-                throw;
-            }
-        }
-
-        public async Task<Movies> UpdateMovieGenreAsync(int genreId, int movieId, Genres genre)
-        {
-            try
-            {
-                // Find the movie with its existing genres
-                var movie = await _dbContext.Movies
-                    .Include(m => m.MoviesGenres)
-                    .FirstOrDefaultAsync(m => m.Id == movieId);
-
-                if (movie == null)
-                {
-                    throw new InvalidOperationException($"Movie with ID {movieId} not found.");
-                }
-
-                // Find the existing movie-genre relationship
-                var existingMovieGenre = movie.MoviesGenres?
-                    .FirstOrDefault(mg => mg.GenreId == genreId);
-
-                if (existingMovieGenre == null)
-                {
-                    throw new InvalidOperationException($"Genre {genreId} is not associated with this movie.");
-                }
-
-                // Validate the new genre
-                var newGenre = await _dbContext.Genres
-                    .FirstOrDefaultAsync(g => g.Id == genre.Id);
-
-                if (newGenre == null)
-                {
-                    throw new InvalidOperationException($"New genre with ID {genre.Id} not found.");
-                }
-
-                // Check if the new genre is already associated with the movie
-                if (movie.MoviesGenres.Any(mg => mg.GenreId == genre.Id))
-                {
-                    throw new InvalidOperationException($"Genre {genre.Id} is already associated with this movie.");
-                }
-
-                // Remove the old genre-movie relationship
-                _dbContext.MoviesGenres.Remove(existingMovieGenre);
-
-                // Add the new genre-movie relationship
-                var newMovieGenre = new MoviesGenres
-                {
-                    MovieId = movieId,
-                    GenreId = genre.Id
-                };
-
-                movie.MoviesGenres.Remove(existingMovieGenre);
-                movie.MoviesGenres.Add(newMovieGenre);
-
-                // Save changes
-                await _dbContext.SaveChangesAsync();
-
-                return movie;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error updating genre for movie ID: {movieId}");
-                throw;
-            }
-        }
-
-        public async Task<Movies> AddActorToMovieAsync(int actorId, int movieId)
-        {
-            try
-            {
-                var movie = await _dbContext.Movies
-                    .Include(m => m.MoviesActors)
-                    .FirstOrDefaultAsync(m => m.Id == movieId);
-
-                if (movie == null)
-                {
-                    throw new InvalidOperationException($"Movie with ID {movieId} not found.");
-                }
-
-                var actor = await _dbContext.Actors
-                    .FirstOrDefaultAsync(a => a.Id == actorId);
-
-                if (actor == null)
-                {
-                    throw new InvalidOperationException($"Actor with ID {actorId} not found.");
-                }
-
-                if (movie.MoviesActors == null)
-                {
-                    movie.MoviesActors = new List<MoviesActors>();
-                }
-
-                if (movie.MoviesActors.Any(ma => ma.ActorId == actorId))
-                {
-                    throw new InvalidOperationException($"Actor {actorId} is already associated with this movie.");
-                }
-
-                var movieActor = new MoviesActors
-                {
-                    MovieId = movieId,
-                    ActorId = actorId
-                };
-
-                movie.MoviesActors.Add(movieActor);
-
-                await _dbContext.SaveChangesAsync();
-
-                return movie;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error adding actor to movie. MovieId: {movieId}, ActorId: {actorId}");
-                throw;
-            }
-        }
-
-        public async Task<Movies> UpdateMovieActorAsync(int actorId, int movieId, Actors actor)
-        {
-            try
-            {
-                var movie = await _dbContext.Movies
-                    .Include(m => m.MoviesActors)
-                    .FirstOrDefaultAsync(m => m.Id == movieId);
-
-                if (movie == null)
-                {
-                    throw new InvalidOperationException($"Movie with ID {movieId} not found.");
-                }
-
-                var existingMovieActor = movie.MoviesActors?
-                    .FirstOrDefault(ma => ma.ActorId == actorId);
-
-                if (existingMovieActor == null)
-                {
-                    throw new InvalidOperationException($"Actor {actorId} is not associated with this movie.");
-                }
-
-                var newActor = await _dbContext.Actors
-                    .FirstOrDefaultAsync(a => a.Id == actor.Id);
-
-                if (newActor == null)
-                {
-                    throw new InvalidOperationException($"New actor with ID {actor.Id} not found.");
-                }
-
-                if (movie.MoviesActors.Any(ma => ma.ActorId == actor.Id))
-                {
-                    throw new InvalidOperationException($"Actor {actor.Id} is already associated with this movie.");
-                }
-
-                _dbContext.MoviesActors.Remove(existingMovieActor);
-
-                var newMovieActor = new MoviesActors
-                {
-                    MovieId = movieId,
-                    ActorId = actor.Id
-                };
-
-                movie.MoviesActors.Remove(existingMovieActor);
-                movie.MoviesActors.Add(newMovieActor);
-
-                // Save changes
-                await _dbContext.SaveChangesAsync();
-
-                return movie;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error updating actor for movie ID: {movieId}");
-                throw;
-            }
-        }
     }
 }

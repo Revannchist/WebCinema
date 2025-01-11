@@ -72,7 +72,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateUserBasicInfo(int id, UsersEditDTO dto)
+        public async Task<IActionResult> UpdateUserBasicInfo(int id, UsersEditDto dto)
         {
             var user = await _usersService.UpdateUserBasicInfoAsync(id, dto);
             if(user == null)

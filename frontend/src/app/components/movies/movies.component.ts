@@ -8,21 +8,70 @@ import { Observable, take } from 'rxjs';
   templateUrl: './movies.component.html',
   styleUrl: './movies.component.css'
 })
+
 export class MoviesComponent {
   constructor(private http:HttpClient){}
   public movies:any
-  public movieToAdd:any={}
+  public movieToAdd:any = { moviesGenresIds: [], moviesActorsIds: [] }
   public search:any
   public filteredMovies:any
-  private debounceTimer: any;
-
+  private debounceTimer:any;
+  public director: { id: number; firstName: string, lastName: string }[] = [];
+  public country: { id: number; name: string }[] = [];
+  public genres: any[] = [];
+  public actors: any[] = [];
 
   ngOnInit():void{
-    this.http.get(MyConfig.APIurl + '/api/Movies/GetAllMovies').subscribe(x=>{
-      this.movies = x;
-      this.filteredMovies = x;
+    this.http.get(MyConfig.APIurl + '/api/Movies/GetAllMovies').subscribe(response=>{
+      this.movies = response;
+      this.filteredMovies = response;
       console.log(this.movies);
     })
+    this.loadDirectors();
+    this.loadCountries();
+    this.loadGenres();
+    this.loadActors();
+  }
+
+  loadGenres(): void {
+    this.http.get(MyConfig.APIurl + '/api/Genres/GetAllGenres').subscribe((response : any) => 
+      this.genres = response);
+  }
+
+  getGenreName(genreId: number): string {
+    const genre = this.genres.find((g: any) => g.id === genreId);  
+    return genre ? genre.name : 'N/A'; 
+  }
+
+  loadActors(): void {
+    this.http.get(MyConfig.APIurl + '/api/Actors/GetAllActors').subscribe((response : any) => 
+      this.actors = response);
+  }
+
+  getActorName(actorId: number): string {
+    const actor = this.actors.find((a: any) => a.id === actorId);  
+    return actor ? `${actor.firstName} ${actor.lastName}` : 'N/A'; 
+  }
+
+  loadDirectors(): void{
+    this.http.get(MyConfig.APIurl + '/api/Directors/GetAllDirectors').subscribe((response: any) => {
+      this.director = response;
+    })
+  }
+
+  loadCountries(): void{
+    this.http.get(MyConfig.APIurl + '/api/Countries/GetAllCountries').subscribe((response: any) => {
+      this.country = response;
+    })
+  }
+
+  getCountryName(countryId: number) {
+    return this.country.find(c => c.id === countryId)?.name || 'N/A';
+  }
+
+  getDirectorName(directorId: number) {
+    const director = this.director.find(d => d.id === directorId);
+    return director ? `${director.firstName} ${director.lastName}` : 'N/A';  
   }
 
   deleteMovie(movie:any):void{
@@ -50,16 +99,40 @@ export class MoviesComponent {
       moviesGenresIds: movieData.moviesGenresIds,
       moviesActorsIds: movieData.moviesActorsIds 
     };
-    this.http.post<any>(`${MyConfig.APIurl}/api/Movies/AddMovie`, body).subscribe(
+    this.http.post<any>(`${MyConfig.APIurl}/api/Movies/CreateMovie`, body).subscribe(
       (response) => {
         this.movieToAdd = {}; 
+      },
+      (error) => {
+        console.error('Error adding movie:', error);
       }
     );     
-    }
+  }
 
-    filterMovies(): void {
-        clearTimeout(this.debounceTimer);
-    
+  updateMovie(movieData: any): void {
+    const body = {
+      title: movieData.title,
+      description: movieData.description,
+      releaseDate: movieData.releaseDate,
+      duration: movieData.duration,
+      ageRating: movieData.ageRating,
+      directorId: movieData.directorId,
+      countryId: movieData.countryId,
+    }; 
+    this.http.put<any>(`${MyConfig.APIurl}/api/Movies/UpdateMovie`, body).subscribe(
+      (response) => {
+        console.log('Movie updated:', response);
+        this.ngOnInit(); 
+        this.movieToAdd = {};  
+      },
+      (error) => {
+        console.error('Error updating movie:', error);
+      }
+    );
+  }
+
+  filterMovies(): void {
+      clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => {
             if (!this.search) {
                 this.filteredMovies = [...this.movies];
@@ -68,7 +141,6 @@ export class MoviesComponent {
                     movie.title.toLowerCase().includes(this.search.toLowerCase())
                 );
             }
-        }, 300); 
-    }
-
+    }, 300); 
+  }
 }

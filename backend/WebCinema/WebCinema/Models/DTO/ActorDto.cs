@@ -1,16 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
-namespace WebCinema.Models
+﻿namespace WebCinema.Models.DTO
 {
-    public class Actors
+    public class ActorDto
     {
         public int Id { get; set; }
-
         public string FirstName { get; set; }
-
         public string LastName { get; set; }
-
         public List<MoviesActors>? MoviesActors { get; set; }
     }
 }

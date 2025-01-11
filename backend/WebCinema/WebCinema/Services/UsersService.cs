@@ -67,7 +67,7 @@ namespace WebCinema.Services
             return _users;
         }
 
-        public async Task<Users> UpdateUserBasicInfoAsync(int id, UsersEditDTO dto) //DTO for editing
+        public async Task<Users> UpdateUserBasicInfoAsync(int id, UsersEditDto dto) //DTO for editing
         {
             var user = await _dbContext.Users.FindAsync(id);
             if (user != null)

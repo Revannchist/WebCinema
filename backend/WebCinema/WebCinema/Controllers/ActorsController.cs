@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 using WebCinema.Services;
 
 namespace WebCinema.Controllers
@@ -16,9 +17,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddActor(Actors actor)
+        public async Task<IActionResult> AddActor(ActorCreateDto actorDto)
         {
-            var createdActor = await _actorsService.CreateActorAsync(actor);
+            var createdActor = await _actorsService.CreateActorAsync(actorDto);
             if (createdActor == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -38,9 +39,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateActor(int id, Actors actor)
+        public async Task<IActionResult> UpdateActor(int id, ActorUpdateDto actorDto)
         {
-            var updatedActor = await _actorsService.UpdateActorsAsync(id, actor);
+            var updatedActor = await _actorsService.UpdateActorsAsync(id, actorDto);
             if (updatedActor == null)
             {
                 return BadRequest("Error | Bad Request!");

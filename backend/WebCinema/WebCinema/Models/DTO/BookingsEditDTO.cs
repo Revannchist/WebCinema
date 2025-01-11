@@ -1,6 +1,6 @@
 ﻿namespace WebCinema.Models.DTO
 {
-    public class BookingsEditDTO
+    public class BookingsEditDto
     {
         public ShowTimes? ShowTimes { get; set; }
         public DateTime BookingDateTime { get; set; }

@@ -7,8 +7,7 @@ namespace WebCinema.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-
-        [JsonIgnore]
-        public ICollection<Movies>? Movie { get; set; }
+        //public bool IsDeleted { get; set; }
+        public List<Movies>? Movie { get; set; }
     }
 }

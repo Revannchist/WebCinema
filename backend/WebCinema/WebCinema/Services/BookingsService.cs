@@ -62,7 +62,7 @@ namespace WebCinema.Services
             return _bookings;
         }
 
-        public async Task<Bookings> UpdateBookingsBasicInfoAsync(int id, BookingsEditDTO dto)
+        public async Task<Bookings> UpdateBookingsBasicInfoAsync(int id, BookingsEditDto dto)
         {
             try
             {

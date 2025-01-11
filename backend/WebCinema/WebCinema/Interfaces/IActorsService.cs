@@ -1,17 +1,18 @@
 ﻿using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Interfaces
 {
     public interface IActorsService
     {
-        Task<Actors> CreateActorAsync(Actors actors);
+        Task<ActorGetDto> CreateActorAsync(ActorCreateDto actorDto);
 
-        Task<List<Actors>> GetAllActorsAsync();
+        Task<List<ActorGetDto>> GetAllActorsAsync();
 
-        Task<Actors> GetActorByIdAsync(int id);
+        Task<ActorGetDto> GetActorByIdAsync(int id);
 
-        Task<Actors> DeleteActorByIdAsync(int id);
+        Task<ActorGetDto> DeleteActorByIdAsync(int id);
 
-        Task<Actors> UpdateActorsAsync(int id, Actors actors);
+        Task<ActorGetDto> UpdateActorsAsync(int id, ActorUpdateDto actorDto);
     }
 }

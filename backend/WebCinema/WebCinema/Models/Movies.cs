@@ -13,23 +13,19 @@ namespace WebCinema.Models
         public string Language { get; set; }
         public string AgeRating { get; set; }
 
-        public int DirectorId { get; set; }
+        public int? DirectorId { get; set; }
         [ForeignKey("DirectorId")]
 
-        [JsonIgnore]
         public Directors? Director { get; set; }
 
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
         [ForeignKey("CountryId")]
 
-        [JsonIgnore]
-        public Countries? Country { get; set; }
+        public Countries Country { get; set; }
 
-        [JsonIgnore]
-        public ICollection<MoviesGenres>? MoviesGenres { get; set; }
+        public List<MoviesGenres>? MoviesGenres { get; set; }
 
-        [JsonIgnore]
-        public ICollection<MoviesActors>? MoviesActors { get; set; }
+        public List<MoviesActors>? MoviesActors { get; set; }
 
         //treba jos dodat Id od Ratings, ali kasnije kada napravimo tu tabelu
     }

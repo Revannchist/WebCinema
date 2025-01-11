@@ -27,7 +27,7 @@ namespace WebCinema.Controllers
             return Ok(createdBookings);
         }
         [HttpPost]
-        public async Task<IActionResult> UpdateBooking(int id, BookingsEditDTO dto)
+        public async Task<IActionResult> UpdateBooking(int id, BookingsEditDto dto)
         {
             var updatedBooking = await _bookingsService.UpdateBookingsBasicInfoAsync(id, dto);
             if (updatedBooking == null)
