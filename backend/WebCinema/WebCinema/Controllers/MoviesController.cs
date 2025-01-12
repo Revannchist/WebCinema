@@ -38,53 +38,6 @@ namespace WebCinema.Controllers
             return Ok(deletedMovie);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> AddGenreToMovie(int genreId, int movieId)
-        //{
-
-        //    var movie = await _moviesService.AddGenreToMovieAsync(genreId, movieId);
-        //    if(movie == null)
-        //    {
-        //        return BadRequest("Error | Bad Request!");
-        //    }
-        //    return Ok(movie);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> AddActorToMovie(int actorId, int movieId)
-        //{
-
-        //    var actor = await _moviesService.AddActorToMovieAsync(actorId, movieId);
-        //    if (actor == null)
-        //    {
-        //        return BadRequest("Error | Bad Request!");
-        //    }
-        //    return Ok(actor);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateMovieGenre(int genreId, int movieId, Genres genre)
-        //{
-        //    var updatedMovie = await _moviesService.UpdateMovieGenreAsync(genreId, movieId, genre);
-        //    if (updatedMovie == null)
-        //    {
-        //        return BadRequest("Error | Bad Request!");
-        //    }
-        //    return Ok(updatedMovie);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateMovieActor(int actorId, int movieId, Actors actor)
-        //{
-        //    var updatedActor = await _moviesService.UpdateMovieActorAsync(actorId, movieId, actor);
-        //    if (updatedActor == null)
-        //    {
-        //        return BadRequest("Error | Bad Request!");
-        //    }
-        //    return Ok(updatedActor);
-        //}
-
-
         [HttpPost]
         public async Task<IActionResult> UpdateMovie(int id, MoviesUpdateDto movieDto)
         {

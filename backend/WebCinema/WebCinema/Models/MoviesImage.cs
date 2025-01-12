@@ -10,5 +10,6 @@ namespace WebCinema.Models
         public Movies? Movies { get; set; }
         public byte[] ImageByteArray { get; set; }
         public string ImageFormat { get; set; }
+        public bool IsPoster { get; set; }
     }
 }
