@@ -1,4 +1,3 @@
-<p>movies works!</p>
 
 <input type="text" placeholder="Search..." id="search" name="search" [(ngModel)]="search" (ngModelChange)="filterMovies()">
 
@@ -27,8 +26,9 @@
       <td>{{ movie?.duration ? movie?.duration + ' min' : 'N/A' }}</td>
       <td>{{ movie?.language || 'N/A' }}</td>
       <td>{{ movie?.ageRating || 'N/A' }}</td>
-      <td>{{ getDirectorName(movie?.directorId) || 'N/A' }}</td>
+      <td>{{ getDirectorName(movie?.directorId)|| 'N/A' }}</td>
       <td>{{ getCountryName(movie?.countryId) || 'N/A' }}</td>
+
       <td>
         <span *ngFor="let genreId of movie?.moviesGenresIds; let i = index">
           {{ getGenreName(genreId) }}
@@ -44,7 +44,7 @@
       </td>
 
       <td>
-        <button (click)="updateMovie(movie)" class="btn btn-warning">Edit</button>
+        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" (click)="prepareEditMovie(movie)">Edit</button>
         <button (click)="deleteMovie(movie)" class="btn btn-danger">Delete</button>
       </td>
     </tr>
@@ -111,18 +111,32 @@
           </div>
 
           <div class="form-group">
-            <label for="moviesGenresIds">Genres:</label>
-            <select id="moviesGenresIds" class="form-control" [(ngModel)]="movieToAdd.moviesGenresIds" name="moviesGenresIds" multiple required>
-              <option *ngFor="let genre of genres" [value]="genre.id">{{ genre.name }}</option>
+            <label for="GenreIds">Genres:</label>
+            <select id="GenreIds" 
+                    class="form-control" 
+                    [(ngModel)]="movieToAdd.moviesGenresIds" 
+                    name="moviesGenresIds" 
+                    multiple 
+                    required>
+                <option *ngFor="let genre of genres" [ngValue]="genre.id">
+                    {{ genre.name }}
+                </option>
             </select>
-          </div>
-
-          <div class="form-group">
-            <label for="moviesActorsIds">Actors:</label>
-            <select id="moviesActorsIds" class="form-control" [(ngModel)]="movieToAdd.moviesActorsIds" name="moviesActorsIds" multiple required>
-              <option *ngFor="let actor of actors" [value]="actor.id">{{ actor.firstName }} {{ actor.lastName }}</option>
+        </div>
+        
+        <div class="form-group">
+            <label for="ActorIds">Actors:</label>
+            <select id="ActorIds" 
+                    class="form-control" 
+                    [(ngModel)]="movieToAdd.moviesActorsIds" 
+                    name="moviesActorsIds" 
+                    multiple 
+                    required>
+                <option *ngFor="let actor of actors" [ngValue]="actor.id">
+                    {{ actor.firstName }} {{ actor.lastName }}
+                </option>
             </select>
-          </div>
+        </div>
           
           <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
         </form>
@@ -131,76 +145,90 @@
   </div>
 </div>
 
-<!-- Modal for Updating Movie -->
-<div class="modal fade" id="editMovie" tabindex="-1" aria-labelledby="editMovieLabel" aria-hidden="true">
+<!-- Modal for Editing Movie -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editMovieLabel">Edit Movie</h5>
+        <h5 class="modal-title" id="editModalLabel">Edit movie</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form (ngSubmit)="updateMovie(movieToAdd)">
+        <form (ngSubmit)="updateMovie(movieToEdit)">
           <div class="form-group">
-            <label for="title">Title:</label>
-            <input type="text" id="title" class="form-control" [(ngModel)]="movieToAdd.title" name="title" required>
+            <label for="editTitle">Title:</label>
+            <input type="text" id="editTitle" class="form-control" [(ngModel)]="movieToEdit.title" name="title" required>
           </div>
 
           <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea id="description" class="form-control" [(ngModel)]="movieToAdd.description" name="description" required></textarea>
+            <label for="editDescription">Description:</label>
+            <textarea id="editDescription" class="form-control" [(ngModel)]="movieToEdit.description" name="description" required></textarea>
           </div>
 
           <div class="form-group">
-            <label for="releaseDate">Release Date:</label>
-            <input type="date" id="releaseDate" class="form-control" [(ngModel)]="movieToAdd.releaseDate" name="releaseDate" required>
+            <label for="editReleaseDate">Release Date:</label>
+            <input type="date" id="editReleaseDate" class="form-control" [(ngModel)]="movieToEdit.releaseDate" name="releaseDate" required>
           </div>
 
           <div class="form-group">
-            <label for="duration">Duration (in minutes):</label>
-            <input type="number" id="duration" class="form-control" [(ngModel)]="movieToAdd.duration" name="duration" required>
+            <label for="editDuration">Duration (in minutes):</label>
+            <input type="number" id="editDuration" class="form-control" [(ngModel)]="movieToEdit.duration" name="duration" required>
           </div>
 
           <div class="form-group">
-            <label for="language">Language:</label>
-            <input type="text" id="language" class="form-control" [(ngModel)]="movieToAdd.language" name="language" required>
+            <label for="editLanguage">Language:</label>
+            <input type="text" id="editLanguage" class="form-control" [(ngModel)]="movieToEdit.language" name="language" required>
           </div>
 
           <div class="form-group">
-            <label for="ageRating">Age Rating:</label>
-            <input type="text" id="ageRating" class="form-control" [(ngModel)]="movieToAdd.ageRating" name="ageRating" required>
+            <label for="editAgeRating">Age Rating:</label>
+            <input type="text" id="editAgeRating" class="form-control" [(ngModel)]="movieToEdit.ageRating" name="ageRating" required>
           </div>
 
           <div class="form-group">
-            <label for="directorId">Director:</label>
-            <select id="directorId" class="form-control" [(ngModel)]="movieToAdd.directorId" name="directorId" required>
+            <label for="editDirectorId">Director:</label>
+            <select id="editDirectorId" class="form-control" [(ngModel)]="movieToEdit.directorId" name="directorId" required>
               <option value="" disabled>Select a director</option>
               <option *ngFor="let director of director" [value]="director.id">{{ director.firstName }} {{ director.lastName }}</option>
             </select>
           </div>        
 
           <div class="form-group">
-            <label for="countryId">Country:</label>
-            <select id="countryId" class="form-control" [(ngModel)]="movieToAdd.countryId" name="countryId" required>
+            <label for="editCountryId">Country:</label>
+            <select id="editCountryId" class="form-control" [(ngModel)]="movieToEdit.countryId" name="countryId" required>
               <option value="" disabled>Select a country</option>
               <option *ngFor="let c of country" [value]="c.id">{{ c.name }}</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="moviesGenresIds">Genres:</label>
-            <select id="moviesGenresIds" class="form-control" [(ngModel)]="movieToAdd.moviesGenresIds" name="moviesGenresIds" multiple required>
-              <option *ngFor="let genre of genres" [value]="genre.id">{{ genre.name }}</option>
+            <label for="GenreIds">Genres:</label>
+            <select id="GenreIds" 
+                    class="form-control" 
+                    [(ngModel)]="movieToEdit.moviesGenresIds" 
+                    name="moviesGenresIds" 
+                    multiple 
+                    required>
+                <option *ngFor="let genre of genres" [ngValue]="genre.id">
+                    {{ genre.name }}
+                </option>
             </select>
-          </div>
-
-          <div class="form-group">
-            <label for="moviesActorsIds">Actors:</label>
-            <select id="moviesActorsIds" class="form-control" [(ngModel)]="movieToAdd.moviesActorsIds" name="moviesActorsIds" multiple required>
-              <option *ngFor="let actor of actors" [value]="actor.id">{{ actor.firstName }} {{ actor.lastName }}</option>
+        </div>
+        
+        <div class="form-group">
+            <label for="ActorIds">Actors:</label>
+            <select id="ActorIds" 
+                    class="form-control" 
+                    [(ngModel)]="movieToEdit.moviesActorsIds" 
+                    name="moviesActorsIds" 
+                    multiple 
+                    required>
+                <option *ngFor="let actor of actors" [ngValue]="actor.id">
+                    {{ actor.firstName }} {{ actor.lastName }}
+                </option>
             </select>
-          </div>
-
+        </div>
+          
           <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
         </form>
       </div>

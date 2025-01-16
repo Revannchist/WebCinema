@@ -1,0 +1,88 @@
+<input type="text" placeholder="Search..." id="search" name="search" [(ngModel)]="search" (ngModelChange)="filterActors()">
+
+<!-- Table for Displaying Actors -->
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Movies</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let actor of filteredActors">
+      <td>{{ actor?.firstName || 'N/A' }}</td>
+      <td>{{ actor?.lastName || 'N/A' }}</td>
+      <td>
+        <div class="movie-list">
+          <span *ngFor="let movie of getMoviesForActor(actor.id); let last = last">
+            {{ movie.title }}{{ !last ? ', ' : '' }}
+          </span>
+          <span *ngIf="getMoviesForActor(actor.id).length === 0">No movies</span>
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" (click)="prepareEditActor(actor)">Edit</button>
+        <button (click)="deleteActor(actor)" class="btn btn-danger">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#kreiraj">Create Actor</button>
+
+<!-- Modal for Creating Actor -->
+<div class="modal fade" id="kreiraj" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create Actor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addActor(actorToAdd)">
+          <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" class="form-control" [(ngModel)]="actorToAdd.firstName" name="firstName" required>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" class="form-control" [(ngModel)]="actorToAdd.lastName" name="lastName" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Editing Actor -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Actor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateActor(actorToEdit)">
+            
+          <div class="form-group">
+            <label for="editFirstName">First Name:</label>
+            <input type="text" id="editFirstName" class="form-control" [(ngModel)]="actorToEdit.firstName" name="firstName" required>
+          </div>
+
+          <div class="form-group">
+            <label for="editLastName">Last Name:</label>
+            <input type="text" id="editLastName" class="form-control" [(ngModel)]="actorToEdit.lastName" name="lastName" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

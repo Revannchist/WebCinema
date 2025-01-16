@@ -25,6 +25,17 @@ namespace WebCinema.Services
                     throw new ArgumentNullException(nameof(directorDto));
                 }
 
+                // Check for existing director with same name
+                var existingDirector = await _dbContext.Directors
+                    .FirstOrDefaultAsync(d =>
+                        d.FirstName.ToLower() == directorDto.FirstName.ToLower() &&
+                        d.LastName.ToLower() == directorDto.LastName.ToLower());
+
+                if (existingDirector != null)
+                {
+                    throw new InvalidOperationException($"Director with name {directorDto.FirstName} {directorDto.LastName} already exists");
+                }
+
                 var director = new Directors
                 {
                     FirstName = directorDto.FirstName,
@@ -160,6 +171,18 @@ namespace WebCinema.Services
                 if (director == null)
                 {
                     throw new KeyNotFoundException($"Director with ID {id} not found");
+                }
+
+                // Check for existing director with same name, excluding the current director
+                var existingDirector = await _dbContext.Directors
+                    .FirstOrDefaultAsync(d =>
+                        d.Id != id &&
+                        d.FirstName.ToLower() == directorDto.FirstName.ToLower() &&
+                        d.LastName.ToLower() == directorDto.LastName.ToLower());
+
+                if (existingDirector != null)
+                {
+                    throw new InvalidOperationException($"Director with name {directorDto.FirstName} {directorDto.LastName} already exists");
                 }
 
                 director.FirstName = directorDto.FirstName;

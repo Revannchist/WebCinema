@@ -1,8 +1,8 @@
-<p>countries works!</p>
 
-<input type="text" placeholder="Pretraga..." id="search" name="search" [(ngModel)]="search" (ngModelChange)="filterCountries()">
+<input type="text" placeholder="Search.." id="search" name="search" [(ngModel)]="search" (ngModelChange)="filterCountries()">
 
-<button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#kreiraj">Kreiraj državu</button>
+<button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#kreiraj">Add country</button>
+
   <div class="modal fade" id="detalji" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">

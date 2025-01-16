@@ -11,8 +11,35 @@ import { Observable, take } from 'rxjs';
 
 export class MoviesComponent {
   constructor(private http:HttpClient){}
+
   public movies:any
-  public movieToAdd:any = { moviesGenresIds: [], moviesActorsIds: [] }
+  movieToAdd: any = {
+    title: '',
+    description: '',
+    releaseDate: '',
+    duration: null,
+    language: '',
+    ageRating: '',
+    directorId: null,
+    countryId: null,
+    GenreIds: [],
+    ActorIds: []
+  };
+
+  public movieToEdit: any = {
+    id: null,
+    title: '',
+    description: '',
+    releaseDate: '',
+    duration: null,
+    language: '',
+    ageRating: '',
+    directorId: null,
+    countryId: null,
+    GenreIds: [],
+    ActorIds: []
+  };
+
   public search:any
   public filteredMovies:any
   private debounceTimer:any;
@@ -78,6 +105,7 @@ export class MoviesComponent {
     this.http.post(MyConfig.APIurl + '/api/Movies/DeleteMovieById?id=' + movie.id, [{}]).subscribe(
       (response)=>{
         console.log('Movie delete response: ' + response);
+        this.ngOnInit(); 
       }
     )
   }
@@ -85,8 +113,17 @@ export class MoviesComponent {
   clearModalTextBox():void{
     this.movieToAdd.name="";
   }
-  
+
   addMovie(movieData: any): void {
+
+    const genreIds: number[] = Array.isArray(movieData.moviesGenresIds) 
+    ? movieData.moviesGenresIds 
+    : [];
+  
+  const actorIds: number[] = Array.isArray(movieData.moviesActorsIds) 
+    ? movieData.moviesActorsIds 
+    : [];
+
     const body = {
       title: movieData.title,
       description: movieData.description,
@@ -96,39 +133,68 @@ export class MoviesComponent {
       ageRating: movieData.ageRating,
       directorId: movieData.directorId,
       countryId: movieData.countryId,
-      moviesGenresIds: movieData.moviesGenresIds,
-      moviesActorsIds: movieData.moviesActorsIds 
+      GenreIds : genreIds, 
+      ActorIds: actorIds   
     };
-    this.http.post<any>(`${MyConfig.APIurl}/api/Movies/CreateMovie`, body).subscribe(
-      (response) => {
-        this.movieToAdd = {}; 
+    this.http.post<any>(`${MyConfig.APIurl}/api/Movies/CreateMovie`, body).subscribe({
+      next: (response) => {
+        this.movieToAdd = {};
+        console.log('Movie add response: ' + response);
+        this.ngOnInit(); 
       },
-      (error) => {
+      error: (error) => {
         console.error('Error adding movie:', error);
       }
-    );     
+    });    
   }
 
+    prepareEditMovie(movie: any): void {
+      this.movieToEdit = {
+        id: movie.id,
+        title: movie.title,
+        description: movie.description,
+        releaseDate: movie.releaseDate,
+        duration: movie.duration,
+        language: movie.language,
+        ageRating: movie.ageRating,
+        directorId: movie.directorId,
+        countryId: movie.countryId,
+        GenreIds: movie.genreIds, 
+        ActorIds: movie.actorIds 
+      };
+    }
+
   updateMovie(movieData: any): void {
+    const genreIds: number[] = Array.isArray(movieData.moviesGenresIds) 
+    ? movieData.moviesGenresIds 
+    : [];
+  const actorIds: number[] = Array.isArray(movieData.moviesActorsIds) 
+    ? movieData.moviesActorsIds 
+    : [];
+
     const body = {
       title: movieData.title,
       description: movieData.description,
       releaseDate: movieData.releaseDate,
       duration: movieData.duration,
+      language: movieData.language,
       ageRating: movieData.ageRating,
       directorId: movieData.directorId,
       countryId: movieData.countryId,
-    }; 
-    this.http.put<any>(`${MyConfig.APIurl}/api/Movies/UpdateMovie`, body).subscribe(
-      (response) => {
+      GenreIds: genreIds, 
+      ActorIds: actorIds 
+    };
+    const url = `${MyConfig.APIurl}/api/Movies/UpdateMovie?id=${movieData.id}`;
+  
+    this.http.post<any>(url, body).subscribe({
+      next: (response) => {
         console.log('Movie updated:', response);
         this.ngOnInit(); 
-        this.movieToAdd = {};  
       },
-      (error) => {
+      error: (error) => {
         console.error('Error updating movie:', error);
       }
-    );
+    });
   }
 
   filterMovies(): void {

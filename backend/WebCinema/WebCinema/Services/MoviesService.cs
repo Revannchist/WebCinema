@@ -78,6 +78,7 @@ namespace WebCinema.Services
                     Id = movie.Country.Id,
                     Name = movie.Country.Name
                 } : null,
+
                 Genres = movie.MoviesGenres?.Select(mg => new GenreDto
                 {
                     Id = mg.Genre.Id,

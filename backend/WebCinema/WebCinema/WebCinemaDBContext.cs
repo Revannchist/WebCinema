@@ -17,7 +17,7 @@ namespace WebCinema
                 new Genres { Id = 3, Name = "Thriller" },
                 new Genres { Id = 4, Name = "Western" },
                 new Genres { Id = 5, Name = "Romance" }
-                //dodat ostale zanrove pa samo onda: add-migration GenreData2 -> update-database
+                //dodat ostale zanrove pa samo onda: add-migration GenreData -> update-database
                 );
 
             modelBuilder.Entity<Cities>().HasData(
@@ -30,15 +30,6 @@ namespace WebCinema
                 new Countries { Id = 2, Name = "Germany" }
                 );
 
-            modelBuilder.Entity<Actors>().HasData(
-                new Actors { Id = 1, FirstName = "Brad", LastName = "Pitt" },
-                new Actors { Id = 2, FirstName = "Angelina", LastName = "Jolie" }
-                );
-
-            modelBuilder.Entity<Directors>().HasData(
-                new Directors { Id = 1, FirstName = "Hilk", LastName = "Hogan" },
-                new Directors { Id = 2, FirstName = "Christopher", LastName = "Nolan" }
-                );
             //------------------------------------------------------//
             modelBuilder.Entity<MoviesGenres>()
                 .HasKey(sc => new { sc.MovieId, sc.GenreId });
@@ -47,7 +38,6 @@ namespace WebCinema
                 .HasOne(sc => sc.Movie)
                 .WithMany(s => s.MoviesGenres)
                 .HasForeignKey(sc => sc.MovieId);
-
 
             modelBuilder.Entity<MoviesGenres>()
                 .HasOne(sc => sc.Genre)
@@ -66,7 +56,7 @@ namespace WebCinema
                 .HasOne(sc => sc.Actor)
                 .WithMany(c => c.MoviesActors)
                 .HasForeignKey(sc => sc.ActorId);
-            //------------------------------------------------------//-------------------//
+            //------------------------------------------------------//
 
             modelBuilder.Entity<Movies>()
                 .HasOne(b => b.Director)
@@ -80,21 +70,20 @@ namespace WebCinema
                 .HasForeignKey(m => m.DirectorId);
             //------------------------------------------------------//
 
-            modelBuilder.Entity<Booked_Seats>()
+            modelBuilder.Entity<BookedSeats>()
                 .HasKey(bs => new { bs.BookingId, bs.SeatsId });
 
-            modelBuilder.Entity<Booked_Seats>()
+            modelBuilder.Entity<BookedSeats>()
                 .HasOne(bs => bs.Bookings)
                 .WithMany(b => b.Booked_Seats)
                 .HasForeignKey(bs => bs.BookingId)
                 .OnDelete(DeleteBehavior.Restrict); // Ovdje Restrict umjesto CASCADE
 
-            modelBuilder.Entity<Booked_Seats>()
+            modelBuilder.Entity<BookedSeats>()
                 .HasOne(bs => bs.Seats)
                 .WithMany(s => s.Booked_Seats)
                 .HasForeignKey(bs => bs.SeatsId)
                 .OnDelete(DeleteBehavior.Restrict);
-
             //------------------------------------------------------//
 
 

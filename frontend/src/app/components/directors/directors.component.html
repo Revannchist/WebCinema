@@ -1,0 +1,90 @@
+<!-- Search Input -->
+<input type="text" placeholder="Search..." id="search" name="search" [(ngModel)]="search" (ngModelChange)="filterDirectors()">
+
+<!-- Table for Displaying Directors -->
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Movies</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let director of filteredDirectors">
+      <td>{{ director?.firstName || 'N/A' }}</td>
+      <td>{{ director?.lastName || 'N/A' }}</td>
+      <td>
+        <div class="movie-list">
+          <span *ngFor="let movie of getMoviesForDirector(director.id); let last = last">
+            {{ movie.title }}{{ !last ? ', ' : '' }}
+          </span>
+          <span *ngIf="getMoviesForDirector(director.id).length === 0">No movies</span>
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editDirectorModal" (click)="prepareEditDirector(director)">Edit</button>
+        <button (click)="deleteDirector(director)" class="btn btn-danger">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Button to Create Director -->
+<button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#createDirectorModal">Create Director</button>
+
+<!-- Modal for Creating Director -->
+<div class="modal fade" id="createDirectorModal" tabindex="-1" aria-labelledby="createDirectorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createDirectorModalLabel">Create Director</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addDirector(directorToAdd)">
+          <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" class="form-control" [(ngModel)]="directorToAdd.firstName" name="firstName" required>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" class="form-control" [(ngModel)]="directorToAdd.lastName" name="lastName" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Editing Director -->
+<div class="modal fade" id="editDirectorModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Director</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateDirector(directorToEdit)">
+            
+          <div class="form-group">
+            <label for="editFirstName">First Name:</label>
+            <input type="text" id="editFirstName" class="form-control" [(ngModel)]="directorToEdit.firstName" name="firstName" required>
+          </div>
+
+          <div class="form-group">
+            <label for="editLastName">Last Name:</label>
+            <input type="text" id="editLastName" class="form-control" [(ngModel)]="directorToEdit.lastName" name="lastName" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

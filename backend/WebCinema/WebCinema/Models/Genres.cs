@@ -8,12 +8,6 @@ namespace WebCinema.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-
         public List<MoviesGenres>? MoviesGenres { get; set; }
-
-        //[NotMapped] //nez treba li ovo
-        //public int MoviesId { get; set; }
-        //[ForeignKey("MoviesId")]
-        //public Movies Movies { get; set; }
     }
 }
