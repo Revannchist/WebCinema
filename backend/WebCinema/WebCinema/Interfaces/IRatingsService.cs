@@ -1,10 +1,11 @@
 ﻿using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Interfaces
 {
     public interface IRatingsService
     {
-        Task<Ratings> CreateRatingsAsync(Ratings ratings);
+        Task<RatingsResponseDto> CreateRatingAsync(RatingCreateDto ratings);
 
         Task<List<Ratings>> GetAllRatingsAsync();
 
