@@ -2,7 +2,7 @@
 
 namespace WebCinema.Models
 {
-    public class Booked_Seats
+    public class BookedSeats
     {
         public int BookingId { get; set; }
         [ForeignKey("BookingId")]

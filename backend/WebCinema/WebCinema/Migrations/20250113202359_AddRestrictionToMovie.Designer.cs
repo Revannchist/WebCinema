@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250113202359_AddRestrictionToMovie")]
+    partial class AddRestrictionToMovie
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +46,7 @@ namespace WebCinema.Migrations
                     b.ToTable("Actors");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.BookedSeats", b =>
+            modelBuilder.Entity("WebCinema.Models.Booked_Seats", b =>
                 {
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
@@ -55,7 +58,7 @@ namespace WebCinema.Migrations
 
                     b.HasIndex("SeatsId");
 
-                    b.ToTable("BookedSeats");
+                    b.ToTable("Booked_Seats");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Bookings", b =>
@@ -415,40 +418,6 @@ namespace WebCinema.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Roles", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Moderator"
-                        });
-                });
-
             modelBuilder.Entity("WebCinema.Models.Seats", b =>
                 {
                     b.Property<int>("Id")
@@ -567,49 +536,13 @@ namespace WebCinema.Migrations
                     b.Property<DateTime>("RegistrationTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RolesId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("RolesId");
-
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.UsersImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<byte[]>("ImageByteArray")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageFormat")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UsersImages");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Booked_Seats", b =>
@@ -797,32 +730,6 @@ namespace WebCinema.Migrations
                     b.Navigation("City");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Users", b =>
-                {
-                    b.HasOne("WebCinema.Models.Roles", "Roles")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Roles", null)
-                        .WithMany("Users")
-                        .HasForeignKey("RolesId");
-
-                    b.Navigation("Roles");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.UsersImage", b =>
-                {
-                    b.HasOne("WebCinema.Models.Users", "Users")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Users");
-                });
-
             modelBuilder.Entity("WebCinema.Models.Actors", b =>
                 {
                     b.Navigation("MoviesActors");
@@ -853,11 +760,6 @@ namespace WebCinema.Migrations
                     b.Navigation("MoviesActors");
 
                     b.Navigation("MoviesGenres");
-                });
-
-            modelBuilder.Entity("WebCinema.Models.Roles", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Seats", b =>

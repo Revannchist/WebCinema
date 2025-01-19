@@ -19,57 +19,119 @@ namespace WebCinema.Controllers
         [HttpPost]
         public async Task<IActionResult> AddActor(ActorCreateDto actorDto)
         {
-            var createdActor = await _actorsService.CreateActorAsync(actorDto);
-            if (createdActor == null)
+            try
+            {
+                var createdActor = await _actorsService.CreateActorAsync(actorDto);
+                if (createdActor == null)
+                {
+                    return BadRequest("Error | Bad Request!");
+                }
+                return Ok(createdActor);
+            }
+            catch (ArgumentNullException)
             {
                 return BadRequest("Error | Bad Request!");
             }
-            return Ok(createdActor);
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest($"Error | {ex.Message}");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error | Internal Server Error!");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteActorById(int id)
         {
-            var deletedActor = await _actorsService.DeleteActorByIdAsync(id);
-            if (deletedActor == null)
+            try
             {
-                return BadRequest("Error | Bad Request!");
+                var deletedActor = await _actorsService.DeleteActorByIdAsync(id);
+                if (deletedActor == null)
+                {
+                    return BadRequest("Error | Bad Request!");
+                }
+                return Ok(deletedActor);
             }
-            return Ok(deletedActor);
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Error | Actor with ID {id} not found!");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error | Internal Server Error!");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> UpdateActor(int id, ActorUpdateDto actorDto)
         {
-            var updatedActor = await _actorsService.UpdateActorsAsync(id, actorDto);
-            if (updatedActor == null)
+            try
+            {
+                var updatedActor = await _actorsService.UpdateActorsAsync(id, actorDto);
+                if (updatedActor == null)
+                {
+                    return BadRequest("Error | Bad Request!");
+                }
+                return Ok(updatedActor);
+            }
+            catch (ArgumentNullException)
             {
                 return BadRequest("Error | Bad Request!");
             }
-            return Ok(updatedActor);
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Error | Actor with ID {id} not found!");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest($"Error | {ex.Message}");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error | Internal Server Error!");
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> GetActorById(int id)
         {
-            var actor = await _actorsService.GetActorByIdAsync(id);
-            if (actor == null)
+            try
             {
-                return BadRequest("Error | Bad Request!");
+                var actor = await _actorsService.GetActorByIdAsync(id);
+                if (actor == null)
+                {
+                    return BadRequest("Error | Bad Request!");
+                }
+                return Ok(actor);
             }
-            return Ok(actor);
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Error | Actor with ID {id} not found!");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Error | Internal Server Error!");
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllActors()
         {
-            var actors = await _actorsService.GetAllActorsAsync();
-            if (actors == null)
+            try
             {
-                return BadRequest("Error | Bad Request!");
+                var actors = await _actorsService.GetAllActorsAsync();
+                if (actors == null)
+                {
+                    return BadRequest("Error | Bad Request!");
+                }
+                return Ok(actors);
             }
-            return Ok(actors);
-
+            catch (Exception)
+            {
+                return StatusCode(500, "Error | Internal Server Error!");
+            }
         }
     }
 }

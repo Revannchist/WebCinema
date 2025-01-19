@@ -18,7 +18,7 @@ namespace WebCinema.Models
         public decimal TotalPrice { get; set; }
         public string BookingStatus { get; set; }
         [JsonIgnore]
-        public ICollection<Booked_Seats>? Booked_Seats { get; set; }
+        public ICollection<BookedSeats>? Booked_Seats { get; set; }
 
 
     }

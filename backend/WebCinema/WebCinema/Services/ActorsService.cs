@@ -25,6 +25,16 @@ namespace WebCinema.Services
                     throw new ArgumentNullException(nameof(actorDto));
                 }
 
+                var existingActor = await _dbContext.Actors
+                    .FirstOrDefaultAsync(a =>
+                        a.FirstName.ToLower() == actorDto.FirstName.ToLower() &&
+                        a.LastName.ToLower() == actorDto.LastName.ToLower());
+
+                if (existingActor != null)
+                {
+                    throw new InvalidOperationException($"Actor with name {actorDto.FirstName} {actorDto.LastName} already exists");
+                }
+
                 var actor = new Actors
                 {
                     FirstName = actorDto.FirstName,
@@ -162,6 +172,18 @@ namespace WebCinema.Services
                 if (actor == null)
                 {
                     throw new KeyNotFoundException($"Actor with ID {id} not found");
+                }
+
+                // Check for existing actor with same name, excluding the current actor
+                var existingActor = await _dbContext.Actors
+                    .FirstOrDefaultAsync(a =>
+                        a.Id != id &&
+                        a.FirstName.ToLower() == actorDto.FirstName.ToLower() &&
+                        a.LastName.ToLower() == actorDto.LastName.ToLower());
+
+                if (existingActor != null)
+                {
+                    throw new InvalidOperationException($"Actor with name {actorDto.FirstName} {actorDto.LastName} already exists");
                 }
 
                 actor.FirstName = actorDto.FirstName;
