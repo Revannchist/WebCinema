@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250115220748_addedUsersDisplayDto")]
+    partial class addedUsersDisplayDto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,9 +44,23 @@ namespace WebCinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Actors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Brad",
+                            LastName = "Pitt"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FirstName = "Angelina",
+                            LastName = "Jolie"
+                        });
                 });
 
-            modelBuilder.Entity("WebCinema.Models.BookedSeats", b =>
+            modelBuilder.Entity("WebCinema.Models.Booked_Seats", b =>
                 {
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
@@ -55,7 +72,7 @@ namespace WebCinema.Migrations
 
                     b.HasIndex("SeatsId");
 
-                    b.ToTable("BookedSeats");
+                    b.ToTable("Booked_Seats");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Bookings", b =>
@@ -168,6 +185,20 @@ namespace WebCinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Directors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Hilk",
+                            LastName = "Hogan"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FirstName = "Christopher",
+                            LastName = "Nolan"
+                        });
                 });
 
             modelBuilder.Entity("WebCinema.Models.Genres", b =>
@@ -579,8 +610,6 @@ namespace WebCinema.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
                     b.HasIndex("RolesId");
 
                     b.ToTable("Users");
@@ -800,12 +829,6 @@ namespace WebCinema.Migrations
             modelBuilder.Entity("WebCinema.Models.Users", b =>
                 {
                     b.HasOne("WebCinema.Models.Roles", "Roles")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCinema.Models.Roles", null)
                         .WithMany("Users")
                         .HasForeignKey("RolesId");
 

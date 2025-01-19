@@ -12,8 +12,8 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    [Migration("20250111192750_newDB")]
-    partial class newDB
+    [Migration("20250115143618_AddedUsersImage")]
+    partial class AddedUsersImage
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -349,6 +349,35 @@ namespace WebCinema.Migrations
                     b.ToTable("MoviesGenres");
                 });
 
+            modelBuilder.Entity("WebCinema.Models.MoviesImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("ImageByteArray")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ImageFormat")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPoster")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("MoviesImages");
+                });
+
             modelBuilder.Entity("WebCinema.Models.Payments", b =>
                 {
                     b.Property<int>("Id")
@@ -645,6 +674,17 @@ namespace WebCinema.Migrations
                     b.Navigation("Genre");
 
                     b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("WebCinema.Models.MoviesImage", b =>
+                {
+                    b.HasOne("WebCinema.Models.Movies", "Movies")
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movies");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Payments", b =>

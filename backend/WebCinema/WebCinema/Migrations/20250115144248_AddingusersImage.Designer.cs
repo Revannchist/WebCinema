@@ -12,8 +12,8 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    [Migration("20250112155857_AddMoviesImage")]
-    partial class AddMoviesImage
+    [Migration("20250115144248_AddingusersImage")]
+    partial class AddingusersImage
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

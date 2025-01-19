@@ -45,7 +45,7 @@ namespace WebCinema.Services
         public async Task<Seats> GetSeatsByIdAsync(int id)
         {
             var seats = await _dbContext.Seats.FirstOrDefaultAsync(x => x.Id == id);
-            seats.Hall = await _hallsService.GetHallsByIdAsync(seats.HallsId);
+            seats.Hall = await _hallsService.GetHallEntityByIdAsync(seats.HallsId);
             return seats;
         }
 

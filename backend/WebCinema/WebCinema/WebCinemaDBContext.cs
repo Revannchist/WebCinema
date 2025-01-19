@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Data;
 using WebCinema.Models;
 
 namespace WebCinema
@@ -87,6 +88,26 @@ namespace WebCinema
             //------------------------------------------------------//
 
 
+            modelBuilder.Entity<Roles>().HasData(
+            new Roles { Id = 1, Name = "Admin" },
+            new Roles { Id = 2, Name = "User" },
+            new Roles { Id = 3, Name = "Moderator" }
+            );
+
+            //------------------------------------------------------//
+
+            modelBuilder.Entity<Users>()
+            .HasOne(u => u.Roles)
+            .WithMany()
+            .HasForeignKey(u => u.RoleId)
+            .IsRequired();
+
+            //------------------------------------------------------//
+
+
+
+
+
         }
 
         public DbSet<Countries> Countries { get; set; }
@@ -106,5 +127,7 @@ namespace WebCinema
         public DbSet<Bookings> Bookings { get; set; }
         public DbSet<Payments>Payments { get; set; }
         public DbSet<MoviesImage> MoviesImages { get; set; }
+        public DbSet<UsersImage>UsersImages { get; set; }
+        public DbSet<Roles> Roles { get; set; }
     }
 }
