@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 using WebCinema.Services;
 
 namespace WebCinema.Controllers
@@ -16,9 +17,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddRatings(Ratings ratings)
+        public async Task<IActionResult> AddRatings(RatingCreateDto ratingDto)
         {
-            var createdRatings = await _ratingsService.CreateRatingsAsync(ratings);
+            var createdRatings = await _ratingsService.CreateRatingAsync(ratingDto);
             if (createdRatings == null)
             {
                 return BadRequest("Greska!");
