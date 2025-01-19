@@ -61,23 +61,14 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllMovies([FromQuery] MoviesParameters parameters)
+        public async Task<IActionResult> GetAllMovies()
         {
-            try
+            var movies = await _moviesService.GetAllMoviesAsync();
+            if (movies == null)
             {
-                var movies = await _moviesService.GetAllMoviesAsync(parameters);
-
-                if (movies.Items == null || !movies.Items.Any())
-                {
-                    return NotFound("No movies found matching the criteria.");
-                }
-
-                return Ok(movies);
+                return BadRequest("Error | Bad Request!");
             }
-            catch (Exception)
-            {
-                return BadRequest("An error occurred while processing your request.");
-            }
+            return Ok(movies);
         }
 
         [HttpGet]

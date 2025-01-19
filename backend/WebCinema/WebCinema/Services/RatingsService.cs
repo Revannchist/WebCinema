@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebCinema.Interfaces;
 using WebCinema.Models;
-using WebCinema.Models.DTO;
 
 namespace WebCinema.Services
 {
@@ -13,83 +12,28 @@ namespace WebCinema.Services
         {
             _dbContext = dbContext;
         }
-        public async Task<RatingsResponseDto> CreateRatingAsync(RatingCreateDto ratingDto)
+        public async Task<Ratings> CreateRatingsAsync(Ratings ratings)
         {
-            var rating = new Ratings
+            if (ratings == null)
             {
-                MoviesId = ratingDto.MoviesId,
-                UsersId = ratingDto.UsersId,
-                Rating = ratingDto.Rating,
-                Review = ratingDto.Review,
-                RatingDateTime = DateTime.UtcNow
-            };
+                return null;
+            }
+            if (ratings.Rating < 1 || ratings.Rating > 5)
+            {
+                throw new ArgumentException("Ocjena mora biti između 1 i 5");
+            }
+            var existingRating = await _dbContext.Ratings
+                .FirstOrDefaultAsync(r =>
+                r.UsersId == ratings.UsersId &&
+                r.MoviesId == ratings.MoviesId);
 
-            await _dbContext.Ratings.AddAsync(rating);
+            if (existingRating != null)
+            {
+                throw new Exception("Vec ste ocijenili ovaj film!");
+            }
+            await _dbContext.Ratings.AddAsync(ratings);
             await _dbContext.SaveChangesAsync();
-
-            // Load related data for response
-            await _dbContext.Entry(rating)
-                .Reference(r => r.Movies)
-                .LoadAsync();
-
-            await _dbContext.Entry(rating)
-                .Reference(r => r.Users)
-                .LoadAsync();
-
-            // Load related movie data and user data
-            var movieResponse = new MoviesResponseDto
-            {
-                Id = rating.Movies.Id,
-                Title = rating.Movies.Title,
-                Description = rating.Movies.Description,
-                ReleaseDate = rating.Movies.ReleaseDate,
-                Duration = rating.Movies.Duration,
-                Language = rating.Movies.Language,
-                AgeRating = rating.Movies.AgeRating,
-                Director = rating.Movies.Director != null ? new DirectorDto
-                {
-                    Id = rating.Movies.Director.Id,
-                    FirstName = rating.Movies.Director.FirstName,
-                    LastName = rating.Movies.Director.LastName
-                } : null,
-
-                Country = rating.Movies.Country != null ? new CountryDto
-                {
-                    Id = rating.Movies.Country.Id,
-                    Name = rating.Movies.Country.Name
-                } : null,
-
-                Genres = rating.Movies.MoviesGenres?.Select(mg => new GenreDto
-                {
-                    Id = mg.Genre.Id,
-                    Name = mg.Genre.Name
-                }).ToList(),
-
-                Actors = rating.Movies.MoviesActors?.Select(ma => new ActorDto
-                {
-                    Id = ma.Actor.Id,
-                    FirstName = ma.Actor.FirstName,
-                    LastName = ma.Actor.LastName
-                }).ToList()
-            };
-
-            return new RatingsResponseDto
-            {
-                Id = rating.Id,
-                MoviesId = rating.MoviesId,
-                UsersId = rating.UsersId,
-                Rating = rating.Rating,
-                Review = rating.Review,
-                RatingDateTime = rating.RatingDateTime,
-                //User = rating.Users != null ? new UserDto
-                //{
-                //    Id = rating.Users.Id,
-                //    FirstName = rating.Users.FirstName,
-                //    LastName = rating.Users.LastName
-                //} : null,
-
-                Movie = movieResponse  // Assigning MovieResponseDto
-            };
+            return ratings;
         }
 
         public async Task<Ratings> DeleteRatingsByIdAsync(int id)

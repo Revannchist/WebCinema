@@ -1,6 +1,6 @@
 ﻿namespace WebCinema.Models.DTO
 {
-    public class MoviesResponseDto
+    public class MovieResponseDto
     {
         public int Id { get; set; }
         public string Title { get; set; }

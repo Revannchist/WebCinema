@@ -17,7 +17,7 @@ namespace WebCinema.Services
             _logger = logger;
         }
 
-        public async Task<MoviesResponseDto> CreateMovieAsync(MovieCreateDto movieDto)
+        public async Task<MovieResponseDto> CreateMovieAsync(MovieCreateDto movieDto)
         {
             var movie = new Movies
             {
@@ -57,7 +57,7 @@ namespace WebCinema.Services
                 .Include(ma => ma.Actor)
                 .LoadAsync();
 
-            return new MoviesResponseDto
+            return new MovieResponseDto
             {
                 Id = movie.Id,
                 Title = movie.Title,
@@ -144,69 +144,12 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<MoviesPagedResponse<MoviesGetDto>> GetAllMoviesAsync(MoviesParameters parameters)
+        public async Task<List<MoviesGetDto>> GetAllMoviesAsync()
         {
             try
             {
-                var query = _dbContext.Movies.AsNoTracking();
-
-                // Apply filters
-                if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
-                {
-                    query = query.Where(m =>
-                        m.Title.Contains(parameters.SearchTerm)); //||
-                       //m.Description.Contains(parameters.SearchTerm));
-                }
-
-                if (parameters.FromDate.HasValue)
-                {
-                    query = query.Where(m => m.ReleaseDate >= parameters.FromDate);
-                }
-
-                if (parameters.ToDate.HasValue)
-                {
-                    query = query.Where(m => m.ReleaseDate <= parameters.ToDate);
-                }
-
-                if (!string.IsNullOrWhiteSpace(parameters.Language))
-                {
-                    query = query.Where(m => m.Language == parameters.Language);
-                }
-
-                if (!string.IsNullOrWhiteSpace(parameters.AgeRating))
-                {
-                    query = query.Where(m => m.AgeRating == parameters.AgeRating);
-                }
-
-                if (parameters.DirectorId.HasValue)
-                {
-                    query = query.Where(m => m.DirectorId == parameters.DirectorId);
-                }
-
-                if (parameters.CountryId.HasValue)
-                {
-                    query = query.Where(m => m.CountryId == parameters.CountryId);
-                }
-
-                if (parameters.GenreIds != null && parameters.GenreIds.Any())
-                {
-                    query = query.Where(m => m.MoviesGenres
-                        .Any(mg => parameters.GenreIds.Contains(mg.GenreId)));
-                }
-
-                if (parameters.ActorsIds != null && parameters.ActorsIds.Any())
-                {
-                    query = query.Where(m => m.MoviesActors
-                        .Any(mg => parameters.ActorsIds.Contains(mg.ActorId)));
-                }
-
-                // Get total count for pagination
-                var totalCount = await query.CountAsync();
-
-                // Apply pagination
-                var movies = await query
-                    .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                    .Take(parameters.PageSize)
+                var movies = await _dbContext.Movies
+                    .AsNoTracking()
                     .Select(m => new MoviesGetDto
                     {
                         Id = m.Id,
@@ -216,8 +159,8 @@ namespace WebCinema.Services
                         Duration = m.Duration,
                         Language = m.Language,
                         AgeRating = m.AgeRating,
-                        DirectorId = m.Director != null ? new DirectorDto
-                        {
+                        DirectorId = m.Director != null ? new DirectorDto //U slucaju da korisnik izbrise direktora
+                        {                                                 //ovo omogucava da film bude prikazan iako nema direktora
                             Id = m.Director.Id,
                             FirstName = m.Director.FirstName,
                             LastName = m.Director.LastName
@@ -236,21 +179,11 @@ namespace WebCinema.Services
                     })
                     .ToListAsync();
 
-                // paged response
-                var response = new MoviesPagedResponse<MoviesGetDto>
-                {
-                    Items = movies,
-                    PageNumber = parameters.PageNumber,
-                    PageSize = parameters.PageSize,
-                    TotalCount = totalCount,
-                    TotalPages = (int)Math.Ceiling(totalCount / (double)parameters.PageSize)
-                };
-
-                return response;
+                return movies;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving paged movies");
+                _logger.LogError(ex, "Error retrieving all movies");
                 throw;
             }
         }
@@ -279,7 +212,7 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<MoviesResponseDto> UpdateMovieAsync(int id, MoviesUpdateDto movieDto)
+        public async Task<MovieResponseDto> UpdateMovieAsync(int id, MoviesUpdateDto movieDto)
         {
             var existingMovie = await _dbContext.Movies
                 .Include(m => m.MoviesGenres)
@@ -363,7 +296,7 @@ namespace WebCinema.Services
                 .LoadAsync();
 
             // Map to response DTO
-            return new MoviesResponseDto
+            return new MovieResponseDto
             {
                 Id = existingMovie.Id,
                 Title = existingMovie.Title,
