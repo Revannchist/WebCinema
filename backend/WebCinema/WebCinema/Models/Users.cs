@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
+using System.Text.Json.Serialization;
 
 namespace WebCinema.Models
 {
@@ -12,6 +14,10 @@ namespace WebCinema.Models
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
         public DateTime RegistrationTime { get; set; }
+
+        public int RoleId { get; set; }
+        [ForeignKey("RoleId")]
+        public Roles Roles { get; set; }
 
         //public int RoleId { get; set; }
         //public Role? Role { get; set; }

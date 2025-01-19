@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250115201503_AddedRoles")]
+    partial class AddedRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -458,23 +461,6 @@ namespace WebCinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Moderator"
-                        });
                 });
 
             modelBuilder.Entity("WebCinema.Models.Seats", b =>
@@ -595,9 +581,6 @@ namespace WebCinema.Migrations
                     b.Property<DateTime>("RegistrationTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("RolesId")
                         .HasColumnType("int");
 
@@ -606,8 +589,6 @@ namespace WebCinema.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
 
                     b.HasIndex("RolesId");
 
@@ -827,17 +808,9 @@ namespace WebCinema.Migrations
 
             modelBuilder.Entity("WebCinema.Models.Users", b =>
                 {
-                    b.HasOne("WebCinema.Models.Roles", "Roles")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebCinema.Models.Roles", null)
                         .WithMany("Users")
                         .HasForeignKey("RolesId");
-
-                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("WebCinema.Models.UsersImage", b =>

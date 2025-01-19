@@ -25,6 +25,8 @@ namespace WebCinema
             builder.Services.AddScoped<IBookingsService, BookingsService>();
             builder.Services.AddScoped<IPaymentsService, PaymentsService>();
             builder.Services.AddScoped<IMoviesImageService, MoviesImageService>();
+            builder.Services.AddScoped<IUsersImageService, UsersImageService>();
+            builder.Services.AddScoped<IRolesService,RoleService>();
             // Add services to the container.
 
             builder.Services.AddControllers();

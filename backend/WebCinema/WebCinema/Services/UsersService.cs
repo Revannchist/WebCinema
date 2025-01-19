@@ -15,69 +15,211 @@ namespace WebCinema.Services
             _dbContext = dbContext;
         }
 
-        public async Task<Users> CreateUsersAsync(Users users)
+        private async Task<bool> IsUsernameUniqueAsync(string username, int? excludeUserId = null)
+        {
+            return !await _dbContext.Users
+                .AnyAsync(u => u.Username == username && (!excludeUserId.HasValue || u.Id != excludeUserId));
+        }
+
+        private async Task<bool> IsEmailUniqueAsync(string email, int? excludeUserId = null)
+        {
+            return !await _dbContext.Users
+                .AnyAsync(u => u.Email == email && (!excludeUserId.HasValue || u.Id != excludeUserId));
+        }
+
+        private bool IsPasswordValid(string password)
+        {
+            return password.Length >= 5 && password.Any(char.IsDigit);
+        }
+
+        private async Task<(bool isValid, string errorMessage)> ValidateUserAsync(Users users, int? excludeUserId = null)
+        {
+            if (!await IsUsernameUniqueAsync(users.Username, excludeUserId))
+            {
+                return (false, "Username already exists");
+            }
+
+            if (!await IsEmailUniqueAsync(users.Email, excludeUserId))
+            {
+                return (false, "Email already exists");
+            }
+
+            if (!IsPasswordValid(users.Password))
+            {
+                return (false, "Password must be at least 5 characters long and contain at least 1 number");
+            }
+
+            // Provera role
+            var roleExists = await _dbContext.Roles.AnyAsync(r => r.Id == users.RoleId);
+            if (!roleExists)
+            {
+                return (false, "Invalid role specified");
+            }
+
+            return (true, string.Empty);
+        }
+
+        public async Task<(Users user, string errorMessage)> CreateUsersAsync(Users users)
         {
             if (users == null)
             {
-                return null;
+                return (null, "User data is required");
             }
+
+            // Ako nije prosleđena rola, postavi default rolu (User - ID 2)
+            if (users.RoleId == 0)
+            {
+                users.RoleId = 2; // ID za User rolu
+            }
+
+            var validation = await ValidateUserAsync(users);
+            if (!validation.isValid)
+            {
+                return (null, validation.errorMessage);
+            }
+
             await _dbContext.Users.AddAsync(users);
             await _dbContext.SaveChangesAsync();
-            return users;
+            return (users, string.Empty);
         }
 
-        public async Task<List<Users>> GetAllUsersAsync()
+        public async Task<List<UserDisplayDto>> GetAllUsersAsync()
         {
-            var users = await _dbContext.Users.ToListAsync();
-            return users;
+            return await _dbContext.Users
+                .Include(u => u.Roles)
+                .Select(u => new UserDisplayDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    Password = u.Password,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    DateOfBirth = u.DateOfBirth,
+                    RegistrationTime = u.RegistrationTime,
+                    RoleId = u.RoleId,
+                    RoleName = u.Roles.Name
+                })
+                .ToListAsync();
+        }
+
+        public async Task<UserDisplayDto> GetUsersByIdForDisplayAsync(int id)
+        {
+            return await _dbContext.Users
+                .Include(u => u.Roles)
+                .Where(x => x.Id == id)
+                .Select(u => new UserDisplayDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    Password = u.Password,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    DateOfBirth = u.DateOfBirth,
+                    RegistrationTime = u.RegistrationTime,
+                    RoleId = u.RoleId,
+                    RoleName = u.Roles.Name
+                })
+                .FirstOrDefaultAsync();
         }
 
         public async Task<Users> GetUsersByIdAsync(int id)
         {
-            var users = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
-            return users;
+            return await _dbContext.Users
+                .Include(u => u.Roles)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<Users> DeleteUsersByIdAsync(int id)
-        {
-            var users = await GetUsersByIdAsync(id);
-            if (users != null)
-            {
-                _dbContext.Users.Remove(users);
-                await _dbContext.SaveChangesAsync();
-            }
-            return users;
-        }
 
-        public async Task<Users> UpdateUsersAsync(int id, Users users)
-        {
-            var _users = await GetUsersByIdAsync(id);
-            if (users != null)
-            {
-                _users.Username = users.Username;
-                _users.Email = users.Email;
-                _users.Password = users.Password;
-                _users.FirstName = users.FirstName;
-                _users.LastName = users.LastName;
-                _users.DateOfBirth = users.DateOfBirth;
-                _users.RegistrationTime = users.RegistrationTime;
-                _dbContext.Users.Update(_users);
-                await _dbContext.SaveChangesAsync();
-            }
-            return _users;
-        }
 
-        public async Task<Users> UpdateUserBasicInfoAsync(int id, UsersEditDto dto) //DTO for editing
+
+        public async Task<UserDisplayDto> DeleteUsersByIdAsync(int id)
         {
-            var user = await _dbContext.Users.FindAsync(id);
+            var user = await GetUsersByIdAsync(id);
             if (user != null)
             {
-                user.Username = dto.Username;
-                user.Email = dto.Email;
-                user.Password = dto.Password;
+                _dbContext.Users.Remove(user);
+                await _dbContext.SaveChangesAsync();
+
+                return new UserDisplayDto
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Password = user.Password,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    DateOfBirth = user.DateOfBirth,
+                    RegistrationTime = user.RegistrationTime,
+                    RoleId = user.RoleId,
+                    RoleName = user.Roles?.Name
+                };
             }
-            await _dbContext.SaveChangesAsync();
-            return user;
+            return null;
         }
+
+        public async Task<(Users user, string errorMessage)> UpdateUsersAsync(int id, Users users)
+        {
+            var existingUser = await GetUsersByIdAsync(id);
+            if (existingUser == null)
+            {
+                return (null, "User not found");
+            }
+
+            var validation = await ValidateUserAsync(users, id);
+            if (!validation.isValid)
+            {
+                return (null, validation.errorMessage);
+            }
+
+            existingUser.Username = users.Username;
+            existingUser.Email = users.Email;
+            existingUser.Password = users.Password;
+            existingUser.FirstName = users.FirstName;
+            existingUser.LastName = users.LastName;
+            existingUser.DateOfBirth = users.DateOfBirth;
+            existingUser.RegistrationTime = users.RegistrationTime;
+            existingUser.RoleId = users.RoleId;
+
+            _dbContext.Users.Update(existingUser);
+            await _dbContext.SaveChangesAsync();
+            return (existingUser, string.Empty);
+        }
+
+        public async Task<(Users user, string errorMessage)> UpdateUserBasicInfoAsync(int id, UsersEditDto dto)
+        {
+            var user = await _dbContext.Users.FindAsync(id);
+            if (user == null)
+            {
+                return (null, "User not found");
+            }
+
+            var tempUser = new Users
+            {
+                Username = dto.Username,
+                Email = dto.Email,
+                Password = dto.Password,
+                RoleId = dto.RoleId
+            };
+
+            var validation = await ValidateUserAsync(tempUser, id);
+            if (!validation.isValid)
+            {
+                return (null, validation.errorMessage);
+            }
+
+            user.Username = dto.Username;
+            user.Email = dto.Email;
+            user.Password = dto.Password;
+            user.RoleId = dto.RoleId;
+
+            await _dbContext.SaveChangesAsync();
+            return (user, string.Empty);
+        }
+
+       
     }
+
+   
 }

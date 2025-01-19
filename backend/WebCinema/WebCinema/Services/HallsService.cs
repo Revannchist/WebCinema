@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Services
 {
@@ -24,42 +25,98 @@ namespace WebCinema.Services
             return halls;
         }
 
-        public async Task<Halls> DeleteHallsByIdAsync(int id)
+        public async Task<HallDisplayDto> DeleteHallsByIdAsync(int id)
         {
-            var halls = await GetHallsByIdAsync(id);
-            if (halls != null)
+            var hall = await _dbContext.Halls
+         .Include(h => h.Theater)
+         .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (hall != null)
             {
-                _dbContext.Halls.Remove(halls);
+                _dbContext.Halls.Remove(hall);
                 await _dbContext.SaveChangesAsync();
+
+                return new HallDisplayDto
+                {
+                    Id = hall.Id,
+                    TheatersID = hall.TheatersID,
+                    TheaterName = hall.Theater?.Name,
+                    HallName = hall.HallName,
+                    Capacity = hall.Capacity,
+                    HallType = hall.HallType
+                };
             }
-            return halls;
+            return null;
         }
 
-        public async Task<List<Halls>> GetAllHallsAsync()
+        public async Task<List<HallDisplayDto>> GetAllHallsAsync()
         {
-            var halls = await _dbContext.Halls.ToListAsync();
-            return halls;
+            return await _dbContext.Halls
+        .Include(h => h.Theater)
+        .Select(h => new HallDisplayDto
+        {
+            Id = h.Id,
+            TheatersID = h.TheatersID,
+            TheaterName = h.Theater.Name, 
+            HallName = h.HallName,
+            Capacity = h.Capacity,
+            HallType = h.HallType
+        })
+        .ToListAsync();
         }
 
-        public async Task<Halls> GetHallsByIdAsync(int id)
+        public async Task<Halls> GetHallEntityByIdAsync(int id)
         {
-            var halls = await _dbContext.Halls.FirstOrDefaultAsync(x => x.Id == id);
-            halls.Theater=await _theatersService.GetTheatersByIdAsync(halls.TheatersID);
-            return halls;
+           
+                return await _dbContext.Halls
+                    .Include(h => h.Theater)
+                    .FirstOrDefaultAsync(h => h.Id == id);
+            
         }
 
-        public async Task<Halls> UpdateHallsAsync(int id, Halls halls)
+        public async Task<HallDisplayDto> GetHallsByIdAsync(int id)
         {
-            var _halls = await GetHallsByIdAsync(id);
-            if (halls != null)
+            return await _dbContext.Halls
+       .Include(h => h.Theater)
+       .Where(h => h.Id == id)
+       .Select(h => new HallDisplayDto
+       {
+           Id = h.Id,
+           TheatersID = h.TheatersID,
+           TheaterName = h.Theater.Name, 
+           HallName = h.HallName,
+           Capacity = h.Capacity,
+           HallType = h.HallType
+       })
+       .FirstOrDefaultAsync();
+        }
+
+        public async Task<HallDisplayDto> UpdateHallsAsync(int id, Halls halls)
+        {
+            var hall = await _dbContext.Halls
+         .Include(h => h.Theater)
+         .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (hall != null)
             {
-                _halls.HallName = halls.HallName;
-                _halls.Capacity= halls.Capacity;
-                _halls.HallType=halls.HallType;
-                _dbContext.Halls.Update(_halls);
+                hall.HallName = halls.HallName;
+                hall.Capacity = halls.Capacity;
+                hall.HallType = halls.HallType;
+
+                _dbContext.Halls.Update(hall);
                 await _dbContext.SaveChangesAsync();
+
+                return new HallDisplayDto
+                {
+                    Id = hall.Id,
+                    TheatersID = hall.TheatersID,
+                    TheaterName = hall.Theater?.Name,
+                    HallName = hall.HallName,
+                    Capacity = hall.Capacity,
+                    HallType = hall.HallType
+                };
             }
-            return _halls;
+            return null;
         }
     }
 }

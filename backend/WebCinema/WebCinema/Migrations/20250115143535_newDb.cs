@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebCinema.Migrations
 {
     /// <inheritdoc />
-    public partial class newDB : Migration
+    public partial class newDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -217,6 +217,28 @@ namespace WebCinema.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_MoviesGenres_Movies_MovieId",
+                        column: x => x.MovieId,
+                        principalTable: "Movies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MoviesImages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MovieId = table.Column<int>(type: "int", nullable: false),
+                    ImageByteArray = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    ImageFormat = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsPoster = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MoviesImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MoviesImages_Movies_MovieId",
                         column: x => x.MovieId,
                         principalTable: "Movies",
                         principalColumn: "Id",
@@ -467,6 +489,11 @@ namespace WebCinema.Migrations
                 column: "GenreId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MoviesImages_MovieId",
+                table: "MoviesImages",
+                column: "MovieId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payments_BookingId",
                 table: "Payments",
                 column: "BookingId");
@@ -513,6 +540,9 @@ namespace WebCinema.Migrations
 
             migrationBuilder.DropTable(
                 name: "MoviesGenres");
+
+            migrationBuilder.DropTable(
+                name: "MoviesImages");
 
             migrationBuilder.DropTable(
                 name: "Payments");

@@ -11,60 +11,75 @@ namespace WebCinema.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersService _usersService;
+
         public UsersController(IUsersService usersService)
         {
             _usersService = usersService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUser(Users users)
+        public async Task<IActionResult> AddUser(UserCreateDto userDto)
         {
-            var createdUsers = await _usersService.CreateUsersAsync(users);
-            if (createdUsers == null)
+            var users = new Users
             {
-                return BadRequest("Error | Bad Request!");
+                Username = userDto.Username,
+                Email = userDto.Email,
+                Password = userDto.Password,
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                DateOfBirth = userDto.DateOfBirth,
+                RegistrationTime = DateTime.Now,
+                RoleId = userDto.RoleId
+            };
+
+            var (createdUser, errorMessage) = await _usersService.CreateUsersAsync(users);
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                return BadRequest(errorMessage);
             }
-            return Ok(createdUsers);
+            return Ok(createdUser);
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteUserById(int id)
         {
-            var deletedUsers = await _usersService.DeleteUsersByIdAsync(id);
-            if (deletedUsers == null)
+            var deletedUser = await _usersService.DeleteUsersByIdAsync(id);
+            if (deletedUser == null)
             {
                 return BadRequest("Error | Bad Request!");
             }
-            return Ok(deletedUsers);
+            return Ok(deletedUser);
         }
 
         [HttpPost]
         public async Task<IActionResult> UpdateUser(int id, Users users)
         {
-            var updatedUsers = await _usersService.UpdateUsersAsync(id, users);
-            if (updatedUsers == null)
+            var (updatedUser, errorMessage) = await _usersService.UpdateUsersAsync(id, users);
+            if (!string.IsNullOrEmpty(errorMessage))
             {
-                return BadRequest("Error | Bad Request!");
+                return BadRequest(errorMessage);
             }
-            return Ok(updatedUsers);
+            return Ok(updatedUser);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var users = await _usersService.GetUsersByIdAsync(id);
-            if (users == null)
+            var user = await _usersService.GetUsersByIdForDisplayAsync(id);
+            if (user == null)
             {
                 return BadRequest("Error | Bad Request!");
             }
-            return Ok(users);
+            return Ok(user);
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _usersService.GetAllUsersAsync();
-            if (users == null)
+            if (users == null || !users.Any())
             {
                 return BadRequest("Error | Bad Request!");
             }
@@ -74,12 +89,12 @@ namespace WebCinema.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateUserBasicInfo(int id, UsersEditDto dto)
         {
-            var user = await _usersService.UpdateUserBasicInfoAsync(id, dto);
-            if(user == null)
+            var (updatedUser, errorMessage) = await _usersService.UpdateUserBasicInfoAsync(id, dto);
+            if (!string.IsNullOrEmpty(errorMessage))
             {
-                return BadRequest("Error | Bad Request!");
+                return BadRequest(errorMessage);
             }
-            return Ok(user);
+            return Ok(updatedUser);
         }
     }
 }

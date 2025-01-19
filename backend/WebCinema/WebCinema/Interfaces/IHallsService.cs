@@ -1,4 +1,5 @@
 ﻿using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Interfaces
 {
@@ -6,12 +7,13 @@ namespace WebCinema.Interfaces
     {
         Task<Halls> CreateHallsAsync(Halls halls);
 
-        Task<List<Halls>> GetAllHallsAsync();
+        Task<List<HallDisplayDto>> GetAllHallsAsync();
 
-        Task<Halls> GetHallsByIdAsync(int id);
+        Task<HallDisplayDto> GetHallsByIdAsync(int id);
 
-        Task<Halls> DeleteHallsByIdAsync(int id);
+        Task<HallDisplayDto> DeleteHallsByIdAsync(int id);
 
-        Task<Halls> UpdateHallsAsync(int id, Halls halls);
+        Task<HallDisplayDto> UpdateHallsAsync(int id, Halls halls);
+        Task<Halls> GetHallEntityByIdAsync(int id);
     }
 }

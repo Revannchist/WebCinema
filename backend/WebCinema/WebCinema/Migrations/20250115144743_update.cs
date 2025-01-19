@@ -5,44 +5,43 @@
 namespace WebCinema.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMoviesImage : Migration
+    public partial class update : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "MoviesImages",
+                name: "UsersImages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MovieId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     ImageByteArray = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    ImageFormat = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsPoster = table.Column<bool>(type: "bit", nullable: false)
+                    ImageFormat = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MoviesImages", x => x.Id);
+                    table.PrimaryKey("PK_UsersImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MoviesImages_Movies_MovieId",
-                        column: x => x.MovieId,
-                        principalTable: "Movies",
+                        name: "FK_UsersImages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_MoviesImages_MovieId",
-                table: "MoviesImages",
-                column: "MovieId");
+                name: "IX_UsersImages_UserId",
+                table: "UsersImages",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "MoviesImages");
+                name: "UsersImages");
         }
     }
 }
