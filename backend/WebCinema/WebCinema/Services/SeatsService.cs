@@ -2,6 +2,7 @@
 using System;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Services
 {
@@ -27,7 +28,7 @@ namespace WebCinema.Services
 
         public async Task<Seats> DeleteSeatsByIdAsync(int id)
         {
-            var seats = await GetSeatsByIdAsync(id);
+            var seats = await _dbContext.Seats.FirstOrDefaultAsync(x => x.Id == id);
             if (seats != null)
             {
                 _dbContext.Seats.Remove(seats);
@@ -36,26 +37,48 @@ namespace WebCinema.Services
             return seats;
         }
 
-        public async Task<List<Seats>> GetAllSeatsAsync()
+        public async Task<List<SeatsDto>> GetAllSeatsAsync()
         {
-            var seats = await _dbContext.Seats.ToListAsync();
+            var seats = await _dbContext.Seats
+                .Include(s => s.Hall)
+                .Select(s => new SeatsDto
+                {
+                    Id = s.Id,
+                    HallsId = s.HallsId,
+                    HallName = s.Hall.HallName,
+                    SeatNumber = s.SeatNumber,
+                    SeatType = s.SeatType
+                })
+                .ToListAsync();
+
             return seats;
         }
 
-        public async Task<Seats> GetSeatsByIdAsync(int id)
+        public async Task<SeatsDto> GetSeatsByIdAsync(int id)
         {
-            var seats = await _dbContext.Seats.FirstOrDefaultAsync(x => x.Id == id);
-            seats.Hall = await _hallsService.GetHallEntityByIdAsync(seats.HallsId);
-            return seats;
+            var seat = await _dbContext.Seats
+                .Include(s => s.Hall)
+                .Where(x => x.Id == id)
+                .Select(s => new SeatsDto
+                {
+                    Id = s.Id,
+                    HallsId = s.HallsId,
+                    HallName = s.Hall.HallName,
+                    SeatNumber = s.SeatNumber,
+                    SeatType = s.SeatType
+                })
+                .FirstOrDefaultAsync();
+
+            return seat;
         }
 
         public async Task<Seats> UpdateSeatsAsync(int id, Seats seats)
         {
-            var _seats = await GetSeatsByIdAsync(id);
-            if (seats != null)
+            var _seats = await _dbContext.Seats.FirstOrDefaultAsync(x => x.Id == id);
+            if (_seats != null)
             {
                 _seats.SeatNumber = seats.SeatNumber;
-                _seats.SeatNumber=seats.SeatNumber;
+                _seats.SeatType = seats.SeatType;
                 _dbContext.Seats.Update(_seats);
                 await _dbContext.SaveChangesAsync();
             }

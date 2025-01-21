@@ -1,4 +1,5 @@
 ﻿using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Interfaces
 {
@@ -6,9 +7,9 @@ namespace WebCinema.Interfaces
     {
         Task<ShowTimes> CreateShowTimesAsync(ShowTimes showtimes);
 
-        Task<List<ShowTimes>> GetAllShowTimesAsync();
+        Task<List<ShowTimesDto>> GetAllShowTimesAsync();
 
-        Task<ShowTimes> GetShowTimesByIdAsync(int id);
+        Task<ShowTimesDto> GetShowTimesByIdAsync(int id);
 
         Task<ShowTimes> DeleteShowTimesByIdAsync(int id);
 

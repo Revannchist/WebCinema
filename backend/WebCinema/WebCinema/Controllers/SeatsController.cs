@@ -59,12 +59,11 @@ namespace WebCinema.Controllers
             return Ok(seats);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetAllSeats()
         {
             var seats = await _seatsService.GetAllSeatsAsync();
-            if (seats == null)
+            if (seats == null || !seats.Any())
             {
                 return BadRequest("Error | Bad Request!");
             }

@@ -7,9 +7,9 @@ namespace WebCinema.Interfaces
     {
         Task<Theaters> CreateTheatersAsync(Theaters theaters);
 
-        Task<List<Theaters>> GetAllTheatersAsync();
+        Task<List<TheaterDto>> GetAllTheatersAsync();
 
-        Task<Theaters> GetTheatersByIdAsync(int id);
+        Task<TheaterDto> GetTheatersByIdAsync(int id);
 
         Task<Theaters> DeleteTheatersByIdAsync(int id);
 

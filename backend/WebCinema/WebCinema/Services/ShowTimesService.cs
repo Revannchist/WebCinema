@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Services
 {
@@ -25,7 +26,7 @@ namespace WebCinema.Services
 
         public async Task<ShowTimes> DeleteShowTimesByIdAsync(int id)
         {
-            var showtimes = await GetShowTimesByIdAsync(id);
+            var showtimes = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
             if (showtimes != null)
             {
                 _dbContext.ShowTimes.Remove(showtimes);
@@ -34,31 +35,58 @@ namespace WebCinema.Services
             return showtimes;
         }
 
-        public async Task<List<ShowTimes>> GetAllShowTimesAsync()
+        public async Task<List<ShowTimesDto>> GetAllShowTimesAsync()
         {
-            var showtimes = await _dbContext.ShowTimes.ToListAsync();
+            var showtimes = await _dbContext.ShowTimes
+                .Include(s => s.Movies)
+                .Include(s => s.Halls)
+                .Select(s => new ShowTimesDto
+                {
+                    Id = s.Id,
+                    MoviesId = s.MoviesId,
+                    MovieTitle = s.Movies.Title,
+                    HallsId = s.HallsId,
+                    HallName = s.Halls.HallName,
+                    ShowDateTieme = s.ShowDateTieme,
+                    TicketPrice = s.TicketPrice
+                })
+                .ToListAsync();
 
             return showtimes;
         }
 
-        public async Task<ShowTimes> GetShowTimesByIdAsync(int id)
+        public async Task<ShowTimesDto> GetShowTimesByIdAsync(int id)
         {
-            var showtimes = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
-            return showtimes;
+            var showtime = await _dbContext.ShowTimes
+                .Include(s => s.Movies)
+                .Include(s => s.Halls)
+                .Where(x => x.Id == id)
+                .Select(s => new ShowTimesDto
+                {
+                    Id = s.Id,
+                    MoviesId = s.MoviesId,
+                    MovieTitle = s.Movies.Title,
+                    HallsId = s.HallsId,
+                    HallName = s.Halls.HallName,
+                    ShowDateTieme = s.ShowDateTieme,
+                    TicketPrice = s.TicketPrice
+                })
+                .FirstOrDefaultAsync();
+
+            return showtime;
         }
 
         public async Task<ShowTimes> UpdateShowTimesAsync(int id, ShowTimes showtimes)
         {
-            var _showtimes = await GetShowTimesByIdAsync(id);
-            if (showtimes != null)
+            var existingShowtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
+            if (existingShowtime != null)
             {
-                
-                _showtimes.ShowDateTieme = showtimes.ShowDateTieme;
-                _showtimes.TicketPrice = showtimes.TicketPrice;
-                _dbContext.ShowTimes.Update(_showtimes);
+                existingShowtime.ShowDateTieme = showtimes.ShowDateTieme;
+                existingShowtime.TicketPrice = showtimes.TicketPrice;
+                _dbContext.ShowTimes.Update(existingShowtime);
                 await _dbContext.SaveChangesAsync();
             }
-            return _showtimes;
+            return existingShowtime;
         }
     }
 }

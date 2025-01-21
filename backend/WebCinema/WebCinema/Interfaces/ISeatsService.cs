@@ -1,4 +1,5 @@
 ﻿using WebCinema.Models;
+using WebCinema.Models.DTO;
 
 namespace WebCinema.Interfaces
 {
@@ -6,9 +7,9 @@ namespace WebCinema.Interfaces
     {
         Task<Seats> CreateSeatsAsync(Seats seats);
 
-        Task<List<Seats>> GetAllSeatsAsync();
+        Task<List<SeatsDto>> GetAllSeatsAsync();
 
-        Task<Seats> GetSeatsByIdAsync(int id);
+        Task<SeatsDto> GetSeatsByIdAsync(int id);
 
         Task<Seats> DeleteSeatsByIdAsync(int id);
 

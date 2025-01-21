@@ -26,7 +26,7 @@ namespace WebCinema.Services
 
         public async Task<Bookings> DeleteBookingsByIdAsync(int id)
         {
-            var bookings = await GetBookingsByIdAsync(id);
+            var bookings = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
             if (bookings != null)
             {
                 _dbContext.Bookings.Remove(bookings);
@@ -35,31 +35,67 @@ namespace WebCinema.Services
             return bookings;
         }
 
-        public async Task<List<Bookings>> GetAllBookingsAsync()
+        public async Task<List<BookingsDto>> GetAllBookingsAsync()
         {
-            var bookings = await _dbContext.Bookings.ToListAsync();
+            var bookings = await _dbContext.Bookings
+                .Include(b => b.User)
+                .Include(b => b.ShowTimes)
+                    .ThenInclude(s => s.Movies)
+                .Include(b => b.ShowTimes)
+                    .ThenInclude(s => s.Halls)
+                .Select(b => new BookingsDto
+                {
+                    Id = b.Id,
+                    UserName = b.User.Username,
+                    MovieTitle = b.ShowTimes.Movies.Title,
+                    HallName = b.ShowTimes.Halls.HallName,
+                    ShowDateTime = b.ShowTimes.ShowDateTieme,
+                    BookingDateTime = b.BookingDateTime,
+                    TotalPrice = b.TotalPrice,
+                    BookingStatus = b.BookingStatus
+                })
+                .ToListAsync();
 
             return bookings;
         }
 
-        public async Task<Bookings> GetBookingsByIdAsync(int id)
+        public async Task<BookingsDto> GetBookingsByIdAsync(int id)
         {
-            var bookings = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
-            return bookings;
+            var booking = await _dbContext.Bookings
+                .Include(b => b.User)
+                .Include(b => b.ShowTimes)
+                    .ThenInclude(s => s.Movies)
+                .Include(b => b.ShowTimes)
+                    .ThenInclude(s => s.Halls)
+                .Where(b => b.Id == id)
+                .Select(b => new BookingsDto
+                {
+                    Id = b.Id,
+                    UserName = b.User.Username,
+                    MovieTitle = b.ShowTimes.Movies.Title,
+                    HallName = b.ShowTimes.Halls.HallName,
+                    ShowDateTime = b.ShowTimes.ShowDateTieme,
+                    BookingDateTime = b.BookingDateTime,
+                    TotalPrice = b.TotalPrice,
+                    BookingStatus = b.BookingStatus
+                })
+                .FirstOrDefaultAsync();
+
+            return booking;
         }
 
         public async Task<Bookings> UpdateBookingsAsync(int id, Bookings bookings)
         {
-            var _bookings = await GetBookingsByIdAsync(id);
-            if (bookings != null)
+            var existingBooking = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
+            if (existingBooking != null)
             {
-                _bookings.BookingDateTime=bookings.BookingDateTime;
-                _bookings.BookingStatus=bookings.BookingStatus;
-                _bookings.TotalPrice=bookings.TotalPrice;
-                _dbContext.Bookings.Update(_bookings);
+                existingBooking.BookingDateTime = bookings.BookingDateTime;
+                existingBooking.BookingStatus = bookings.BookingStatus;
+                existingBooking.TotalPrice = bookings.TotalPrice;
+                _dbContext.Bookings.Update(existingBooking);
                 await _dbContext.SaveChangesAsync();
             }
-            return _bookings;
+            return existingBooking;
         }
 
         public async Task<Bookings> UpdateBookingsBasicInfoAsync(int id, BookingsEditDto dto)

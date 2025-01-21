@@ -73,7 +73,7 @@ namespace WebCinema.Controllers
         public async Task<IActionResult> GetAllBookings()
         {
             var bookings = await _bookingsService.GetAllBookingsAsync();
-            if (bookings == null)
+            if (bookings == null || !bookings.Any())
             {
                 return BadRequest("Error | Bad Request!");
             }

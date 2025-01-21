@@ -63,7 +63,7 @@ namespace WebCinema.Controllers
         public async Task<IActionResult> GetAllShowTiemes()
         {
             var showtimes = await _showtimesService.GetAllShowTimesAsync();
-            if (showtimes == null)
+            if (showtimes == null || !showtimes.Any())
             {
                 return BadRequest("Error | Bad Request!");
             }
