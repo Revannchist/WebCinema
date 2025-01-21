@@ -9,12 +9,26 @@ namespace WebCinema.Services
     {
 
         private readonly WebCinemaDBContext _dbContext;
-        public RatingsService(WebCinemaDBContext dbContext)
+        private readonly ILogger<RatingsService> _logger;
+        public RatingsService(WebCinemaDBContext dbContext, ILogger<RatingsService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
+
+
+
         public async Task<RatingsResponseDto> CreateRatingAsync(RatingCreateDto ratingDto)
         {
+
+            var existingRating = await _dbContext.Ratings
+                .FirstOrDefaultAsync(r => r.MoviesId == ratingDto.MoviesId && r.UsersId == ratingDto.UsersId);
+
+            if (existingRating != null)
+            {
+                throw new InvalidOperationException("This user has already rated the movie.");
+            }
+
             var rating = new Ratings
             {
                 MoviesId = ratingDto.MoviesId,
@@ -27,7 +41,6 @@ namespace WebCinema.Services
             await _dbContext.Ratings.AddAsync(rating);
             await _dbContext.SaveChangesAsync();
 
-            // Load related data for response
             await _dbContext.Entry(rating)
                 .Reference(r => r.Movies)
                 .LoadAsync();
@@ -35,43 +48,6 @@ namespace WebCinema.Services
             await _dbContext.Entry(rating)
                 .Reference(r => r.Users)
                 .LoadAsync();
-
-            // Load related movie data and user data
-            var movieResponse = new MoviesResponseDto
-            {
-                Id = rating.Movies.Id,
-                Title = rating.Movies.Title,
-                Description = rating.Movies.Description,
-                ReleaseDate = rating.Movies.ReleaseDate,
-                Duration = rating.Movies.Duration,
-                Language = rating.Movies.Language,
-                AgeRating = rating.Movies.AgeRating,
-                Director = rating.Movies.Director != null ? new DirectorDto
-                {
-                    Id = rating.Movies.Director.Id,
-                    FirstName = rating.Movies.Director.FirstName,
-                    LastName = rating.Movies.Director.LastName
-                } : null,
-
-                Country = rating.Movies.Country != null ? new CountryDto
-                {
-                    Id = rating.Movies.Country.Id,
-                    Name = rating.Movies.Country.Name
-                } : null,
-
-                Genres = rating.Movies.MoviesGenres?.Select(mg => new GenreDto
-                {
-                    Id = mg.Genre.Id,
-                    Name = mg.Genre.Name
-                }).ToList(),
-
-                Actors = rating.Movies.MoviesActors?.Select(ma => new ActorDto
-                {
-                    Id = ma.Actor.Id,
-                    FirstName = ma.Actor.FirstName,
-                    LastName = ma.Actor.LastName
-                }).ToList()
-            };
 
             return new RatingsResponseDto
             {
@@ -81,53 +57,177 @@ namespace WebCinema.Services
                 Rating = rating.Rating,
                 Review = rating.Review,
                 RatingDateTime = rating.RatingDateTime,
-                //User = rating.Users != null ? new UserDto
-                //{
-                //    Id = rating.Users.Id,
-                //    FirstName = rating.Users.FirstName,
-                //    LastName = rating.Users.LastName
-                //} : null,
 
-                Movie = movieResponse  // Assigning MovieResponseDto
+                User = rating.Users != null ? new UsersDto
+                {
+                    Id = rating.Users.Id,
+                    Username = rating.Users.Username,
+                } : null,
+
+                Movie = rating.Movies != null ? new MoviesResponseDto //mogu uklonit ova 2 responsa jer ovaj info nije bitan 
+                {
+                    Id = rating.Movies.Id,
+                    Title = rating.Movies.Title,
+                    Description = rating.Movies.Description,
+                    ReleaseDate = rating.Movies.ReleaseDate,
+                    Duration = rating.Movies.Duration,
+                    AgeRating = rating.Movies.AgeRating
+                } : null
             };
         }
 
-        public async Task<Ratings> DeleteRatingsByIdAsync(int id)
+        public async Task<Ratings?> DeleteRatingByIdAsync(int id)
         {
-            var ratings = await GetRatingsByIdAsync(id);
-            if (ratings != null)
+            try
             {
-                _dbContext.Ratings.Remove(ratings);
+                var rating = await _dbContext.Ratings.FindAsync(id);
+
+                if (rating == null)
+                {
+                    _logger.LogWarning($"Attempt to delete non-existent rating: {id}");
+                    return null;
+                }
+                _dbContext.Ratings.Remove(rating);
                 await _dbContext.SaveChangesAsync();
+
+                _logger.LogInformation($"Rating deleted successfully: {id}");
+                return rating;
             }
-            return ratings;
-        }
-
-        public async Task<List<Ratings>> GetAllRatingsAsync()
-        {
-            var ratings = await _dbContext.Ratings.ToListAsync();
-
-            return ratings;
-        }
-
-        public async Task<Ratings> GetRatingsByIdAsync(int id)
-        {
-            var ratings = await _dbContext.Ratings.FirstOrDefaultAsync(x => x.Id == id);
-            return ratings;
-        }
-
-        public async Task<Ratings> UpdateRatingsAsync(int id, Ratings ratings)
-        {
-            var _ratings = await GetRatingsByIdAsync(id);
-            if (ratings != null)
+            catch (Exception ex)
             {
-                _ratings.Rating=ratings.Rating;
-                _ratings.Review=ratings.Review;
-                _ratings.RatingDateTime=ratings.RatingDateTime;
-                _dbContext.Ratings.Update(_ratings);
-                await _dbContext.SaveChangesAsync();
+                _logger.LogError(ex, $"Error deleting rating with ID: {id}");
+                throw;
             }
-            return _ratings;
         }
+
+        public async Task<List<RatingsGetDto>> GetAllRatingsAsync()
+        {
+            try
+            {
+                var ratings = await _dbContext.Ratings
+                    .AsNoTracking()
+                    .Include(r => r.Movies) // Include the related Movies
+                    .Include(r => r.Users)  // Include the related Users
+                    .Select(r => new RatingsGetDto
+                    {
+                        Id = r.Id,
+                        MoviesId = r.MoviesId,
+                        UsersId = r.UsersId,
+                        Rating = r.Rating,
+                        Review = r.Review,
+                        RatingDateTime = r.RatingDateTime,
+
+                        // Mapping related Movie information
+                        MovieTitle = r.Movies.Title,
+                        MovieDescription = r.Movies.Description,
+
+                        // Mapping related User information
+                        Username = r.Users.Username,
+                        UserEmail = r.Users.Email
+                    })
+                    .ToListAsync();
+
+                return ratings;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all ratings");
+                throw;
+            }
+        }
+
+        public async Task<RatingsGetDto> GetRatingsByIdAsync(int id)
+        {
+            try
+            {
+                var rating = await _dbContext.Ratings
+                    .AsNoTracking()
+                    .Where(r => r.Id == id)
+                    .Select(r => new RatingsGetDto
+                    {
+                        Id = r.Id,
+                        MoviesId = r.MoviesId,
+                        UsersId = r.UsersId,
+                        Rating = r.Rating,
+                        Review = r.Review,
+                        RatingDateTime = r.RatingDateTime,
+                        MovieTitle = r.Movies.Title,
+                        MovieDescription = r.Movies.Description,
+                        Username = r.Users.Username,
+                        UserEmail = r.Users.Email
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (rating == null)
+                {
+                    throw new KeyNotFoundException($"Rating with ID {id} not found");
+                }
+
+                return rating;
+            }
+            catch (Exception ex) when (ex is not KeyNotFoundException)
+            {
+                _logger.LogError(ex, "Error retrieving rating with ID {RatingId}", id);
+                throw;
+            }
+        }
+
+        public async Task<RatingsResponseDto> UpdateRatingsAsync(int id, RatingUpdateDto ratingDto)
+        {
+            var existingRating = await _dbContext.Ratings
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (existingRating == null)
+            {
+                _logger.LogWarning($"Rating not found for update: {id}");
+                throw new InvalidOperationException($"Rating with ID {id} not found");
+            }
+
+            // Update properties
+            existingRating.Rating = ratingDto.Rating;
+            existingRating.Review = ratingDto.Review;
+            existingRating.RatingDateTime = DateTime.UtcNow;
+
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation($"Rating updated successfully: {id}");
+
+            await _dbContext.Entry(existingRating)
+                .Reference(r => r.Movies)
+                .LoadAsync();
+
+            await _dbContext.Entry(existingRating)
+                .Reference(r => r.Users)
+                .LoadAsync();
+
+            return new RatingsResponseDto
+            {
+                Id = existingRating.Id,
+                MoviesId = existingRating.MoviesId,
+                UsersId = existingRating.UsersId,
+                Rating = existingRating.Rating,
+                Review = existingRating.Review,
+                RatingDateTime = existingRating.RatingDateTime,
+
+                User = existingRating.Users != null ? new UsersDto
+                {
+                    Id = existingRating.Users.Id,
+                    FirstName = existingRating.Users.FirstName,
+                    LastName = existingRating.Users.LastName,
+                    Email = existingRating.Users.Email
+                } : null,
+
+                Movie = existingRating.Movies != null ? new MoviesResponseDto
+                {
+                    Id = existingRating.Movies.Id,
+                    Title = existingRating.Movies.Title,
+                    Description = existingRating.Movies.Description,
+                    ReleaseDate = existingRating.Movies.ReleaseDate,
+                    Duration = existingRating.Movies.Duration,
+                    Language = existingRating.Movies.Language,
+                    AgeRating = existingRating.Movies.AgeRating
+                } : null
+            };
+        }
+
     }
 }

@@ -5,14 +5,14 @@ namespace WebCinema.Interfaces
 {
     public interface IRatingsService
     {
-        Task<RatingsResponseDto> CreateRatingAsync(RatingCreateDto ratings);
+        Task<RatingsResponseDto> CreateRatingAsync(RatingCreateDto ratingDto);
 
-        Task<List<Ratings>> GetAllRatingsAsync();
+        Task<List<RatingsGetDto>> GetAllRatingsAsync();
 
-        Task<Ratings> GetRatingsByIdAsync(int id);
+        Task<RatingsGetDto> GetRatingsByIdAsync(int id);
 
-        Task<Ratings> DeleteRatingsByIdAsync(int id);
+        Task<Ratings?> DeleteRatingByIdAsync(int id);
 
-        Task<Ratings> UpdateRatingsAsync(int id, Ratings ratings);
+        Task<RatingsResponseDto> UpdateRatingsAsync(int id, RatingUpdateDto ratingDto);
     }
 }

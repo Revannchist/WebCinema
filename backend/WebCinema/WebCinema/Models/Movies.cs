@@ -26,5 +26,8 @@ namespace WebCinema.Models
         public List<MoviesGenres>? MoviesGenres { get; set; }
 
         public List<MoviesActors>? MoviesActors { get; set; }
+
+        //public int? RatingsId { get; set; }
+        //public Ratings Ratings { get; set; }  //i ovo treba kasnije implementovat
     }
 }

@@ -2,14 +2,8 @@
 
 namespace WebCinema.Models.DTO
 {
-    public class RatingCreateDto
+    public class RatingUpdateDto
     {
-        [Required]
-        public int MoviesId { get; set; }
-
-        [Required]
-        public int UsersId { get; set; }
-
         [Required]
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int Rating { get; set; }

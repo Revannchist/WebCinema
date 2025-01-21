@@ -7,9 +7,7 @@ namespace WebCinema.Models
     {
         public int Id { get; set; }
         public int TheatersID { get; set; }
-        [ForeignKey("TheatersID")]
-        
-        
+        [ForeignKey("TheatersID")]    
         public Theaters? Theater { get; set; }
         public string HallName { get; set; }
         public int Capacity {  get; set; }

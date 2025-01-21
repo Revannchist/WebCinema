@@ -408,9 +408,10 @@ namespace WebCinema.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MoviesId");
-
                     b.HasIndex("UsersId");
+
+                    b.HasIndex("MoviesId", "UsersId")
+                        .IsUnique();
 
                     b.ToTable("Ratings");
                 });
@@ -612,7 +613,7 @@ namespace WebCinema.Migrations
                     b.ToTable("UsersImages");
                 });
 
-            modelBuilder.Entity("WebCinema.Models.Booked_Seats", b =>
+            modelBuilder.Entity("WebCinema.Models.BookedSeats", b =>
                 {
                     b.HasOne("WebCinema.Models.Bookings", "Bookings")
                         .WithMany("Booked_Seats")

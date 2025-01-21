@@ -19,20 +19,25 @@ namespace WebCinema.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRatings(RatingCreateDto ratingDto)
         {
-            var createdRatings = await _ratingsService.CreateRatingAsync(ratingDto);
-            if (createdRatings == null)
+            try
             {
-                return BadRequest("Greska!");
+                var createdRatings = await _ratingsService.CreateRatingAsync(ratingDto);
+                return Ok(createdRatings);
             }
-            return Ok(createdRatings);
-
-           
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message); // This will return "This user has already rated the movie."
+            }
+            catch (Exception)
+            {
+                return BadRequest("An error occurred while creating the rating.");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteRatingsById(int id)
         {
-            var deletedRatings = await _ratingsService.DeleteRatingsByIdAsync(id);
+            var deletedRatings = await _ratingsService.DeleteRatingByIdAsync(id);
             if (deletedRatings == null)
             {
                 return BadRequest("Greska!");
@@ -41,9 +46,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateRatings(int id, Ratings ratings)
+        public async Task<IActionResult> UpdateRatings(int id, RatingUpdateDto ratingDto)
         {
-            var updatedRatings = await _ratingsService.UpdateRatingsAsync(id, ratings);
+            var updatedRatings = await _ratingsService.UpdateRatingsAsync(id, ratingDto);
             if (updatedRatings == null)
             {
                 return BadRequest("Greska!");

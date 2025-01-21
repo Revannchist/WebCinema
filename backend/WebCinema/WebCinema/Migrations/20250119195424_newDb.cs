@@ -81,22 +81,16 @@ namespace WebCinema.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RegistrationTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -151,6 +145,38 @@ namespace WebCinema.Migrations
                         principalTable: "Directors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RegistrationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    RolesId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_RolesId",
+                        column: x => x.RolesId,
+                        principalTable: "Roles",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -275,6 +301,27 @@ namespace WebCinema.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UsersImages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ImageByteArray = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    ImageFormat = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UsersImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UsersImages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Seats",
                 columns: table => new
                 {
@@ -353,7 +400,7 @@ namespace WebCinema.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Booked_Seats",
+                name: "BookedSeats",
                 columns: table => new
                 {
                     BookingId = table.Column<int>(type: "int", nullable: false),
@@ -361,15 +408,15 @@ namespace WebCinema.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Booked_Seats", x => new { x.BookingId, x.SeatsId });
+                    table.PrimaryKey("PK_BookedSeats", x => new { x.BookingId, x.SeatsId });
                     table.ForeignKey(
-                        name: "FK_Booked_Seats_Bookings_BookingId",
+                        name: "FK_BookedSeats_Bookings_BookingId",
                         column: x => x.BookingId,
                         principalTable: "Bookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Booked_Seats_Seats_SeatsId",
+                        name: "FK_BookedSeats_Seats_SeatsId",
                         column: x => x.SeatsId,
                         principalTable: "Seats",
                         principalColumn: "Id",
@@ -401,15 +448,6 @@ namespace WebCinema.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Actors",
-                columns: new[] { "Id", "FirstName", "LastName" },
-                values: new object[,]
-                {
-                    { 1, "Brad", "Pitt" },
-                    { 2, "Angelina", "Jolie" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Cities",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
@@ -428,15 +466,6 @@ namespace WebCinema.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Directors",
-                columns: new[] { "Id", "FirstName", "LastName" },
-                values: new object[,]
-                {
-                    { 1, "Hilk", "Hogan" },
-                    { 2, "Christopher", "Nolan" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Genres",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
@@ -448,9 +477,19 @@ namespace WebCinema.Migrations
                     { 5, "Romance" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Admin" },
+                    { 2, "User" },
+                    { 3, "Moderator" }
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_Booked_Seats_SeatsId",
-                table: "Booked_Seats",
+                name: "IX_BookedSeats_SeatsId",
+                table: "BookedSeats",
                 column: "SeatsId");
 
             migrationBuilder.CreateIndex(
@@ -499,9 +538,10 @@ namespace WebCinema.Migrations
                 column: "BookingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ratings_MoviesId",
+                name: "IX_Ratings_MoviesId_UsersId",
                 table: "Ratings",
-                column: "MoviesId");
+                columns: new[] { "MoviesId", "UsersId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ratings_UsersId",
@@ -527,13 +567,28 @@ namespace WebCinema.Migrations
                 name: "IX_Theaters_CityId",
                 table: "Theaters",
                 column: "CityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RoleId",
+                table: "Users",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RolesId",
+                table: "Users",
+                column: "RolesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UsersImages_UserId",
+                table: "UsersImages",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Booked_Seats");
+                name: "BookedSeats");
 
             migrationBuilder.DropTable(
                 name: "MoviesActors");
@@ -549,6 +604,9 @@ namespace WebCinema.Migrations
 
             migrationBuilder.DropTable(
                 name: "Ratings");
+
+            migrationBuilder.DropTable(
+                name: "UsersImages");
 
             migrationBuilder.DropTable(
                 name: "Seats");
@@ -573,6 +631,9 @@ namespace WebCinema.Migrations
 
             migrationBuilder.DropTable(
                 name: "Movies");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Theaters");
