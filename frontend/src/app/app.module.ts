@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { MoviesComponent } from './components/movies/movies.component';
 import { ActorsComponent } from './components/actors/actors.component';
 import { DirectorsComponent } from './components/directors/directors.component';
+import { LandingPageComponent } from './components/landing-page/landing-page.component';
 
 const routes:Routes=[
   //{path:'test',component:TestComponent},
@@ -18,7 +19,8 @@ const routes:Routes=[
   {path:'countries',component:CountriesComponent},
   {path:'movies',component:MoviesComponent},
   {path:'actors',component:ActorsComponent},
-  {path:'directors',component:DirectorsComponent}
+  {path:'directors',component:DirectorsComponent},
+  {path:'landing-page',component:LandingPageComponent}
 ]
 @NgModule({
   declarations: [
@@ -29,6 +31,7 @@ const routes:Routes=[
     MoviesComponent,
     ActorsComponent,
     DirectorsComponent,
+    LandingPageComponent,
   ],
   imports: [
     BrowserModule,

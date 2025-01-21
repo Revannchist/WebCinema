@@ -31,6 +31,18 @@ namespace WebCinema
                 new Countries { Id = 2, Name = "Germany" }
                 );
 
+            modelBuilder.Entity<Roles>().HasData(
+                new Roles { Id = 1, Name = "Admin" },
+                new Roles { Id = 2, Name = "User" },
+                new Roles { Id = 3, Name = "Moderator" }
+                );
+
+            //modelBuilder.Entity<Halls>().HasData(
+            //    new Halls { Id = 1, TheatersID = 1, HallName = "Hala1", Capacity=40, HallType = "Srednja" },
+            //    new Halls { Id = 1, TheatersID = 1, HallName = "Hala2", Capacity = 60, HallType = "Velika" }
+            //    );
+
+
             //------------------------------------------------------//
             modelBuilder.Entity<MoviesGenres>()
                 .HasKey(sc => new { sc.MovieId, sc.GenreId });
@@ -86,25 +98,17 @@ namespace WebCinema
                 .HasForeignKey(bs => bs.SeatsId)
                 .OnDelete(DeleteBehavior.Restrict);
             //------------------------------------------------------//
-
-
-            modelBuilder.Entity<Roles>().HasData(
-            new Roles { Id = 1, Name = "Admin" },
-            new Roles { Id = 2, Name = "User" },
-            new Roles { Id = 3, Name = "Moderator" }
-            );
-
+            modelBuilder.Entity<Ratings>()
+                .HasIndex(r => new { r.MoviesId, r.UsersId })
+                .IsUnique();
             //------------------------------------------------------//
-
             modelBuilder.Entity<Users>()
-            .HasOne(u => u.Roles)
-            .WithMany()
-            .HasForeignKey(u => u.RoleId)
-            .IsRequired();
+                .HasOne(u => u.Roles)
+                .WithMany()
+                .HasForeignKey(u => u.RoleId)
+                .IsRequired();
 
             //------------------------------------------------------//
-
-
 
 
 

@@ -5,7 +5,7 @@
 namespace WebCinema.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedUsersImageDto : Migration
+    public partial class test1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

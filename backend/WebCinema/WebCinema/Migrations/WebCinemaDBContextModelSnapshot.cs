@@ -408,9 +408,10 @@ namespace WebCinema.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MoviesId");
-
                     b.HasIndex("UsersId");
+
+                    b.HasIndex("MoviesId", "UsersId")
+                        .IsUnique();
 
                     b.ToTable("Ratings");
                 });
