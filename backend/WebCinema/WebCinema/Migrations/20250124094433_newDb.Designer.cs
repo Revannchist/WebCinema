@@ -12,8 +12,8 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    [Migration("20250120195730_BookingsDtoAdd")]
-    partial class BookingsDtoAdd
+    [Migration("20250124094433_newDb")]
+    partial class newDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -411,9 +411,10 @@ namespace WebCinema.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MoviesId");
-
                     b.HasIndex("UsersId");
+
+                    b.HasIndex("MoviesId", "UsersId")
+                        .IsUnique();
 
                     b.ToTable("Ratings");
                 });

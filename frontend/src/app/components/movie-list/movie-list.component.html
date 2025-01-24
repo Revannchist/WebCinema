@@ -1,0 +1,32 @@
+<div class="container">
+    <h2>Movies</h2>
+    
+    <div class="filters">
+      <input [(ngModel)]="filterParams.searchTerm" 
+             (keyup.enter)="loadMovies()" 
+             placeholder="Search movies...">
+    </div>
+  
+    <div class="movies-grid">
+      <div *ngFor="let movie of movies" class="movie-card">
+        <h3>{{movie.title}}</h3>
+        <div class="movie-info">
+          <p>{{movie.description}}</p>
+          <p>Release Date: {{movie.releaseDate | date}}</p>
+          <p>Duration: {{movie.duration}} minutes</p>
+          <p>Language: {{movie.language}}</p>
+          <p>Rating: {{movie.ageRating}}</p>
+        </div>
+        <!-- Placeholder for future ticket purchasing functionality -->
+        <!-- <button class="buy-ticket-btn" (click)="buyTicket(movie.id)">Buy Ticket</button> -->
+      </div>
+    </div>
+  
+    <div class="pagination">
+      <button [disabled]="currentPage === 1" 
+              (click)="onPageChange(currentPage - 1)">Previous</button>
+      <span>Page {{currentPage}} of {{Math.ceil(totalItems / pageSize)}}</span>
+      <button [disabled]="currentPage >= totalItems / pageSize" 
+              (click)="onPageChange(currentPage + 1)">Next</button>
+    </div>
+  </div>

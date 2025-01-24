@@ -12,6 +12,9 @@ import { MoviesComponent } from './components/movies/movies.component';
 import { ActorsComponent } from './components/actors/actors.component';
 import { DirectorsComponent } from './components/directors/directors.component';
 import { LandingPageComponent } from './components/landing-page/landing-page.component';
+import { AdminPanelComponentComponent } from './admin-panel/admin-panel.component/admin-panel.component.component';
+import { AdminPanelMoviesComponent } from './admin-panel/admin-panel-movies/admin-panel-movies.component';
+import { MovieListComponent } from './components/movie-list/movie-list.component';
 
 const routes:Routes=[
   //{path:'test',component:TestComponent},
@@ -20,7 +23,9 @@ const routes:Routes=[
   {path:'movies',component:MoviesComponent},
   {path:'actors',component:ActorsComponent},
   {path:'directors',component:DirectorsComponent},
-  {path:'landing-page',component:LandingPageComponent}
+  {path:'landing-page',component:LandingPageComponent},
+  {path:'admin-panel-movies',component:AdminPanelMoviesComponent},
+  {path:'movie-list',component:MovieListComponent}
 ]
 @NgModule({
   declarations: [
@@ -32,6 +37,10 @@ const routes:Routes=[
     ActorsComponent,
     DirectorsComponent,
     LandingPageComponent,
+    AdminPanelComponentComponent,
+    AdminPanelMoviesComponent,
+
+    MovieListComponent
   ],
   imports: [
     BrowserModule,
