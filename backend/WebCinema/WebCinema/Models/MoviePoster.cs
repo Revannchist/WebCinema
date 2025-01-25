@@ -2,14 +2,13 @@
 
 namespace WebCinema.Models
 {
-    public class MoviesImage
+    public class MoviePoster
     {
         public int Id { get; set; }
         public int MovieId { get; set; }
         [ForeignKey("MovieId")]
         public Movies? Movies { get; set; }
-        public byte[] ImageByteArray { get; set; }
+        public byte[] PosterImage { get; set; }
         public string ImageFormat { get; set; }
-        public bool IsPoster { get; set; }
     }
 }

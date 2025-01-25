@@ -22,7 +22,7 @@
         public int? DirectorId { get; set; }
         public int? CountryId { get; set; }
         public List<int>? GenreIds { get; set; }
-        public List<int>? ActorsIds { get; set; }
+        public List<int>? ActorIds { get; set; }
 
     }
 }

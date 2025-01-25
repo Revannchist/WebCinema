@@ -1,401 +1,313 @@
 <body>
-    <div class="filters mb-4"> 
-      <div class="row g-3 align-items-center"> 
-        <!-- Search -->
-        <div class="col">
-          <input type="text"
-                 class="form-control"
-                 placeholder="Search..."
-                 [(ngModel)]="search"
-                 (ngModelChange)="filterMovies()">
-        </div>
-    
-        <!-- Date Range Filters -->
-        <div class="col">
-          <input type="date"
-                 class="form-control"
-                 [(ngModel)]="filterParams.fromDate"
-                 (ngModelChange)="filterMovies()"
-                 placeholder="From Date">
-        </div>
-        <div class="col">
-          <input type="date"a
-                 class="form-control"
-                 [(ngModel)]="filterParams.toDate"
-                 (ngModelChange)="filterMovies()"
-                 placeholder="To Date">
-        </div>
-    
-        <!-- Director Filter -->
-        <div class="col">
-          <select class="form-control"
-                  [(ngModel)]="filterParams.directorId"
-                  (ngModelChange)="filterMovies()">
-            <option [ngValue]="null">All Directors</option>
-            <option *ngFor="let d of director" [value]="d.id">
-              {{d.firstName}} {{d.lastName}}
-            </option>
-          </select>
-        </div>
-        
-        <!-- Genre Multi-select Dropdown --> 
-        <div class="col-md-2">
-          <div class="dropdown-container">
-            <div class="selected-options" (click)="isGenreDropdownOpen = !isGenreDropdownOpen">
-              <div class="selected-items">
-                <span *ngFor="let genreId of filterParams.genreIds" class="selected-tag">
-                  {{ getGenreName(genreId) }}
-                  <button type="button" class="remove-btn" (click)="removeGenre(filterParams.genreIds, genreId); filterMovies(); $event.stopPropagation()">
-                    ×
-                  </button>
-                </span>
-              </div>
-              <span class="dropdown-arrow">▼</span>
-            </div>
-            <div *ngIf="isGenreDropdownOpen" class="dropdown-list">
-              <div *ngFor="let genre of genres" 
-                   class="dropdown-item"
-                   [class.selected]="filterParams.genreIds.includes(genre.id)"
-                   (click)="toggleGenre(filterParams.genreIds, genre.id, $event); filterMovies()">
-                {{ genre.name }}
-              </div>
-            </div>
-          </div>
-        </div>
-    
-        <!-- Actor Multi-select Dropdown -->
-        <div class="col-md-2">
-          <div class="dropdown-container">
-            <div class="selected-options" (click)="isActorDropdownOpen = !isActorDropdownOpen">
-              <div class="selected-items">
-                <span *ngFor="let actorId of filterParams.actorIds" class="selected-tag">
-                  {{ getActorName(actorId) }}
-                  <button type="button" class="remove-btn" (click)="removeActor(filterParams.actorIds, actorId); filterMovies(); $event.stopPropagation()">
-                    ×
-                  </button>
-                </span>
-              </div>
-              <span class="dropdown-arrow">▼</span>
-            </div>
-            <div *ngIf="isActorDropdownOpen" class="dropdown-list">
-              <div *ngFor="let actor of actors" 
-                   class="dropdown-item"
-                   [class.selected]="filterParams.actorIds.includes(actor.id)"
-                   (click)="toggleActor(filterParams.actorIds, actor.id, $event); filterMovies()">
-                {{ actor.firstName }} {{ actor.lastName }}
-              </div>
-            </div>
-          </div>
-        </div>
-    
-        <!-- Reset Filters Button -->
-        <div class="col-auto">
-          <button class="btn btn-secondary" (click)="resetFilters()">
-            Reset All Filters
-          </button>
-        </div>
+  <div class="filters mb-4">
+    <div class="row g-3 align-items-center">
+      <!-- Search -->
+      <div class="col">
+        <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="search"
+          (ngModelChange)="filterMovies()">
       </div>
-    </div>
-    
-    <!--  -->
-    
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Description</th>
-          <th>Release Date</th>
-          <th>Duration</th>
-          <th>Language</th>
-          <th>Age Rating</th>
-          <th>Director</th>
-          <th>Country</th>
-          <th>Genres</th>
-          <th>Actors</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let movie of filteredMovies">
-          <td>{{ movie?.title || 'N/A' }}</td>
-          <td>{{ movie?.description || 'N/A' }}</td>
-          <td>{{ movie?.releaseDate | date:'MM-dd--yyyy' }}</td>
-          <td>{{ movie?.duration ? movie?.duration + ' min' : 'N/A' }}</td>
-          <td>{{ movie?.language || 'N/A' }}</td>
-          <td>{{ movie?.ageRating || 'N/A' }}</td>
-          <td>{{ getDirectorName(movie?.directorId)|| 'N/A' }}</td>
-          <td>{{ getCountryName(movie?.countryId) || 'N/A' }}</td>
-    
-          <td>
-            <span *ngFor="let genreId of movie?.moviesGenresIds; let i = index">
-              {{ getGenreName(genreId) }}
-              <span *ngIf="i < movie.moviesGenresIds.length - 1">, </span>
-            </span>
-          </td>
-    
-          <td>
-            <span *ngFor="let actorId of movie?.moviesActorsIds; let i = index">
-              {{ getActorName(actorId) }}
-              <span *ngIf="i < movie.moviesActorsIds.length - 1">, </span>
-            </span>
-          </td>
-    
-          <td>
-            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" (click)="prepareEditMovie(movie)">Edit</button>
-            <button (click)="deleteMovie(movie)" class="btn btn-danger">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <div>
-        Showing {{(currentPage - 1) * pageSize + 1}} to 
-        {{Math.min(currentPage * pageSize, totalItems)}} of {{totalItems}} entries
+
+      <!-- Date Range Filters -->
+      <div class="col">
+        <input type="date" class="form-control" [(ngModel)]="filterParams.fromDate" (ngModelChange)="filterMovies()"
+          placeholder="From Date">
       </div>
-      
-      <nav aria-label="Page navigation">
-        <ul class="pagination">
-          <li class="page-item" [class.disabled]="currentPage === 1">
-            <a class="page-link" (click)="onPageChange(currentPage - 1)" role="button">Previous</a>
-          </li>
-          
-          <li class="page-item" 
-              *ngFor="let page of [].constructor(totalPages); let i = index" 
-              [class.active]="currentPage === i + 1">
-            <a class="page-link" (click)="onPageChange(i + 1)" role="button">{{i + 1}}</a>
-          </li>
-          
-          <li class="page-item" [class.disabled]="currentPage === totalPages">
-            <a class="page-link" (click)="onPageChange(currentPage + 1)" role="button">Next</a>
-          </li>
-        </ul>
-      </nav>
-      
-      <div class="form-inline">
-        <label class="mr-2">Items per page:</label>
-        <select class="form-control" 
-                [(ngModel)]="filterParams.pageSize" 
-                (ngModelChange)="loadMovies()">
-          <option [value]="10">10</option>
-          <option [value]="25">25</option>
-          <option [value]="50">50</option>
+      <div class="col">
+        <input type="date" a class="form-control" [(ngModel)]="filterParams.toDate" (ngModelChange)="filterMovies()"
+          placeholder="To Date">
+      </div>
+
+      <!-- Director Filter -->
+      <div class="col">
+        <select class="form-control" [(ngModel)]="filterParams.directorId" (ngModelChange)="filterMovies()">
+          <option [ngValue]="null">All Directors</option>
+          <option *ngFor="let d of director" [value]="d.id">
+            {{d.firstName}} {{d.lastName}}
+          </option>
         </select>
       </div>
-    </div>
-    
-    
-    <button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#kreiraj">Create movie</button>
-    
-    <!-- Modal for Creating Movie -->
-    <div class="modal fade" id="kreiraj" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Create movie</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+      <!-- Genre Multi-select Dropdown -->
+      <div class="col-md-2">
+        <div class="dropdown-container">
+          <div class="selected-options" (click)="isGenreDropdownOpen = !isGenreDropdownOpen">
+            <div class="selected-items">
+              <span *ngFor="let genreId of filterParams.genreIds" class="selected-tag">
+                {{ getGenreName(genreId) }}
+                <button type="button" class="remove-btn"
+                  (click)="removeGenre(filterParams.genreIds, genreId); filterMovies(); $event.stopPropagation()">
+                  ×
+                </button>
+              </span>
+            </div>
+            <span class="dropdown-arrow">▼</span>
           </div>
-          <div class="modal-body">
-            <form (ngSubmit)="addMovie(movieToAdd)">
-              <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" class="form-control" [(ngModel)]="movieToAdd.title" name="title" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea id="description" class="form-control" [(ngModel)]="movieToAdd.description" name="description" required></textarea>
-              </div>
-    
-              <div class="form-group">
-                <label for="releaseDate">Release Date:</label>
-                <input type="date" id="releaseDate" class="form-control" [(ngModel)]="movieToAdd.releaseDate" name="releaseDate" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="duration">Duration (in minutes):</label>
-                <input type="number" id="duration" class="form-control" [(ngModel)]="movieToAdd.duration" name="duration" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="language">Language:</label>
-                <input type="text" id="language" class="form-control" [(ngModel)]="movieToAdd.language" name="language" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="ageRating">Age Rating:</label>
-                <input type="text" id="ageRating" class="form-control" [(ngModel)]="movieToAdd.ageRating" name="ageRating" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="directorId">Director:</label>
-                <select id="directorId" class="form-control" [(ngModel)]="movieToAdd.directorId" name="directorId" required>
-                  <option value="" disabled selected>Select a director</option>
-                  <option *ngFor="let director of director" [value]="director.id">{{ director.firstName }} {{ director.lastName }}</option>
-                </select>
-              </div>        
-    
-              <div class="form-group">
-                <label for="countryId">Country:</label>
-                <select id="countryId" class="form-control" [(ngModel)]="movieToAdd.countryId" name="countryId" required>
-                  <option value="" disabled selected>Select a country</option>
-                  <option *ngFor="let c of country" [value]="c.id">{{ c.name }}</option>
-                </select>
-              </div>
-    
-              <div class="form-group mb-3">
-                <label for="genres">Genres:</label>
-                <div class="dropdown-container">
-                  <div class="selected-options" (click)="isModalGenreDropdownOpen = !isModalGenreDropdownOpen">
-                    <div class="selected-items">
-                      <span *ngFor="let genreId of movieToAdd.moviesGenresIds" class="selected-tag">
-                        {{ getGenreName(genreId) }}
-                        <button type="button" class="remove-btn" (click)="removeGenre(movieToAdd.moviesGenresIds, genreId); $event.stopPropagation()">
-                          ×
-                        </button>
-                      </span>
-                    </div>
-                    <span class="dropdown-arrow">▼</span>
-                  </div>
-                  <div *ngIf="isModalGenreDropdownOpen" class="dropdown-list">
-                    <div *ngFor="let genre of genres" 
-                         class="dropdown-item" 
-                         [class.selected]="movieToAdd.moviesGenresIds.includes(genre.id)"
-                         (click)="toggleGenre(movieToAdd.moviesGenresIds, genre.id, $event)">
-                      {{ genre.name }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-    
-              <div class="form-group mb-3">
-                <label for="actors">Actors:</label>
-                <div class="dropdown-container">
-                  <div class="selected-options" (click)="isModalActorDropdownOpen = !isModalActorDropdownOpen">
-                    <div class="selected-items">
-                      <span *ngFor="let actorId of movieToAdd.moviesActorsIds" class="selected-tag">
-                        {{ getActorName(actorId) }}
-                        <button type="button" class="remove-btn" (click)="removeActor(movieToAdd.moviesActorsIds, actorId); $event.stopPropagation()">
-                          ×
-                        </button>
-                      </span>
-                    </div>
-                    <span class="dropdown-arrow">▼</span>
-                  </div>
-                  <div *ngIf="isModalActorDropdownOpen" class="dropdown-list">
-                    <div *ngFor="let actor of actors" 
-                         class="dropdown-item"
-                         [class.selected]="movieToAdd.moviesActorsIds.includes(actor.id)"
-                         (click)="toggleActor(movieToAdd.moviesActorsIds, actor.id, $event)">
-                      {{ actor.firstName }} {{ actor.lastName }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Create</button>
-            </form>
+          <div *ngIf="isGenreDropdownOpen" class="dropdown-list">
+            <div *ngFor="let genre of genres" class="dropdown-item"
+              [class.selected]="filterParams.genreIds.includes(genre.id)"
+              (click)="toggleGenre(filterParams.genreIds, genre.id, $event); filterMovies()">
+              {{ genre.name }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Modal for Editing Movie -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="editModalLabel">Edit movie</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+      <!-- Actor Multi-select Dropdown -->
+      <div class="col-md-2">
+        <div class="dropdown-container">
+          <div class="selected-options" (click)="isActorDropdownOpen = !isActorDropdownOpen">
+            <div class="selected-items">
+              <span *ngFor="let actorId of filterParams.actorIds" class="selected-tag">
+                {{ getActorName(actorId) }}
+                <button type="button" class="remove-btn"
+                  (click)="removeActor(filterParams.actorIds, actorId); filterMovies(); $event.stopPropagation()">
+                  ×
+                </button>
+              </span>
+            </div>
+            <span class="dropdown-arrow">▼</span>
           </div>
-          <div class="modal-body">
-            <form (ngSubmit)="updateMovie(movieToEdit)">
-              <div class="form-group">
-                <label for="editTitle">Title:</label>
-                <input type="text" id="editTitle" class="form-control" [(ngModel)]="movieToEdit.title" name="title" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="editDescription">Description:</label>
-                <textarea id="editDescription" class="form-control" [(ngModel)]="movieToEdit.description" name="description" required></textarea>
-              </div>
-    
-              <div class="form-group">
-                <label for="editReleaseDate">Release Date:</label>
-                <input type="date" id="editReleaseDate" class="form-control" [(ngModel)]="movieToEdit.releaseDate" name="releaseDate" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="editDuration">Duration (in minutes):</label>
-                <input type="number" id="editDuration" class="form-control" [(ngModel)]="movieToEdit.duration" name="duration" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="editLanguage">Language:</label>
-                <input type="text" id="editLanguage" class="form-control" [(ngModel)]="movieToEdit.language" name="language" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="editAgeRating">Age Rating:</label>
-                <input type="text" id="editAgeRating" class="form-control" [(ngModel)]="movieToEdit.ageRating" name="ageRating" required>
-              </div>
-    
-              <div class="form-group">
-                <label for="editDirectorId">Director:</label>
-                <select id="editDirectorId" class="form-control" 
-                        [(ngModel)]="movieToEdit.directorId" 
-                        name="directorId" required>
-                    <option value="" disabled>Select a director</option>
-                    <option *ngFor="let d of director" [value]="d.id">
-                        {{ d.firstName }} {{ d.lastName }}
-                    </option>
-                </select>
+          <div *ngIf="isActorDropdownOpen" class="dropdown-list">
+            <div *ngFor="let actor of actors" class="dropdown-item"
+              [class.selected]="filterParams.actorIds.includes(actor.id)"
+              (click)="toggleActor(filterParams.actorIds, actor.id, $event); filterMovies()">
+              {{ actor.firstName }} {{ actor.lastName }}
             </div>
-            
+          </div>
+        </div>
+      </div>
+
+      <!-- Reset Filters Button -->
+      <div class="col-auto">
+        <button class="btn btn-secondary" (click)="resetFilters()">
+          Reset All Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--  -->
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Release Date</th>
+        <th>Duration</th>
+        <th>Language</th>
+        <th>Age Rating</th>
+        <th>Director</th>
+        <th>Country</th>
+        <th>Genres</th>
+        <th>Actors</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let movie of filteredMovies">
+        <td>{{ movie?.title || 'N/A' }}</td>
+        <td>{{ movie?.description || 'N/A' }}</td>
+        <td>{{ movie?.releaseDate | date:'MM-dd--yyyy' }}</td>
+        <td>{{ movie?.duration ? movie?.duration + ' min' : 'N/A' }}</td>
+        <td>{{ movie?.language || 'N/A' }}</td>
+        <td>{{ movie?.ageRating || 'N/A' }}</td>
+        <td>{{ getDirectorName(movie?.directorId)|| 'N/A' }}</td>
+        <td>{{ getCountryName(movie?.countryId) || 'N/A' }}</td>
+
+        <td>
+          <span *ngFor="let genreId of movie?.moviesGenresIds; let i = index">
+            {{ getGenreName(genreId) }}
+            <span *ngIf="i < movie.moviesGenresIds.length - 1">, </span>
+          </span>
+        </td>
+
+        <td>
+          <span *ngFor="let actorId of movie?.moviesActorsIds; let i = index">
+            {{ getActorName(actorId) }}
+            <span *ngIf="i < movie.moviesActorsIds.length - 1">, </span>
+          </span>
+        </td>
+
+        <td>
+          <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal"
+            (click)="prepareEditMovie(movie)">Edit</button>
+          <button (click)="deleteMovie(movie)" class="btn btn-danger">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+      Showing {{(currentPage - 1) * pageSize + 1}} to
+      {{Math.min(currentPage * pageSize, totalItems)}} of {{totalItems}} entries
+    </div>
+
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="onPageChange(currentPage - 1)" role="button">Previous</a>
+        </li>
+
+        <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+          [class.active]="currentPage === i + 1">
+          <a class="page-link" (click)="onPageChange(i + 1)" role="button">{{i + 1}}</a>
+        </li>
+
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="onPageChange(currentPage + 1)" role="button">Next</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="form-inline">
+      <label class="mr-2">Items per page:</label>
+      <select class="form-control" [(ngModel)]="filterParams.pageSize" (ngModelChange)="loadMovies()">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
+    </div>
+  </div>
+
+
+  <button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#kreiraj">Create movie</button>
+
+  <!-- Modal for Creating Movie -->
+  <div class="modal fade" id="kreiraj" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+    (hidden.bs.modal)="clearModalTextBox(); movieForm.resetForm()">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Create movie</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+            (click)="clearModalTextBox(); movieForm.resetForm()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form #movieForm="ngForm"
+            (ngSubmit)="movieForm.valid && addMovie(movieToAdd); movieForm.resetForm(); clearModalTextBox()">
+
             <div class="form-group">
-                <label for="editCountryId">Country:</label>
-                <select id="editCountryId" class="form-control" 
-                        [(ngModel)]="movieToEdit.countryId" 
-                        name="countryId" required>
-                    <option value="" disabled>Select a country</option>
-                    <option *ngFor="let c of country" [value]="c.id">
-                        {{ c.name }}
-                    </option>
-                </select>
+              <label for="title">Title:</label>
+              <input type="text" id="title" class="form-control" [(ngModel)]="movieToAdd.title" name="title"
+                #title="ngModel" required maxlength="200">
+              <div *ngIf="title.invalid && (title.dirty || title.touched)" class="text-danger">
+                <small *ngIf="title.errors?.['required']">Title is required</small>
+                <small *ngIf="title.errors?.['maxlength']">Title cannot exceed 200 characters</small>
+              </div>
             </div>
-            
+
+            <div class="form-group">
+              <label for="description">Description:</label>
+              <textarea id="description" class="form-control" [(ngModel)]="movieToAdd.description" name="description"
+                #description="ngModel" required maxlength="2000">
+        </textarea>
+              <div *ngIf="description.invalid && (description.dirty || description.touched)" class="text-danger">
+                <small *ngIf="description.errors?.['required']">Description is required</small>
+                <small *ngIf="description.errors?.['maxlength']">Description cannot exceed 2000 characters</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="releaseDate">Release Date:</label>
+              <input type="date" id="releaseDate" class="form-control" [(ngModel)]="movieToAdd.releaseDate"
+                name="releaseDate" #releaseDate="ngModel" required>
+              <div *ngIf="releaseDate.invalid && (releaseDate.dirty || releaseDate.touched)" class="text-danger">
+                <small *ngIf="releaseDate.errors?.['required']">Release date is required</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="duration">Duration (in minutes):</label>
+              <input type="number" id="duration" class="form-control" [(ngModel)]="movieToAdd.duration" name="duration"
+                #duration="ngModel" required min="1" max="1000">
+              <div *ngIf="duration.invalid && (duration.dirty || duration.touched)" class="text-danger">
+                <small *ngIf="duration.errors?.['required']">Duration is required</small>
+                <small *ngIf="duration.errors?.['min'] || duration.errors?.['max']">Duration must be between 1 and 1000
+                  minutes</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="language">Language:</label>
+              <input type="text" id="language" class="form-control" [(ngModel)]="movieToAdd.language" name="language"
+                #language="ngModel" required maxlength="50">
+              <div *ngIf="language.invalid && (language.dirty || language.touched)" class="text-danger">
+                <small *ngIf="language.errors?.['required']">Language is required</small>
+                <small *ngIf="language.errors?.['maxlength']">Language cannot exceed 50 characters</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ageRating">Age Rating:</label>
+              <input type="text" id="ageRating" class="form-control" [(ngModel)]="movieToAdd.ageRating" name="ageRating"
+                #ageRating="ngModel" required maxlength="10">
+              <div *ngIf="ageRating.invalid && (ageRating.dirty || ageRating.touched)" class="text-danger">
+                <small *ngIf="ageRating.errors?.['required']">Age rating is required</small>
+                <small *ngIf="ageRating.errors?.['maxlength']">Age rating cannot exceed 10 characters</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="directorId">Director:</label>
+              <select id="directorId" class="form-control" [(ngModel)]="movieToAdd.directorId" name="directorId"
+                #directorId="ngModel" required>
+                <option value="" disabled selected>Select a director</option>
+                <option *ngFor="let director of director" [value]="director.id">
+                  {{ director.firstName }} {{ director.lastName }}
+                </option>
+              </select>
+              <div *ngIf="directorId.invalid && (directorId.dirty || directorId.touched)" class="text-danger">
+                <small *ngIf="directorId.errors?.['required']">Director is required</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="countryId">Country:</label>
+              <select id="countryId" class="form-control" [(ngModel)]="movieToAdd.countryId" name="countryId"
+                #countryId="ngModel" required>
+                <option value="" disabled selected>Select a country</option>
+                <option *ngFor="let c of country" [value]="c.id">{{ c.name }}</option>
+              </select>
+              <div *ngIf="countryId.invalid && (countryId.dirty || countryId.touched)" class="text-danger">
+                <small *ngIf="countryId.errors?.['required']">Country is required</small>
+              </div>
+            </div>
+
             <div class="form-group mb-3">
               <label for="genres">Genres:</label>
               <div class="dropdown-container">
                 <div class="selected-options" (click)="isModalGenreDropdownOpen = !isModalGenreDropdownOpen">
                   <div class="selected-items">
-                    <span *ngFor="let genreId of movieToEdit.moviesGenresIds" class="selected-tag">
+                    <span *ngFor="let genreId of movieToAdd.genreIds" class="selected-tag">
                       {{ getGenreName(genreId) }}
-                      <button type="button" class="remove-btn" (click)="removeGenre(movieToEdit.moviesGenresIds, genreId); $event.stopPropagation()">
+                      <button type="button" class="remove-btn"
+                        (click)="removeGenre(movieToAdd.genreIds, genreId); $event.stopPropagation()">
                         ×
                       </button>
                     </span>
                   </div>
                   <span class="dropdown-arrow">▼</span>
                 </div>
-                <div *ngIf="isModalGenreDropdownOpen" class="dropdown-list">  
-                  <div *ngFor="let genre of genres" 
-                       class="dropdown-item"
-                       [class.selected]="movieToEdit.moviesGenresIds.includes(genre.id)"
-                       (click)="toggleGenre(movieToEdit.moviesGenresIds, genre.id, $event)">
+                <div *ngIf="isModalGenreDropdownOpen" class="dropdown-list">
+                  <div *ngFor="let genre of genres" class="dropdown-item"
+                    [class.selected]="movieToAdd.genreIds.includes(genre.id)"
+                    (click)="toggleGenre(movieToAdd.genreIds, genre.id, $event)">
                     {{ genre.name }}
                   </div>
                 </div>
               </div>
             </div>
-    
+
             <div class="form-group mb-3">
               <label for="actors">Actors:</label>
               <div class="dropdown-container">
                 <div class="selected-options" (click)="isModalActorDropdownOpen = !isModalActorDropdownOpen">
                   <div class="selected-items">
-                    <span *ngFor="let actorId of movieToEdit.moviesActorsIds" class="selected-tag">
+                    <span *ngFor="let actorId of movieToAdd.actorIds" class="selected-tag">
                       {{ getActorName(actorId) }}
-                      <button type="button" class="remove-btn" (click)="removeActor(movieToEdit.moviesActorsIds, actorId); $event.stopPropagation()">
+                      <button type="button" class="remove-btn"
+                        (click)="removeActor(movieToAdd.actorIds, actorId); $event.stopPropagation()">
                         ×
                       </button>
                     </span>
@@ -403,40 +315,190 @@
                   <span class="dropdown-arrow">▼</span>
                 </div>
                 <div *ngIf="isModalActorDropdownOpen" class="dropdown-list">
-                  <div *ngFor="let actor of actors" 
-                       class="dropdown-item"
-                       [class.selected]="movieToEdit.moviesActorsIds.includes(actor.id)"
-                       (click)="toggleActor(movieToEdit.moviesActorsIds, actor.id, $event)">
+                  <div *ngFor="let actor of actors" class="dropdown-item"
+                    [class.selected]="movieToAdd.actorIds.includes(actor.id)"
+                    (click)="toggleActor(movieToAdd.actorIds, actor.id, $event)">
                     {{ actor.firstName }} {{ actor.lastName }}
                   </div>
                 </div>
               </div>
             </div>
-    
-              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Update</button>
-            </form>
-          </div>
+
+            <button type="submit" class="btn btn-primary"
+              [disabled]="!movieForm.valid || movieToAdd.genreIds.length === 0 || movieToAdd.actorIds.length === 0"
+              data-bs-dismiss="modal">
+              Create
+            </button>
+
+          </form>
         </div>
       </div>
     </div>
-    
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Confirm Delete</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to delete this movie?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-            <button type="button" class="btn btn-danger" (click)="confirmDelete()" data-bs-dismiss="modal">Yes</button>
-          </div>
+  </div>
+
+  <!-- Modal for Editing Movie -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true"
+    (hidden.bs.modal)="movieEditForm.resetForm()">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit movie</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form #movieEditForm="ngForm" (ngSubmit)="movieEditForm.valid && updateMovie(movieToEdit)">
+            <!-- Title -->
+            <div class="form-group">
+              <label for="editTitle">Title:</label>
+              <input type="text" id="editTitle" class="form-control" [(ngModel)]="movieToEdit.title" name="title"
+                #editTitle="ngModel" required maxlength="200">
+              <div *ngIf="editTitle.invalid && (editTitle.dirty || editTitle.touched)" class="text-danger">
+                <small *ngIf="editTitle.errors?.['required']">Title is required</small>
+                <small *ngIf="editTitle.errors?.['maxlength']">Title cannot exceed 200 characters</small>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label for="editDescription">Description:</label>
+              <textarea id="editDescription" class="form-control" [(ngModel)]="movieToEdit.description"
+                name="description" #editDescription="ngModel" required maxlength="2000">
+         </textarea>
+              <div *ngIf="editDescription.invalid && (editDescription.dirty || editDescription.touched)"
+                class="text-danger">
+                <small *ngIf="editDescription.errors?.['required']">Description is required</small>
+                <small *ngIf="editDescription.errors?.['maxlength']">Description cannot exceed 2000 characters</small>
+              </div>
+            </div>
+
+            <!-- Duration -->
+            <div class="form-group">
+              <label for="editDuration">Duration (in minutes):</label>
+              <input type="number" id="editDuration" class="form-control" [(ngModel)]="movieToEdit.duration"
+                name="duration" #editDuration="ngModel" required min="1" max="1000">
+              <div *ngIf="editDuration.invalid && (editDuration.dirty || editDuration.touched)" class="text-danger">
+                <small *ngIf="editDuration.errors?.['required']">Duration is required</small>
+                <small *ngIf="editDuration.errors?.['min'] || editDuration.errors?.['max']">Duration must be between 1
+                  and 1000 minutes</small>
+              </div>
+            </div>
+
+            <!-- Language -->
+            <div class="form-group">
+              <label for="editLanguage">Language:</label>
+              <input type="text" id="editLanguage" class="form-control" [(ngModel)]="movieToEdit.language"
+                name="language" #editLanguage="ngModel" required maxlength="50">
+              <div *ngIf="editLanguage.invalid && (editLanguage.dirty || editLanguage.touched)" class="text-danger">
+                <small *ngIf="editLanguage.errors?.['required']">Language is required</small>
+                <small *ngIf="editLanguage.errors?.['maxlength']">Language cannot exceed 50 characters</small>
+              </div>
+            </div>
+
+            <!-- Age Rating -->
+            <div class="form-group">
+              <label for="editAgeRating">Age Rating:</label>
+              <input type="text" id="editAgeRating" class="form-control" [(ngModel)]="movieToEdit.ageRating"
+                name="ageRating" #editAgeRating="ngModel" required maxlength="10">
+              <div *ngIf="editAgeRating.invalid && (editAgeRating.dirty || editAgeRating.touched)" class="text-danger">
+                <small *ngIf="editAgeRating.errors?.['required']">Age rating is required</small>
+                <small *ngIf="editAgeRating.errors?.['maxlength']">Age rating cannot exceed 10 characters</small>
+              </div>
+            </div>
+
+            <!-- Director -->
+            <div class="form-group">
+              <label for="editDirectorId">Director:</label>
+              <select id="editDirectorId" class="form-control" [(ngModel)]="movieToEdit.directorId" name="directorId"
+                #editDirectorId="ngModel" required>
+                <option value="" disabled>Select a director</option>
+                <option *ngFor="let d of director" [value]="d.id">
+                  {{ d.firstName }} {{ d.lastName }}
+                </option>
+              </select>
+              <div *ngIf="editDirectorId.invalid && (editDirectorId.dirty || editDirectorId.touched)"
+                class="text-danger">
+                <small *ngIf="editDirectorId.errors?.['required']">Director is required</small>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="genres">Genres:</label>
+              <div class="dropdown-container">
+                <div class="selected-options" (click)="isModalGenreDropdownOpen = !isModalGenreDropdownOpen">
+                  <div class="selected-items">
+                    <span *ngFor="let genreId of movieToEdit.genreIds" class="selected-tag">
+                      {{ getGenreName(genreId) }}
+                      <button type="button" class="remove-btn"
+                        (click)="removeGenre(movieToEdit.genreIds, genreId); $event.stopPropagation()">
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                  <span class="dropdown-arrow">▼</span>
+                </div>
+                <div *ngIf="isModalGenreDropdownOpen" class="dropdown-list">
+                  <div *ngFor="let genre of genres" class="dropdown-item"
+                    [class.selected]="movieToEdit.genreIds.includes(genre.id)"
+                    (click)="toggleGenre(movieToEdit.genreIds, genre.id, $event)">
+                    {{ genre.name }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="actors">Actors:</label>
+              <div class="dropdown-container">
+                <div class="selected-options" (click)="isModalActorDropdownOpen = !isModalActorDropdownOpen">
+                  <div class="selected-items">
+                    <span *ngFor="let actorId of movieToEdit.actorIds" class="selected-tag">
+                      {{ getActorName(actorId) }}
+                      <button type="button" class="remove-btn"
+                        (click)="removeActor(movieToEdit.actorIds, actorId); $event.stopPropagation()">
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                  <span class="dropdown-arrow">▼</span>
+                </div>
+                <div *ngIf="isModalActorDropdownOpen" class="dropdown-list">
+                  <div *ngFor="let actor of actors" class="dropdown-item"
+                    [class.selected]="movieToEdit.actorIds.includes(actor.id)"
+                    (click)="toggleActor(movieToEdit.actorIds, actor.id, $event)">
+                    {{ actor.firstName }} {{ actor.lastName }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+              [disabled]="!movieEditForm.valid || movieToEdit.genreIds.length === 0 || movieToEdit.actorIds.length === 0"
+              data-bs-dismiss="modal">
+              Update
+            </button>
+          </form>
         </div>
       </div>
     </div>
-    
-    
-    </body>
+  </div>
+
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this movie?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()" data-bs-dismiss="modal">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body>

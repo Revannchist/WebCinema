@@ -1,32 +1,106 @@
 <div class="container">
-    <h2>Movies</h2>
-    
-    <div class="filters">
-      <input [(ngModel)]="filterParams.searchTerm" 
-             (keyup.enter)="loadMovies()" 
-             placeholder="Search movies...">
-    </div>
-  
-    <div class="movies-grid">
-      <div *ngFor="let movie of movies" class="movie-card">
-        <h3>{{movie.title}}</h3>
-        <div class="movie-info">
-          <p>{{movie.description}}</p>
-          <p>Release Date: {{movie.releaseDate | date}}</p>
-          <p>Duration: {{movie.duration}} minutes</p>
-          <p>Language: {{movie.language}}</p>
-          <p>Rating: {{movie.ageRating}}</p>
+  <h2>Movies</h2>
+
+  <!-- Search and Filters -->
+  <div class="filters mb-4">
+    <input type="text" class="form-control mb-2" placeholder="Search movies..." [(ngModel)]="filterParams.searchTerm"
+      (ngModelChange)="filterMovies()">
+
+    <div class="row g-3">
+      <!-- Date filters -->
+      <div class="col-md-3">
+        <input type="date" class="form-control" [(ngModel)]="filterParams.fromDate" (ngModelChange)="filterMovies()"
+          placeholder="From Date">
+      </div>
+      <div class="col-md-3">
+        <input type="date" class="form-control" [(ngModel)]="filterParams.toDate" (ngModelChange)="filterMovies()"
+          placeholder="To Date">
+      </div>
+
+      <!-- Genre Multi-select Dropdown -->
+      <div class="col-md-2">
+        <div class="dropdown-container">
+          <div class="selected-options" (click)="isGenreDropdownOpen = !isGenreDropdownOpen">
+            <div class="selected-items">
+              <!--<span *ngIf="filterParams.genreIds.length === 0" class="placeholder">Select Genres</span> -->
+              <!-- Kod za placeholder ali ga trenutno ne prikazuje ima neki bug -->
+              <span *ngFor="let genreId of filterParams.genreIds" class="selected-tag">
+                {{ getGenreName(genreId) }}
+                <button type="button" class="remove-btn"
+                  (click)="removeGenre(filterParams.genreIds, genreId); filterMovies(); $event.stopPropagation()">
+                  ×
+                </button>
+              </span>
+            </div>
+            <span class="dropdown-arrow">▼</span>
+          </div>
+          <div *ngIf="isGenreDropdownOpen" class="dropdown-list">
+            <div *ngFor="let genre of genres" class="dropdown-item"
+              [class.selected]="filterParams.genreIds.includes(genre.id)"
+              (click)="toggleGenre(filterParams.genreIds, genre.id, $event); filterMovies()">
+              {{ genre.name }}
+            </div>
+          </div>
         </div>
-        <!-- Placeholder for future ticket purchasing functionality -->
-        <!-- <button class="buy-ticket-btn" (click)="buyTicket(movie.id)">Buy Ticket</button> -->
+      </div>
+
+
+      <div class="col-md-2">
+        <button class="btn btn-secondary w-100" (click)="resetFilters()">
+          Reset Filters
+        </button>
       </div>
     </div>
-  
-    <div class="pagination">
-      <button [disabled]="currentPage === 1" 
-              (click)="onPageChange(currentPage - 1)">Previous</button>
-      <span>Page {{currentPage}} of {{Math.ceil(totalItems / pageSize)}}</span>
-      <button [disabled]="currentPage >= totalItems / pageSize" 
-              (click)="onPageChange(currentPage + 1)">Next</button>
+  </div>
+
+  <!-- Movies Grid -->
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col" *ngFor="let movie of movies">
+      <div class="card h-100">
+
+        <img *ngIf="moviePosters[movie.id]" [src]="moviePosters[movie.id]?.image" class="card-img-top"
+          [alt]="movie.title + ' poster'" style="height: 300px; object-fit: cover;">
+
+        <!-- Placeholder if no poster -->
+        <div *ngIf="!moviePosters[movie.id]"
+          class="card-img-top bg-secondary d-flex justify-content-center align-items-center" style="height: 300px;">
+          <span class="text-white">No Poster Available</span>
+        </div>
+
+        <div class="card-body">
+          <h5 class="card-title">{{movie.title}}</h5>
+          <p class="card-text">{{movie.description}}</p>
+          <ul class="list-unstyled">
+            <li><strong>Release Date:</strong> {{movie.releaseDate | date}}</li>
+            <li><strong>Duration:</strong> {{movie.duration}} minutes</li>
+            <li><strong>Language:</strong> {{movie.language}}</li>
+            <li><strong>Age Rating:</strong> {{movie.ageRating}}</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <div>
+      Showing {{(currentPage - 1) * pageSize + 1}} to
+      {{Math.min(currentPage * pageSize, totalItems)}} of {{totalItems}} entries
+    </div>
+
+    <nav>
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
+        </li>
+        <li class="page-item" [class.active]="currentPage === page"
+          *ngFor="let page of [].constructor(Math.ceil(totalItems / pageSize)); let i = index">
+          <a class="page-link" (click)="onPageChange(i + 1)">{{i + 1}}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage >= totalItems / pageSize">
+          <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

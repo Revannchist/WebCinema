@@ -5,14 +5,14 @@ namespace WebCinema.Interfaces
 {
     public interface IMoviesImageService
     {
-        Task<bool> CreateMovieImageAsync(MoviesImageDto imageDto);
+        Task<bool> CreateMoviePosterAsync(MovieCreatePosterDto posterDto);
 
-        Task<bool> DeleteMovieImageByIdAsync(int imageId);
+        Task<bool> DeleteMoviePosterByIdAsync(int imageId);
 
-        Task<List<MoviesImageDto>> GetAllMovieImagesAsync();
+        Task<List<MoviePosterResponseDto>> GetAllMoviePostersAsync();
 
-        Task<List<MoviesImageDto>> GetImagesByMovieIdAsync(int movieId);
+        Task<MoviePosterResponseDto> GetPosterByMovieIdAsync(int id);
 
-        Task<List<MoviesImageDto>> GetMovieImagesByMovieTitleAsync(string title);
+        Task<MoviePosterResponseDto> GetMoviePosterByTitleAsync(string title);
     }
 }

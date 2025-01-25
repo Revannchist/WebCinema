@@ -130,7 +130,7 @@ namespace WebCinema
         public DbSet<Ratings> Ratings { get; set; }
         public DbSet<Bookings> Bookings { get; set; }
         public DbSet<Payments>Payments { get; set; }
-        public DbSet<MoviesImage> MoviesImages { get; set; }
+        public DbSet<MoviePoster> MoviePoster { get; set; }
         public DbSet<UsersImage>UsersImages { get; set; }
         public DbSet<Roles> Roles { get; set; }
     }

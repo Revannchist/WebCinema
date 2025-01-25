@@ -1,23 +1,238 @@
 .movies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.filters {
+  margin: 20px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card {
+  transition: all 0.3s ease;
+  border: none;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease;
+}
+
+.card-img-top[loading] {
+  opacity: 0;
+}
+
+.card-img-top:not([loading]) {
+  opacity: 1;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+}
+
+.card-text {
+  color: #6c757d;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: #007bff;
+}
+
+.bg-secondary.d-flex {
+  background-color: #e9ecef !important;
+  color: #6c757d !important;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.page-link {
+  padding: 0.5rem 1rem;
+  color: #007bff;
+  background-color: white;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  background-color: #e9ecef;
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: #f8f9fa;
+}
+
+.list-unstyled {
+  margin-bottom: 0;
+}
+
+.list-unstyled li {
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.list-unstyled li strong {
+  color: #2c3e50;
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
   }
-  
-  .movie-card {
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 8px;
-  }
-  
+
   .filters {
-    margin: 20px;
+    margin: 10px;
+    padding: 15px;
   }
-  
-  .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px;
+
+  .card-title {
+    font-size: 1.1rem;
   }
+}
+
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.selected-options {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 12px;
+  min-height: 38px;
+  max-height: 38px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  overflow: hidden;
+}
+
+.selected-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.selected-items::-webkit-scrollbar {
+  display: none;
+}
+
+.selected-tag {
+  background-color: #0d6efd;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: white;
+  padding: 0 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.remove-btn:hover {
+  color: #dc3545;
+}
+
+.dropdown-arrow {
+  color: #6c757d;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item.selected {
+  color: #0d6efd;
+  background-color: #f0f7ff;
+}
+
+.placeholder {
+  color: #6c757d;
+  font-size: 14px;
+}
+

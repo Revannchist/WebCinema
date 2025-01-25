@@ -6,19 +6,19 @@ namespace WebCinema.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class MoviesImageController : ControllerBase
+    public class MoviesPostersController : ControllerBase
     {
         private readonly IMoviesImageService _moviesImageService;
 
-        public MoviesImageController(IMoviesImageService moviesImageService)
+        public MoviesPostersController(IMoviesImageService moviesImageService)
         {
             _moviesImageService = moviesImageService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMovieImage([FromBody] MoviesImageDto imageDto)
+        public async Task<IActionResult> AddMoviePoster([FromBody] MovieCreatePosterDto imageDto)
         {
-            var created = await _moviesImageService.CreateMovieImageAsync(imageDto);
+            var created = await _moviesImageService.CreateMoviePosterAsync(imageDto);
             if (!created)
             {
                 return BadRequest("Error | Bad Request!");
@@ -27,9 +27,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteMovieImageById(int imageId)
+        public async Task<IActionResult> DeleteMoviePosterById(int imageId)
         {
-            var deleted = await _moviesImageService.DeleteMovieImageByIdAsync(imageId);
+            var deleted = await _moviesImageService.DeleteMoviePosterByIdAsync(imageId);
             if (!deleted)
             {
                 return BadRequest("Error | Bad Request!");
@@ -38,9 +38,9 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllMovieImages()
+        public async Task<IActionResult> GetAllMoviePosters()
         {
-            var images = await _moviesImageService.GetAllMovieImagesAsync();
+            var images = await _moviesImageService.GetAllMoviePostersAsync();
             if (images == null)
             {
                 return BadRequest("Error | Bad Request!");
@@ -49,20 +49,20 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetImagesByMovieId(int movieId)
+        public async Task<ActionResult<MoviePosterResponseDto>> GetPosterByMovieId(/*[FromQuery]*/ int movieId)
         {
-            var images = await _moviesImageService.GetImagesByMovieIdAsync(movieId);
-            if (images == null)
+            var poster = await _moviesImageService.GetPosterByMovieIdAsync(movieId);
+            if (poster == null)
             {
-                return BadRequest("Error | Bad Request!");
+                return NotFound($"No poster found for movie ID: {movieId}"); 
             }
-            return Ok(images);
+            return Ok(poster);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMovieImagesByMovieTitle(string title)
+        public async Task<IActionResult> GetMoviePosterByMovieTitle(string title)
         {
-            var images = await _moviesImageService.GetMovieImagesByMovieTitleAsync(title);
+            var images = await _moviesImageService.GetMoviePosterByTitleAsync(title);
             if (images == null)
             {
                 return BadRequest("Error | Bad Request!");

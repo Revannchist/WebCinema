@@ -39,7 +39,6 @@ const routes:Routes=[
     LandingPageComponent,
     AdminPanelComponentComponent,
     AdminPanelMoviesComponent,
-
     MovieListComponent
   ],
   imports: [

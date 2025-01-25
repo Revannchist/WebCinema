@@ -194,10 +194,10 @@ namespace WebCinema.Services
                         .Any(mg => parameters.GenreIds.Contains(mg.GenreId)));
                 }
 
-                if (parameters.ActorsIds != null && parameters.ActorsIds.Any())
+                if (parameters.ActorIds != null && parameters.ActorIds.Any())
                 {
                     query = query.Where(m => m.MoviesActors
-                        .Any(mg => parameters.ActorsIds.Contains(mg.ActorId)));
+                        .Any(mg => parameters.ActorIds.Contains(mg.ActorId)));
                 }
 
                 // Get total count for pagination

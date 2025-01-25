@@ -8,8 +8,8 @@ export interface Movie {
   ageRating: string;
   directorId: number;
   countryId: number;
-  moviesGenresIds: number[];
-  moviesActorsIds: number[];
+  genreIds: number[];
+  actorIds: number[];
   //image?: string;
 }
 

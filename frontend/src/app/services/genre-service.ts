@@ -8,12 +8,14 @@ import { MyConfig } from '../my-config';
     providedIn: 'root'
 })
 
-export class MovieImageService {
+export class GenreService {
     constructor(private http: HttpClient) { }
 
-
-    loadImageByMovieId(id:number){
-        return this.http.post(`${MyConfig.APIurl}/api/MoviesImage/GetImagesByMovieId`, id);
+    getAllGenres(): Observable<any> {
+        return this.http.get(`${MyConfig.APIurl}/api/Genres/GetAllGenres`);
     }
 
+    getGenreById(id: number): Observable<any> {
+        return this.http.get(`${MyConfig.APIurl}/api/Genres/GetGenresById?id=${id}`);
+    }
 }

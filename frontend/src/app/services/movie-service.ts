@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Movie, PagedResponse, FilterParams } from '../models/movie.model';
 import { MyConfig } from '../my-config';
+//import { MovieCreateDto, MovieUpdateDto, MovieGetDto, MovieParameters, MoviePagedResponse } from '../../models/dto/movie.dto';
+import { MovieCreateDto, MovieUpdateDto, MovieGetDto, MovieParameters, MoviePagedResponse } from '../models/dto/movie.dto';
 
 @Injectable({
     providedIn: 'root'
@@ -16,46 +18,45 @@ export class MovieService {
         return isNaN(d.getTime()) ? null : d.toISOString();
     }
 
-    getMovies(filterParams: FilterParams): Observable<PagedResponse<Movie>> {
+    getMovies(filterParams: MovieParameters): Observable<MoviePagedResponse<MovieGetDto>> {
         let params = new HttpParams()
             .set('pageNumber', filterParams.pageNumber.toString())
             .set('pageSize', filterParams.pageSize.toString());
 
-        if (filterParams.searchTerm?.trim()) {
-            params = params.set('searchTerm', filterParams.searchTerm.trim());
+        if (filterParams.searchTerm) {
+            params = params.set('searchTerm', filterParams.searchTerm);
         }
-
         if (filterParams.directorId) {
             params = params.set('directorId', filterParams.directorId.toString());
         }
-
-        filterParams.genreIds?.forEach(id => {
-            params = params.append('genreIds', id.toString());
-        });
-
-        filterParams.actorIds?.forEach(id => {
-            params = params.append('actorsIds', id.toString());
-        });
-
-        const fromDate = this.formatDate(filterParams.fromDate?.toString() ?? null);
-        if (fromDate) params = params.set('fromDate', fromDate);
-
-        const toDate = this.formatDate(filterParams.toDate?.toString() ?? null);
-        if (toDate) params = params.set('toDate', toDate);
-
+        if (filterParams.genreIds?.length) {
+            filterParams.genreIds.forEach(id => {
+                params = params.append('genreIds', id.toString());
+            });
+        }
+        if (filterParams.actorIds?.length) {
+            filterParams.actorIds.forEach(id => {
+                params = params.append('actorIds', id.toString());
+            });
+        }
+        if (filterParams.fromDate) params = params.set('fromDate', filterParams.fromDate);
+        if (filterParams.toDate) params = params.set('toDate', filterParams.toDate);
         if (filterParams.language) params = params.set('language', filterParams.language);
         if (filterParams.ageRating) params = params.set('ageRating', filterParams.ageRating);
         if (filterParams.countryId) params = params.set('countryId', filterParams.countryId.toString());
 
-        return this.http.get<PagedResponse<Movie>>(`${MyConfig.APIurl}/api/Movies/GetAllMovies`, { params });
+        return this.http.get<MoviePagedResponse<MovieGetDto>>(`${MyConfig.APIurl}/api/Movies/GetAllMovies`, { params });
     }
 
-    createMovie(movie: Movie): Observable<Movie> {
-        return this.http.post<Movie>(`${MyConfig.APIurl}/api/Movies/CreateMovie`, movie);
+    createMovie(movie: MovieCreateDto): Observable<MovieGetDto> {
+        return this.http.post<MovieGetDto>(`${MyConfig.APIurl}/api/Movies/CreateMovie`, movie);
     }
 
-    updateMovie(id: number, movie: Movie): Observable<Movie> {
-        return this.http.post<Movie>(`${MyConfig.APIurl}/api/Movies/UpdateMovie?id=${id}`, movie);
+    updateMovie(id: number, movie: MovieUpdateDto): Observable<MovieGetDto> {
+        const url = `${MyConfig.APIurl}/api/Movies/UpdateMovie?id=${id}`;
+        console.log('Service - Final URL:', url);
+        console.log('Service - ID being used:', id);
+        return this.http.post<MovieGetDto>(url, movie);
     }
 
     deleteMovie(id: number): Observable<any> {
