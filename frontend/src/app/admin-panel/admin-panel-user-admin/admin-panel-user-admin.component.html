@@ -1,0 +1,188 @@
+<div class="container">
+  <div class="form-container">
+    <h2>Admin Panel - {{ isEditing ? 'Edit' : 'Create' }} Admin Profile</h2>
+    
+    <form [formGroup]="adminForm" (ngSubmit)="onSubmit()" class="admin-form">
+      <div class="form-row">
+        <div class="form-group">
+          <input 
+            type="text" 
+            formControlName="username" 
+            placeholder="Username"
+            [ngClass]="{'invalid': adminForm.get('username')?.errors && 
+              (adminForm.get('username')?.touched || submitted)}"
+          >
+          <div class="error-message">{{ getErrorMessage('username') }}</div>
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="email" 
+            formControlName="email" 
+            placeholder="Email"
+            [ngClass]="{'invalid': adminForm.get('email')?.errors && 
+              (adminForm.get('email')?.touched || submitted)}"
+          >
+          <div class="error-message">{{ getErrorMessage('email') }}</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <input 
+            type="password" 
+            formControlName="password" 
+            placeholder="Password"
+            [ngClass]="{'invalid': adminForm.get('password')?.errors && 
+              (adminForm.get('password')?.touched || submitted)}"
+          >
+          <div class="error-message">{{ getErrorMessage('password') }}</div>
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="password" 
+            formControlName="confirmPassword" 
+            placeholder="Confirm Password"
+            [ngClass]="{'invalid': (adminForm.get('confirmPassword')?.errors || 
+              adminForm.hasError('mismatch')) && 
+              (adminForm.get('confirmPassword')?.touched || submitted)}"
+          >
+          <div class="error-message">{{ getErrorMessage('confirmPassword') }}</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <input 
+            type="text" 
+            formControlName="firstName" 
+            placeholder="First Name"
+            [ngClass]="{'invalid': adminForm.get('firstName')?.errors && 
+              (adminForm.get('firstName')?.touched || submitted)}"
+          >
+          <div class="error-message">{{ getErrorMessage('firstName') }}</div>
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="text" 
+            formControlName="lastName" 
+            placeholder="Last Name"
+            [ngClass]="{'invalid': adminForm.get('lastName')?.errors && 
+              (adminForm.get('lastName')?.touched || submitted)}"
+          >
+          <div class="error-message">{{ getErrorMessage('lastName') }}</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <input 
+            type="date" 
+            formControlName="dateOfBirth"
+            [ngClass]="{'invalid': adminForm.get('dateOfBirth')?.errors && 
+              (adminForm.get('dateOfBirth')?.touched || submitted)}"
+          >
+          <div class="error-message">{{ getErrorMessage('dateOfBirth') }}</div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button 
+          type="submit" 
+          class="submit-btn"
+          [disabled]="!adminForm.valid"
+        >
+          {{ isEditing ? 'Update' : 'Create' }} Admin
+        </button>
+        <button 
+          *ngIf="isEditing" 
+          type="button" 
+          class="cancel-btn" 
+          (click)="cancelEdit()"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Admins Table -->
+  <div class="table-container">
+    <h2>Administrators List</h2>
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Date of Birth</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let admin of admins">
+          <td>{{ admin.username }}</td>
+          <td>{{ admin.firstName }}</td>
+          <td>{{ admin.lastName }}</td>
+          <td>{{ admin.email }}</td>
+          <td>{{ admin.dateOfBirth | date:'dd.MM.yyyy' }}</td>
+          <td class="action-buttons">
+            <button class="edit-btn" (click)="editUser(admin)">Edit</button>
+            <button class="delete-btn" (click)="deleteUser(admin.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-container">
+    <h2>Users List</h2>
+    
+    <!-- Search filters -->
+    <div class="search-container">
+      <input 
+        type="text" 
+        [(ngModel)]="usernameFilter" 
+        (ngModelChange)="filterUsers()"
+        placeholder="Search by username..."
+        class="search-input"
+      >
+      <input 
+        type="text" 
+        [(ngModel)]="emailFilter" 
+        (ngModelChange)="filterUsers()"
+        placeholder="Search by email..."
+        class="search-input"
+      >
+    </div>
+
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Date of Birth</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.username }}</td>
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.dateOfBirth | date:'dd.MM.yyyy' }}</td>
+          <td class="action-buttons">
+            <button class="delete-btn" (click)="deleteUser(user.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

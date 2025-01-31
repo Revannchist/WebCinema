@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { RouterModule, Routes } from '@angular/router';
 import { GenresComponent } from './components/genres/genres.component';
 import { CountriesComponent } from './components/countries/countries.component';
-import { FormsModule } from '@angular/forms';
 import { MoviesComponent } from './components/movies/movies.component';
 import { ActorsComponent } from './components/actors/actors.component';
 import { DirectorsComponent } from './components/directors/directors.component';
@@ -17,6 +17,8 @@ import { AdminPanelComponentComponent } from './admin-panel/admin-panel.componen
 import { AdminPanelMoviesComponent } from './admin-panel/admin-panel-movies/admin-panel-movies.component';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { UsersComponent } from './components/users/users.component';
+import { AdminPanelUserAdminComponent } from './admin-panel/admin-panel-user-admin/admin-panel-user-admin.component';
+
 
 const routes:Routes=[
   //{path:'test',component:TestComponent},
@@ -43,7 +45,8 @@ const routes:Routes=[
     AdminPanelComponentComponent,
     AdminPanelMoviesComponent,
     MovieListComponent,
-    UsersComponent
+    UsersComponent,
+    AdminPanelUserAdminComponent
   ],
   imports: [
     BrowserModule,
@@ -51,7 +54,8 @@ const routes:Routes=[
     RouterModule.forRoot(routes),
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   providers: [],
   bootstrap: [AppComponent]
