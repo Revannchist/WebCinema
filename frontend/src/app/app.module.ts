@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
+
 import { AppComponent } from './app.component';
 import { RouterModule, Routes } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 import { GenresComponent } from './components/genres/genres.component';
 import { CountriesComponent } from './components/countries/countries.component';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +16,7 @@ import { LandingPageComponent } from './components/landing-page/landing-page.com
 import { AdminPanelComponentComponent } from './admin-panel/admin-panel.component/admin-panel.component.component';
 import { AdminPanelMoviesComponent } from './admin-panel/admin-panel-movies/admin-panel-movies.component';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
+import { UsersComponent } from './components/users/users.component';
 
 const routes:Routes=[
   //{path:'test',component:TestComponent},
@@ -25,7 +27,8 @@ const routes:Routes=[
   {path:'directors',component:DirectorsComponent},
   {path:'landing-page',component:LandingPageComponent},
   {path:'admin-panel-movies',component:AdminPanelMoviesComponent},
-  {path:'movie-list',component:MovieListComponent}
+  {path:'movie-list',component:MovieListComponent},
+  {path:'users',component:UsersComponent}
 ]
 @NgModule({
   declarations: [
@@ -39,14 +42,16 @@ const routes:Routes=[
     LandingPageComponent,
     AdminPanelComponentComponent,
     AdminPanelMoviesComponent,
-    MovieListComponent
+    MovieListComponent,
+    UsersComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     RouterModule.forRoot(routes),
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
