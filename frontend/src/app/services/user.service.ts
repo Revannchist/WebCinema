@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { UserCreateDto } from '../models/dto/user-create-dto';
 import { UserDisplayDto } from '../models/dto/user-display-dto';
 import { environment } from '../../environments/environment';
@@ -49,5 +50,26 @@ export class UserService {
 
   deleteUser(id: number): Observable<UserDisplayDto> {
     return this.http.post<UserDisplayDto>(`${this.baseUrl}/DeleteUserById?id=${id}`, id);
+  }
+
+  login(loginData: { username: string, password: string }): Observable<UserDisplayDto> {
+    // Prvo dohvatimo sve korisnike
+    return this.getAllUsers().pipe(
+      map(users => {
+        // Tražimo korisnika s odgovarajućim username-om
+        const user = users.find(u => u.username === loginData.username);
+        
+        if (!user) {
+          throw new Error('User not found');
+        }
+        
+        // Ovdje bi inače bila prava provjera lozinke, ali za sad ćemo samo simulirati
+        if (loginData.password !== user.password) {
+          throw new Error('Invalid password');
+        }
+        
+        return user;
+      })
+    );
   }
 }

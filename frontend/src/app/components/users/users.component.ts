@@ -25,6 +25,7 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.setupEditModeIfNeeded();
   }
 
   private initializeForm(): void {
@@ -93,9 +94,8 @@ export class UsersComponent implements OnInit {
           next: (response) => {
             alert('User successfully updated');
             this.resetForm();
+            localStorage.setItem('currentUserId', this.selectedUserId!.toString());
             this.loadUsers();
-            this.isEditing = false;
-            this.selectedUserId = null;
           },
           error: (error) => {
             console.error('Update error:', error);
@@ -116,10 +116,11 @@ export class UsersComponent implements OnInit {
         };
 
         this.userService.addUser(userToCreate).subscribe({
-          next: () => {
+          next: (response) => {
             alert('User successfully created');
             this.resetForm();
-            this.loadUsers();
+            localStorage.setItem('currentUserId', response.id.toString());
+            this.users = [response];
           },
           error: (error) => {
             if (error.error && typeof error.error === 'string') {
@@ -159,14 +160,17 @@ export class UsersComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.userService.getAllUsers().subscribe({
-      next: (users) => {
-        this.users = users.filter(user => user.roleId === 2);
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-      }
-    });
+    const currentUserId = localStorage.getItem('currentUserId');
+    if (currentUserId) {
+      this.userService.getAllUsers().subscribe({
+        next: (users) => {
+          this.users = users.filter(user => user.id.toString() === currentUserId);
+        },
+        error: (error) => {
+          console.error('Error loading users:', error);
+        }
+      });
+    }
   }
 
   deleteUser(id: number): void {
@@ -178,6 +182,34 @@ export class UsersComponent implements OnInit {
         },
         error: (error) => {
           alert(error.error || 'Error deleting user. Please try again.');
+        }
+      });
+    }
+  }
+
+  private setupEditModeIfNeeded(): void {
+    const currentUserId = localStorage.getItem('currentUserId');
+    if (currentUserId) {
+      this.userService.getAllUsers().subscribe({
+        next: (users) => {
+          const userToEdit = users.find(u => u.id.toString() === currentUserId);
+          if (userToEdit) {
+            this.isEditing = true;
+            this.selectedUserId = userToEdit.id;
+            
+            this.userForm.patchValue({
+              username: userToEdit.username,
+              email: userToEdit.email,
+              firstName: userToEdit.firstName,
+              lastName: userToEdit.lastName,
+              dateOfBirth: new Date(userToEdit.dateOfBirth).toISOString().split('T')[0],
+              password: userToEdit.password,
+              confirmPassword: userToEdit.password
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error loading user for edit:', error);
         }
       });
     }

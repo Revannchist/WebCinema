@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { UserDisplayDto } from '../../models/dto/user-display-dto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-panel-user-admin',
@@ -21,7 +22,8 @@ export class AdminPanelUserAdminComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private userService: UserService
+    private userService: UserService,
+    private router: Router
   ) {
     this.initializeForm();
   }
@@ -202,5 +204,10 @@ export class AdminPanelUserAdminComponent implements OnInit {
       return 'Passwords do not match';
     }
     return '';
+  }
+
+  editUserInUsersComponent(userId: number): void {
+    localStorage.setItem('currentUserId', userId.toString());
+    this.router.navigate(['/users']);
   }
 }

@@ -91,17 +91,16 @@
       <div class="button-group">
         <button 
           type="submit" 
-          class="submit-btn"
-          [disabled]="!adminForm.valid"
-        >
-          {{ isEditing ? 'Update' : 'Create' }} Admin
+          class="submit-btn" 
+          [disabled]="!adminForm.valid">
+          {{ isEditing ? 'Update Admin' : 'Create Admin' }}
         </button>
+        
         <button 
-          *ngIf="isEditing" 
           type="button" 
           class="cancel-btn" 
-          (click)="cancelEdit()"
-        >
+          *ngIf="isEditing" 
+          (click)="cancelEdit()">
           Cancel
         </button>
       </div>
@@ -179,6 +178,7 @@
           <td>{{ user.email }}</td>
           <td>{{ user.dateOfBirth | date:'dd.MM.yyyy' }}</td>
           <td class="action-buttons">
+            <button class="edit-btn" (click)="editUserInUsersComponent(user.id)">Edit</button>
             <button class="delete-btn" (click)="deleteUser(user.id)">Delete</button>
           </td>
         </tr>

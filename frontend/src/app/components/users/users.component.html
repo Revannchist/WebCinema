@@ -1,6 +1,6 @@
 <div class="container">
   <div class="form-container">
-    <h2>{{ isEditing ? 'Edit User' : 'Create New User' }}</h2>
+    <h2>{{ isEditing ? 'Edit' : 'Create' }} User Profile</h2>
     
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
       <div class="form-group">
@@ -102,7 +102,7 @@
 
   <!-- Ažurirana tablica -->
   <div class="table-container">
-    <h2>Registered Users</h2>
+    <h2>Users Data</h2>
     <table class="users-table">
       <thead>
         <tr>

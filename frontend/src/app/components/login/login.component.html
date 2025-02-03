@@ -1,0 +1,44 @@
+<div class="login-container">
+  <div class="hero-content">
+    <img src="/assets/images/logo.png" alt="Logo" class="logo">
+    <h1 class="title">Web Cinema</h1>
+    <p class="subtitle">Only the best</p>
+  </div>
+  
+  <div class="login-card">
+    <h2>Login</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <input 
+          type="text" 
+          formControlName="username" 
+          placeholder="Username"
+          [ngClass]="{'invalid': loginForm.get('username')?.errors && 
+            (loginForm.get('username')?.touched || submitted)}"
+        >
+        <div class="error-message" *ngIf="loginForm.get('username')?.errors?.['required'] && 
+          (loginForm.get('username')?.touched || submitted)">
+          Username is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <input 
+          type="password" 
+          formControlName="password" 
+          placeholder="Password"
+          [ngClass]="{'invalid': loginForm.get('password')?.errors && 
+            (loginForm.get('password')?.touched || submitted)}"
+        >
+        <div class="error-message" *ngIf="loginForm.get('password')?.errors?.['required'] && 
+          (loginForm.get('password')?.touched || submitted)">
+          Password is required
+        </div>
+      </div>
+
+      <button type="submit" class="login-btn" [disabled]="!loginForm.valid">
+        Login
+      </button>
+    </form>
+  </div>
+</div>

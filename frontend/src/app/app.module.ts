@@ -18,6 +18,7 @@ import { AdminPanelMoviesComponent } from './admin-panel/admin-panel-movies/admi
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { UsersComponent } from './components/users/users.component';
 import { AdminPanelUserAdminComponent } from './admin-panel/admin-panel-user-admin/admin-panel-user-admin.component';
+import { LoginComponent } from './components/login/login.component';
 
 
 const routes:Routes=[
@@ -46,7 +47,8 @@ const routes:Routes=[
     AdminPanelMoviesComponent,
     MovieListComponent,
     UsersComponent,
-    AdminPanelUserAdminComponent
+    AdminPanelUserAdminComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
