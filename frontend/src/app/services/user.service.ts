@@ -72,4 +72,12 @@ export class UserService {
       })
     );
   }
+
+  createUser(userData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/AddUser`, userData);
+  }
+
+  getUsersPaged(page: number, pageSize: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/GetUsersPaged?page=${page}&pageSize=${pageSize}`);
+  }
 }

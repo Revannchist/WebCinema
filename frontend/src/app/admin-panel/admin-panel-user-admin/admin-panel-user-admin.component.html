@@ -1,6 +1,12 @@
 <div class="container">
   <div class="form-container">
-    <h2>Admin Panel - {{ isEditing ? 'Edit' : 'Create' }} Admin Profile</h2>
+    <div class="header-container">
+      <h2>Create Admin Profile</h2>
+      <div class="admin-info">
+        <span class="admin-username">{{ currentAdminUsername }}</span>
+        <button class="logout-btn" (click)="logout()">Odjava</button>
+      </div>
+    </div>
     
     <form [formGroup]="adminForm" (ngSubmit)="onSubmit()" class="admin-form">
       <div class="form-row">
@@ -178,11 +184,34 @@
           <td>{{ user.email }}</td>
           <td>{{ user.dateOfBirth | date:'dd.MM.yyyy' }}</td>
           <td class="action-buttons">
-            <button class="edit-btn" (click)="editUserInUsersComponent(user.id)">Edit</button>
+            <button class="edit-btn" (click)="editUserInUsersComponent(user)">Edit</button>
             <button class="delete-btn" (click)="deleteUser(user.id)">Delete</button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <!-- Dodajte ovo ispod users tablice, prije zatvaranja table-container div-a -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button 
+        class="page-btn" 
+        (click)="previousPage()" 
+        [disabled]="currentPage === 1"
+      >
+        Previous
+      </button>
+      
+      <span class="page-info">
+        Page {{ currentPage }} of {{ totalPages }}
+      </span>
+      
+      <button 
+        class="page-btn" 
+        (click)="nextPage()" 
+        [disabled]="currentPage === totalPages"
+      >
+        Next
+      </button>
+    </div>
   </div>
 </div>

@@ -218,7 +218,37 @@ namespace WebCinema.Services
             return (user, string.Empty);
         }
 
-       
+        public async Task<(List<UserDisplayDto> users, int totalUsers)> GetUsersPagedAsync(int page, int pageSize)
+        {
+            
+
+            var query = _dbContext.Users.Where(u => u.RoleId == 2);
+
+            var totalUsers = await query.CountAsync();
+
+            var users = await query
+                .Include(u => u.Roles)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(u => new UserDisplayDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    Password = u.Password,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    DateOfBirth = u.DateOfBirth,
+                    RegistrationTime = u.RegistrationTime,
+                    RoleId = u.RoleId,
+                    RoleName = u.Roles.Name
+                })
+                .ToListAsync();
+
+            return (users, totalUsers);
+        }
+
+
     }
 
    

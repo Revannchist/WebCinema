@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { UserCreateDto } from '../../models/dto/user-create-dto';
 import { UserDisplayDto } from '../../models/dto/user-display-dto';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-users',
@@ -10,45 +11,200 @@ import { UserDisplayDto } from '../../models/dto/user-display-dto';
   styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
-  userForm!: FormGroup;
+  users: any[] = [];
+  submitted = false;
   isEditing = false;
   selectedUserId: number | null = null;
-  submitted = false;
-  users: UserDisplayDto[] = [];
+  currentUserRole: number = 0;
+  isAdmin: boolean = false;
+  existingPassword: string = '';
+  userForm!: FormGroup;
+  pageSize: number = 3;
+  currentPage: number = 1;
+  totalPages: number = 1;
+  totalUsers: number = 0;
 
   constructor(
     private fb: FormBuilder,
-    private userService: UserService
+    private userService: UserService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
-    this.initializeForm();
+    this.initializeEmptyForm();
   }
 
-  ngOnInit(): void {
-    this.loadUsers();
-    this.setupEditModeIfNeeded();
-  }
-
-  private initializeForm(): void {
+  private initializeEmptyForm(): void {
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [
-        Validators.required, 
-        Validators.minLength(5),
-        Validators.pattern(/^(?=.*[0-9])/)
-      ]],
-      confirmPassword: ['', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      dateOfBirth: ['', Validators.required]
+      dateOfBirth: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(5), Validators.pattern(/^(?=.*[0-9])/)]],
+      confirmPassword: ['', Validators.required]
     }, {
-      validators: this.passwordMatchValidator
+      validator: this.passwordMatchValidator
     });
   }
 
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value
-      ? null : {'mismatch': true};
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const userId = params['userId'];
+      if (userId) {
+        this.userService.getUserById(userId).subscribe({
+          next: (user: UserDisplayDto) => {
+            this.users = [user];
+            this.editUser(user);
+          },
+          error: (error) => {
+            console.error('Error loading specific user:', error);
+          }
+        });
+      } else {
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          const userData = JSON.parse(currentUser);
+          this.currentUserRole = userData.roleId;
+          this.isAdmin = userData.roleId === 1;
+        }
+
+        const isFromLoginCreate = sessionStorage.getItem('fromLoginCreate');
+        if (isFromLoginCreate) {
+          this.clearEverything();
+          sessionStorage.removeItem('fromLoginCreate');
+        } else {
+          const currentUserId = localStorage.getItem('currentUserId');
+          if (currentUserId) {
+            this.setupEditModeIfNeeded();
+          }
+        }
+        this.loadUsers();
+      }
+    });
+  }
+
+  private clearEverything(): void {
+    this.users = [];
+    this.isEditing = false;
+    this.selectedUserId = null;
+    this.existingPassword = '';
+    localStorage.removeItem('currentUserId');
+    this.initializeEmptyForm();
+  }
+
+  passwordMatchValidator(g: AbstractControl): ValidationErrors | null {
+    const password = g.get('password');
+    const confirmPassword = g.get('confirmPassword');
+    
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
+
+  setupEditModeIfNeeded(): void {
+    const currentUserId = localStorage.getItem('currentUserId');
+    if (currentUserId) {
+      this.userService.getAllUsers().subscribe({
+        next: (users) => {
+          const userToEdit = users.find(u => u.id.toString() === currentUserId);
+          if (userToEdit) {
+            this.isEditing = true;
+            this.selectedUserId = userToEdit.id;
+            this.existingPassword = userToEdit.password;
+            
+            const formData: any = {
+              username: userToEdit.username,
+              email: userToEdit.email,
+              firstName: userToEdit.firstName,
+              lastName: userToEdit.lastName,
+              dateOfBirth: new Date(userToEdit.dateOfBirth).toISOString().split('T')[0]
+            };
+
+            if (!this.isAdmin) {
+              formData.password = '';
+              formData.confirmPassword = '';
+            }
+
+            this.userForm.patchValue(formData);
+            this.users = [userToEdit];
+          }
+        },
+        error: (error) => {
+          console.error('Error loading user for edit:', error);
+        }
+      });
+    }
+  }
+
+  onSubmit(): void {
+    this.submitted = true;
+
+    if (this.userForm.valid) {
+      const formValue = this.userForm.value;
+      
+      if (this.isEditing && this.selectedUserId) {
+        const updateData: any = {
+          id: this.selectedUserId,
+          username: formValue.username,
+          email: formValue.email,
+          firstName: formValue.firstName,
+          lastName: formValue.lastName,
+          dateOfBirth: formValue.dateOfBirth,
+          roleId: 2
+        };
+
+        if (this.isAdmin) {
+          updateData.password = this.existingPassword;
+        } else {
+          updateData.password = formValue.password || this.existingPassword;
+        }
+
+        this.userService.updateUser(this.selectedUserId, updateData).subscribe({
+          next: (response: any) => {
+            alert('User successfully updated');
+            this.users = [response];
+            this.existingPassword = updateData.password;
+          },
+          error: (error: any) => {
+            console.error('Update error:', error);
+            if (error.error && typeof error.error === 'string') {
+              alert(error.error);
+            } else {
+              alert('Error updating user. Please try again.');
+            }
+          }
+        });
+      } else {
+        const newUser = {
+          ...formValue,
+          roleId: 2
+        };
+        delete newUser.confirmPassword;
+
+        this.userService.createUser(newUser).subscribe({
+          next: (response: any) => {
+            alert('User successfully created');
+            this.users = [response];
+            this.existingPassword = formValue.password;
+            this.selectedUserId = response.id;
+            this.resetForm();
+          },
+          error: (error: any) => {
+            if (error.error && typeof error.error === 'string') {
+              alert(error.error);
+            } else {
+              alert('Error creating user. Please try again.');
+            }
+          }
+        });
+      }
+    }
+  }
+
+  resetForm(): void {
+    this.userForm.reset();
+    this.submitted = false;
   }
 
   editUser(user: UserDisplayDto): void {
@@ -74,73 +230,6 @@ export class UsersComponent implements OnInit {
     this.resetForm();
   }
 
-  onSubmit(): void {
-    this.submitted = true;
-
-    if (this.userForm.valid) {
-      const { confirmPassword, ...userData } = this.userForm.value;
-      
-      if (this.isEditing && this.selectedUserId) {
-        // Update existing user
-        const userToUpdate = {
-          ...userData,
-          id: this.selectedUserId,
-          roleId: 2
-        };
-
-        console.log('Sending update data:', userToUpdate);
-
-        this.userService.updateUser(this.selectedUserId, userToUpdate).subscribe({
-          next: (response) => {
-            alert('User successfully updated');
-            this.resetForm();
-            localStorage.setItem('currentUserId', this.selectedUserId!.toString());
-            this.loadUsers();
-          },
-          error: (error) => {
-            console.error('Update error:', error);
-            if (error.error && typeof error.error === 'string') {
-              alert(error.error);
-            } else if (error.error?.message) {
-              alert(error.error.message);
-            } else {
-              alert('Error updating user. Please try again.');
-            }
-          }
-        });
-      } else {
-        // Create new user
-        const userToCreate = {
-          ...userData,
-          roleId: 2
-        };
-
-        this.userService.addUser(userToCreate).subscribe({
-          next: (response) => {
-            alert('User successfully created');
-            this.resetForm();
-            localStorage.setItem('currentUserId', response.id.toString());
-            this.users = [response];
-          },
-          error: (error) => {
-            if (error.error && typeof error.error === 'string') {
-              alert(error.error);
-            } else {
-              alert('Error creating user. Please try again.');
-            }
-          }
-        });
-      }
-    }
-  }
-
-  resetForm(): void {
-    this.userForm.reset();
-    this.isEditing = false;
-    this.selectedUserId = null;
-    this.submitted = false;
-  }
-
   getErrorMessage(controlName: string): string {
     const control = this.userForm.get(controlName);
     if (control?.errors && (control.dirty || control.touched || this.submitted)) {
@@ -159,57 +248,46 @@ export class UsersComponent implements OnInit {
     return '';
   }
 
-  loadUsers(): void {
-    const currentUserId = localStorage.getItem('currentUserId');
-    if (currentUserId) {
-      this.userService.getAllUsers().subscribe({
-        next: (users) => {
-          this.users = users.filter(user => user.id.toString() === currentUserId);
-        },
-        error: (error) => {
-          console.error('Error loading users:', error);
-        }
-      });
+  loadUsers(page: number = 1): void {
+    this.userService.getUsersPaged(page, this.pageSize).subscribe({
+      next: (response) => {
+        this.users = response.Users;
+        this.totalUsers = response.TotalUsers;
+        this.totalPages = Math.ceil(this.totalUsers / this.pageSize);
+        this.currentPage = page;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+      }
+    });
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.loadUsers(this.currentPage + 1);
     }
   }
 
-  deleteUser(id: number): void {
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.loadUsers(this.currentPage - 1);
+    }
+  }
+
+  deleteUser(userId: number): void {
     if (confirm('Are you sure you want to delete this user?')) {
-      this.userService.deleteUser(id).subscribe({
-        next: () => {
+      this.userService.deleteUser(userId).subscribe({
+        next: (response: any) => {
           alert('User successfully deleted');
-          this.loadUsers();
+          window.location.reload();
         },
-        error: (error) => {
-          alert(error.error || 'Error deleting user. Please try again.');
-        }
-      });
-    }
-  }
-
-  private setupEditModeIfNeeded(): void {
-    const currentUserId = localStorage.getItem('currentUserId');
-    if (currentUserId) {
-      this.userService.getAllUsers().subscribe({
-        next: (users) => {
-          const userToEdit = users.find(u => u.id.toString() === currentUserId);
-          if (userToEdit) {
-            this.isEditing = true;
-            this.selectedUserId = userToEdit.id;
-            
-            this.userForm.patchValue({
-              username: userToEdit.username,
-              email: userToEdit.email,
-              firstName: userToEdit.firstName,
-              lastName: userToEdit.lastName,
-              dateOfBirth: new Date(userToEdit.dateOfBirth).toISOString().split('T')[0],
-              password: userToEdit.password,
-              confirmPassword: userToEdit.password
-            });
+        error: (error: any) => {
+          console.error('Delete error:', error);
+          if (error.error && typeof error.error === 'string') {
+            alert(error.error);
+          } else {
+            alert('Error deleting user. Please try again.');
           }
-        },
-        error: (error) => {
-          console.error('Error loading user for edit:', error);
         }
       });
     }

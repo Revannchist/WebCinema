@@ -12,6 +12,7 @@ namespace WebCinema.Interfaces
         Task<UserDisplayDto> DeleteUsersByIdAsync(int id);
         Task<(Users user, string errorMessage)> UpdateUsersAsync(int id, Users users);
         Task<(Users user, string errorMessage)> UpdateUserBasicInfoAsync(int id, UsersEditDto dto);
+        Task<(List<UserDisplayDto> users, int totalUsers)> GetUsersPagedAsync(int page, int pageSize);
 
     }
 }

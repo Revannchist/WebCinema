@@ -196,3 +196,39 @@ button:hover {
 .cancel-btn:hover {
   background-color: #5a6268;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px;
+  gap: 15px;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ffc107;
+  color: black;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.page-btn:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+  color: #6c757d;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #ffca2c;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}

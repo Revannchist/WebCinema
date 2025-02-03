@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./admin-panel-user-admin.component.css']
 })
 export class AdminPanelUserAdminComponent implements OnInit {
-  adminForm!: FormGroup;
+  adminForm: FormGroup;
   isEditing = false;
   selectedUserId: number | null = null;
   submitted = false;
@@ -19,21 +19,18 @@ export class AdminPanelUserAdminComponent implements OnInit {
   allUsers: UserDisplayDto[] = [];
   usernameFilter: string = '';
   emailFilter: string = '';
+  currentAdminUsername: string = '';
+  pageSize: number = 3;
+  currentPage: number = 1;
+  totalPages: number = 1;
+  totalUsers: number = 0;
 
   constructor(
-    private fb: FormBuilder,
+    private formBuilder: FormBuilder,
     private userService: UserService,
     private router: Router
   ) {
-    this.initializeForm();
-  }
-
-  ngOnInit(): void {
-    this.loadUsers();
-  }
-
-  private initializeForm(): void {
-    this.adminForm = this.fb.group({
+    this.adminForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
@@ -50,26 +47,47 @@ export class AdminPanelUserAdminComponent implements OnInit {
     });
   }
 
+  ngOnInit(): void {
+    this.loadAdmins();
+    this.loadUsers();
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      const userData = JSON.parse(currentUser);
+      this.currentAdminUsername = userData.username;
+    }
+  }
+
   private passwordMatchValidator(g: FormGroup) {
     return g.get('password')?.value === g.get('confirmPassword')?.value
       ? null : {'mismatch': true};
   }
 
-  loadUsers(): void {
+  loadAdmins(): void {
     this.userService.getAllUsers().subscribe({
-      next: (users) => {
-        this.admins = users.filter(user => user.roleId === 1);
-        this.allUsers = users.filter(user => user.roleId === 2);
-        this.users = [...this.allUsers];
+      next: (response: UserDisplayDto[]) => {
+        this.admins = response.filter((user: UserDisplayDto) => user.roleId === 1);
       },
-      error: (error) => {
+      error: (error: any) => {
+        console.error('Error loading admins:', error);
+      }
+    });
+  }
+
+  loadUsers(): void {
+    this.userService.getUsersPaged(this.currentPage, this.pageSize).subscribe({
+      next: (response: any) => {
+        this.users = response.users.filter((user: UserDisplayDto) => user.roleId === 2);
+        this.totalUsers = response.totalUsers;
+        this.totalPages = Math.ceil(this.totalUsers / this.pageSize);
+      },
+      error: (error: any) => {
         console.error('Error loading users:', error);
       }
     });
   }
 
   filterUsers(): void {
-    this.users = this.allUsers.filter(user => {
+    this.users = this.allUsers.filter((user: UserDisplayDto) => {
       const matchUsername = user.username.toLowerCase().includes(this.usernameFilter.toLowerCase());
       const matchEmail = user.email.toLowerCase().includes(this.emailFilter.toLowerCase());
       
@@ -93,18 +111,18 @@ export class AdminPanelUserAdminComponent implements OnInit {
     this.submitted = true;
 
     if (this.adminForm.valid) {
-      const { confirmPassword, ...userData } = this.adminForm.value;
+      const { confirmPassword, password, ...userData } = this.adminForm.value;
       
       if (this.isEditing && this.selectedUserId) {
         const userToUpdate = {
           ...userData,
           id: this.selectedUserId,
-          roleId: 1
+          roleId: 2 // Za obične korisnike
         };
 
         this.userService.updateUser(this.selectedUserId, userToUpdate).subscribe({
           next: () => {
-            alert('Admin successfully updated');
+            alert('User successfully updated');
             this.resetForm();
             this.loadUsers();
           },
@@ -112,13 +130,15 @@ export class AdminPanelUserAdminComponent implements OnInit {
             if (error.error && typeof error.error === 'string') {
               alert(error.error);
             } else {
-              alert('Error updating admin. Please try again.');
+              alert('Error updating user. Please try again.');
             }
           }
         });
       } else {
+        // Postojeća logika za kreiranje novog admina
         const userToCreate = {
           ...userData,
+          password,
           roleId: 1
         };
 
@@ -126,7 +146,7 @@ export class AdminPanelUserAdminComponent implements OnInit {
           next: () => {
             alert('Admin successfully created');
             this.resetForm();
-            this.loadUsers();
+            this.loadAdmins();
           },
           error: (error) => {
             if (error.error && typeof error.error === 'string') {
@@ -206,8 +226,33 @@ export class AdminPanelUserAdminComponent implements OnInit {
     return '';
   }
 
-  editUserInUsersComponent(userId: number): void {
-    localStorage.setItem('currentUserId', userId.toString());
-    this.router.navigate(['/users']);
+  editUserInUsersComponent(user: UserDisplayDto): void {
+    this.router.navigate(['/users'], { 
+      queryParams: { 
+        userId: user.id 
+      }
+    });
+  }
+
+  logout(): void {
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUserId');
+    
+    this.router.navigate(['/']);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadUsers();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadUsers();
+    }
   }
 }

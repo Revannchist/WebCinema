@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebCinema.Interfaces;
 using WebCinema.Models;
 using WebCinema.Models.DTO;
@@ -73,7 +74,7 @@ namespace WebCinema.Controllers
             return Ok(user);
         }
 
-
+      
 
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
@@ -95,6 +96,17 @@ namespace WebCinema.Controllers
                 return BadRequest(errorMessage);
             }
             return Ok(updatedUser);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsersPaged(int page = 1, int pageSize = 3)
+        {
+            var (users, totalUsers) = await _usersService.GetUsersPagedAsync(page, pageSize);
+            if (users == null || !users.Any())
+            {
+                return BadRequest("No users found.");
+            }
+            return Ok(new { Users = users, TotalUsers = totalUsers });
         }
     }
 }

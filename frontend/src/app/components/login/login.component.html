@@ -39,6 +39,10 @@
       <button type="submit" class="login-btn" [disabled]="!loginForm.valid">
         Login
       </button>
+
+      <div class="register-link">
+        <p>Don't have an account? <a (click)="goToCreateAccount()" style="cursor: pointer;">Create one here</a></p>
+      </div>
     </form>
   </div>
 </div>
