@@ -97,16 +97,16 @@ namespace WebCinema.Controllers
             }
             return Ok(updatedUser);
         }
-
         [HttpGet]
-        public async Task<IActionResult> GetUsersPaged(int page = 1, int pageSize = 3)
+        public async Task<IActionResult> GetUsersPagedAndFiltered(int page = 1, int pageSize = 3, string searchTerm = "")
         {
-            var (users, totalUsers) = await _usersService.GetUsersPagedAsync(page, pageSize);
+            var (users, totalUsers) = await _usersService.GetUsersPagedAndFilteredAsync(page, pageSize, searchTerm);
             if (users == null || !users.Any())
             {
                 return BadRequest("No users found.");
             }
             return Ok(new { Users = users, TotalUsers = totalUsers });
         }
+       
     }
 }

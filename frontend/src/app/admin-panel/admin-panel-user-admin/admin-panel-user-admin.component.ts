@@ -24,6 +24,8 @@ export class AdminPanelUserAdminComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
   totalUsers: number = 0;
+  searchTerm: string = '';
+  debounceTimer?: ReturnType<typeof setTimeout>;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -74,37 +76,29 @@ export class AdminPanelUserAdminComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.userService.getUsersPaged(this.currentPage, this.pageSize).subscribe({
-      next: (response: any) => {
-        this.users = response.users.filter((user: UserDisplayDto) => user.roleId === 2);
-        this.totalUsers = response.totalUsers;
-        this.totalPages = Math.ceil(this.totalUsers / this.pageSize);
-      },
-      error: (error: any) => {
-        console.error('Error loading users:', error);
-      }
-    });
+    const combinedSearchTerm = this.usernameFilter || this.emailFilter;
+    this.userService.getUsersPagedAndFiltered(this.currentPage, this.pageSize, combinedSearchTerm)
+      .subscribe({
+        next: (response: any) => {
+          this.users = response.users;
+          this.totalUsers = response.totalUsers;
+          this.totalPages = Math.ceil(this.totalUsers / this.pageSize);
+        },
+        error: (error: any) => {
+          console.error('Error loading users:', error);
+        }
+      });
   }
 
   filterUsers(): void {
-    this.users = this.allUsers.filter((user: UserDisplayDto) => {
-      const matchUsername = user.username.toLowerCase().includes(this.usernameFilter.toLowerCase());
-      const matchEmail = user.email.toLowerCase().includes(this.emailFilter.toLowerCase());
-      
-      if (!this.usernameFilter && !this.emailFilter) {
-        return true;
-      }
-      
-      if (this.usernameFilter && !this.emailFilter) {
-        return matchUsername;
-      }
-      
-      if (!this.usernameFilter && this.emailFilter) {
-        return matchEmail;
-      }
-      
-      return matchUsername && matchEmail;
-    });
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+
+    this.debounceTimer = setTimeout(() => {
+      this.currentPage = 1; // Reset na prvu stranicu kod novog filtera
+      this.loadUsers();
+    }, 300); // 300ms debounce
   }
 
   onSubmit(): void {

@@ -217,12 +217,18 @@ namespace WebCinema.Services
             await _dbContext.SaveChangesAsync();
             return (user, string.Empty);
         }
-
-        public async Task<(List<UserDisplayDto> users, int totalUsers)> GetUsersPagedAsync(int page, int pageSize)
+        public async Task<(List<UserDisplayDto> users, int totalUsers)> GetUsersPagedAndFilteredAsync(int page, int pageSize, string searchTerm)
         {
-            
-
             var query = _dbContext.Users.Where(u => u.RoleId == 2);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                query = query.Where(u =>
+                    u.Username.ToLower().Contains(searchTerm) ||
+                    u.Email.ToLower().Contains(searchTerm)
+                );
+            }
 
             var totalUsers = await query.CountAsync();
 
@@ -247,6 +253,8 @@ namespace WebCinema.Services
 
             return (users, totalUsers);
         }
+
+       
 
 
     }

@@ -112,6 +112,9 @@ input.invalid {
   width: 100%;
   max-width: 800px;
   margin-top: 20px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-container h2 {
@@ -124,6 +127,8 @@ input.invalid {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  flex: 1;
+  margin-bottom: 20px;
 }
 
 .users-table th,
@@ -131,6 +136,7 @@ input.invalid {
   padding: 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  white-space: nowrap;
 }
 
 .users-table th {
@@ -265,7 +271,7 @@ button.submit-btn:disabled {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: auto;
   padding: 10px;
   gap: 15px;
 }
@@ -295,4 +301,47 @@ button.submit-btn:disabled {
   font-size: 14px;
   color: #495057;
   font-weight: 500;
+}
+
+.users-table tbody {
+  min-height: 144px;
+  display: block;
+}
+
+.users-table thead, 
+.users-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Dodajemo specifične širine za kolone */
+.users-table th:nth-child(1), /* Username */
+.users-table td:nth-child(1) {
+  width: 15%;
+}
+
+.users-table th:nth-child(2), /* First Name */
+.users-table td:nth-child(2) {
+  width: 15%;
+}
+
+.users-table th:nth-child(3), /* Last Name */
+.users-table td:nth-child(3) {
+  width: 15%;
+}
+
+.users-table th:nth-child(4), /* Email */
+.users-table td:nth-child(4) {
+  width: 25%;
+}
+
+.users-table th:nth-child(5), /* Date of Birth */
+.users-table td:nth-child(5) {
+  width: 15%;
+}
+
+.users-table th:nth-child(6), /* Actions */
+.users-table td:nth-child(6) {
+  width: 15%;
 }
