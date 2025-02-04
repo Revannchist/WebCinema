@@ -19,6 +19,7 @@ import { MovieListComponent } from './components/movie-list/movie-list.component
 import { UsersComponent } from './components/users/users.component';
 import { AdminPanelUserAdminComponent } from './admin-panel/admin-panel-user-admin/admin-panel-user-admin.component';
 import { LoginComponent } from './components/login/login.component';
+import { PasswordStrengthComponent } from './components/password-strength/password-strength.component';
 
 
 const routes:Routes=[
@@ -48,7 +49,8 @@ const routes:Routes=[
     MovieListComponent,
     UsersComponent,
     AdminPanelUserAdminComponent,
-    LoginComponent
+    LoginComponent,
+    PasswordStrengthComponent
   ],
   imports: [
     BrowserModule,

@@ -23,6 +23,7 @@ export class UsersComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
   totalUsers: number = 0;
+  password: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -291,5 +292,9 @@ export class UsersComponent implements OnInit {
         }
       });
     }
+  }
+
+  onPasswordInput(event: any) {
+    this.password = event.target.value;
   }
 }
