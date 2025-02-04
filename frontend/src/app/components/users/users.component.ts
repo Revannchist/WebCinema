@@ -4,6 +4,7 @@ import { UserService } from '../../services/user.service';
 import { UserCreateDto } from '../../models/dto/user-create-dto';
 import { UserDisplayDto } from '../../models/dto/user-display-dto';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
@@ -29,7 +30,8 @@ export class UsersComponent implements OnInit {
     private fb: FormBuilder,
     private userService: UserService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private translate: TranslateService
   ) {
     this.initializeEmptyForm();
   }
@@ -83,7 +85,7 @@ export class UsersComponent implements OnInit {
       }
     });
   }
-
+  
   private clearEverything(): void {
     this.users = [];
     this.isEditing = false;
@@ -234,17 +236,17 @@ export class UsersComponent implements OnInit {
   getErrorMessage(controlName: string): string {
     const control = this.userForm.get(controlName);
     if (control?.errors && (control.dirty || control.touched || this.submitted)) {
-      if (control.errors['required']) return 'This field is required';
-      if (control.errors['email']) return 'Please enter a valid email address';
-      if (control.errors['minlength']) {
-        return `Minimum length is ${control.errors['minlength'].requiredLength} characters`;
-      }
-      if (control.errors['pattern'] && controlName === 'password') {
-        return 'Password must contain at least one number';
-      }
+      if (control.errors['required']) 
+        return 'USER_REGISTRATION.VALIDATION.REQUIRED';
+      if (control.errors['email']) 
+        return 'USER_REGISTRATION.VALIDATION.EMAIL_INVALID';
+      if (control.errors['minlength']) 
+        return 'USER_REGISTRATION.VALIDATION.PASSWORD_LENGTH';
+      if (control.errors['pattern'] && controlName === 'password') 
+        return 'USER_REGISTRATION.VALIDATION.PASSWORD_NUMBER';
     }
     if (controlName === 'confirmPassword' && this.userForm.hasError('mismatch')) {
-      return 'Passwords do not match';
+      return 'USER_REGISTRATION.VALIDATION.PASSWORDS_MATCH';
     }
     return '';
   }

@@ -26,6 +26,14 @@ export class AdminPanelUserAdminComponent implements OnInit {
   totalUsers: number = 0;
   searchTerm: string = '';
   debounceTimer?: ReturnType<typeof setTimeout>;
+  adminFilters = {
+    username: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    dateOfBirth: ''
+  };
+  private allAdmins: UserDisplayDto[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -67,7 +75,8 @@ export class AdminPanelUserAdminComponent implements OnInit {
   loadAdmins(): void {
     this.userService.getAllUsers().subscribe({
       next: (response: UserDisplayDto[]) => {
-        this.admins = response.filter((user: UserDisplayDto) => user.roleId === 1);
+        this.allAdmins = response.filter(user => user.roleId === 1);
+        this.admins = [...this.allAdmins];
       },
       error: (error: any) => {
         console.error('Error loading admins:', error);
@@ -96,9 +105,9 @@ export class AdminPanelUserAdminComponent implements OnInit {
     }
 
     this.debounceTimer = setTimeout(() => {
-      this.currentPage = 1; // Reset na prvu stranicu kod novog filtera
+      this.currentPage = 1; 
       this.loadUsers();
-    }, 300); // 300ms debounce
+    }, 300); 
   }
 
   onSubmit(): void {
@@ -135,7 +144,6 @@ export class AdminPanelUserAdminComponent implements OnInit {
           }
         });
       } else {
-        // Postojeća logika za kreiranje novog admina
         const userToCreate = {
           ...formData,
           roleId: 1
@@ -271,5 +279,20 @@ export class AdminPanelUserAdminComponent implements OnInit {
       this.currentPage--;
       this.loadUsers();
     }
+  }
+
+  filterAdmins() {
+    if (!this.allAdmins) return;
+    
+    this.admins = this.allAdmins.filter(admin => {
+      return (
+        admin.username.toLowerCase().includes(this.adminFilters.username.toLowerCase()) &&
+        admin.firstName.toLowerCase().includes(this.adminFilters.firstName.toLowerCase()) &&
+        admin.lastName.toLowerCase().includes(this.adminFilters.lastName.toLowerCase()) &&
+        admin.email.toLowerCase().includes(this.adminFilters.email.toLowerCase()) &&
+        (!this.adminFilters.dateOfBirth || 
+          admin.dateOfBirth.toString().includes(this.adminFilters.dateOfBirth))
+      );
+    });
   }
 }

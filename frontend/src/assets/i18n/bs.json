@@ -1,0 +1,42 @@
+{
+  "LOGIN": {
+    "TITLE": "Prijava",
+    "USERNAME": "Korisničko ime",
+    "PASSWORD": "Lozinka",
+    "SUBMIT": "Prijavi se",
+    "CREATE_ACCOUNT": "Kreiraj račun"
+  },
+  "ADMIN": {
+    "USERS_LIST": "Lista korisnika",
+    "ADMINS_LIST": "Lista administratora",
+    "CREATE_ADMIN": "Kreiraj admin profil",
+    "ACTIONS": "Akcije",
+    "EDIT": "Izmijeni",
+    "DELETE": "Obriši"
+  },
+  "USER_REGISTRATION": {
+    "TITLE": "Kreiraj Novi Račun",
+    "USERNAME": "Korisničko ime",
+    "EMAIL": "Email",
+    "PASSWORD": "Lozinka",
+    "CONFIRM_PASSWORD": "Potvrdi lozinku",
+    "FIRST_NAME": "Ime",
+    "LAST_NAME": "Prezime",
+    "DATE_OF_BIRTH": "Datum rođenja",
+    "SUBMIT": "Kreiraj račun",
+    "CANCEL": "Odustani",
+    "PASSWORD_STRENGTH": {
+      "WEAK": "Slaba",
+      "FAIR": "Dobra",
+      "GOOD": "Jaka",
+      "STRONG": "Vrlo jaka"
+    },
+    "VALIDATION": {
+      "REQUIRED": "Ovo polje je obavezno",
+      "EMAIL_INVALID": "Unesite validnu email adresu",
+      "PASSWORD_LENGTH": "Lozinka mora imati najmanje 5 karaktera",
+      "PASSWORD_NUMBER": "Lozinka mora sadržavati najmanje jedan broj",
+      "PASSWORDS_MATCH": "Lozinke se ne podudaraju"
+    }
+  }
+} 

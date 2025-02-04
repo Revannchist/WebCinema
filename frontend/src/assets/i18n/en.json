@@ -1,0 +1,42 @@
+{
+  "LOGIN": {
+    "TITLE": "Login",
+    "USERNAME": "Username",
+    "PASSWORD": "Password",
+    "SUBMIT": "Sign In",
+    "CREATE_ACCOUNT": "Create account"
+  },
+  "ADMIN": {
+    "USERS_LIST": "Users List",
+    "ADMINS_LIST": "Administrators List",
+    "CREATE_ADMIN": "Create Admin Profile",
+    "ACTIONS": "Actions",
+    "EDIT": "Edit",
+    "DELETE": "Delete"
+  },
+  "USER_REGISTRATION": {
+    "TITLE": "Create New Account",
+    "USERNAME": "Username",
+    "EMAIL": "Email",
+    "PASSWORD": "Password",
+    "CONFIRM_PASSWORD": "Confirm Password",
+    "FIRST_NAME": "First Name",
+    "LAST_NAME": "Last Name",
+    "DATE_OF_BIRTH": "Date of Birth",
+    "SUBMIT": "Create Account",
+    "CANCEL": "Cancel",
+    "PASSWORD_STRENGTH": {
+      "WEAK": "Weak",
+      "FAIR": "Fair",
+      "GOOD": "Good",
+      "STRONG": "Strong"
+    },
+    "VALIDATION": {
+      "REQUIRED": "This field is required",
+      "EMAIL_INVALID": "Please enter a valid email",
+      "PASSWORD_LENGTH": "Password must be at least 5 characters long",
+      "PASSWORD_NUMBER": "Password must contain at least one number",
+      "PASSWORDS_MATCH": "Passwords do not match"
+    }
+  }
+} 

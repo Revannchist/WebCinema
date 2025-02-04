@@ -116,6 +116,42 @@
   <!-- Admins Table -->
   <div class="table-container">
     <h2>Administrators List</h2>
+    <div class="admin-filters">
+      <input 
+        type="text" 
+        [(ngModel)]="adminFilters.username" 
+        (ngModelChange)="filterAdmins()"
+        placeholder="Username"
+        class="filter-input"
+      >
+      <input 
+        type="text" 
+        [(ngModel)]="adminFilters.firstName" 
+        (ngModelChange)="filterAdmins()"
+        placeholder="First Name"
+        class="filter-input"
+      >
+      <input 
+        type="text" 
+        [(ngModel)]="adminFilters.lastName" 
+        (ngModelChange)="filterAdmins()"
+        placeholder="Last Name"
+        class="filter-input"
+      >
+      <input 
+        type="text" 
+        [(ngModel)]="adminFilters.email" 
+        (ngModelChange)="filterAdmins()"
+        placeholder="Email"
+        class="filter-input"
+      >
+      <input 
+        type="date" 
+        [(ngModel)]="adminFilters.dateOfBirth" 
+        (ngModelChange)="filterAdmins()"
+        class="filter-input"
+      >
+    </div>
     <table class="users-table">
       <thead>
         <tr>
@@ -191,7 +227,6 @@
       </tbody>
     </table>
 
-    <!-- Dodajte ovo ispod users tablice, prije zatvaranja table-container div-a -->
     <div class="pagination" *ngIf="totalPages > 1">
       <button 
         class="page-btn" 

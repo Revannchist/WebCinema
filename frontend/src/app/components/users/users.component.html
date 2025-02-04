@@ -1,50 +1,50 @@
 <div class="container">
   <div class="form-container">
-    <h2>{{ isEditing ? 'Edit' : 'Create' }} User Profile</h2>
+    <h2>{{ 'USER_REGISTRATION.TITLE' | translate }}</h2>
     
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <input 
           type="text" 
           formControlName="username" 
-          placeholder="Username"
+          [placeholder]="'USER_REGISTRATION.USERNAME' | translate"
           [ngClass]="{'invalid': userForm.get('username')?.errors && 
             (userForm.get('username')?.touched || submitted)}"
         >
-        <div class="error-message">{{ getErrorMessage('username') }}</div>
+        <div class="error-message">{{ getErrorMessage('username') | translate }}</div>
       </div>
 
       <div class="form-group">
         <input 
           type="email" 
           formControlName="email" 
-          placeholder="Email"
+          [placeholder]="'USER_REGISTRATION.EMAIL' | translate"
           [ngClass]="{'invalid': userForm.get('email')?.errors && 
             (userForm.get('email')?.touched || submitted)}"
         >
-        <div class="error-message">{{ getErrorMessage('email') }}</div>
+        <div class="error-message">{{ getErrorMessage('email') | translate }}</div>
       </div>
 
       <div class="form-group">
         <input 
           type="text" 
           formControlName="firstName" 
-          placeholder="First Name"
+          [placeholder]="'USER_REGISTRATION.FIRST_NAME' | translate"
           [ngClass]="{'invalid': userForm.get('firstName')?.errors && 
             (userForm.get('firstName')?.touched || submitted)}"
         >
-        <div class="error-message">{{ getErrorMessage('firstName') }}</div>
+        <div class="error-message">{{ getErrorMessage('firstName') | translate }}</div>
       </div>
 
       <div class="form-group">
         <input 
           type="text" 
           formControlName="lastName" 
-          placeholder="Last Name"
+          [placeholder]="'USER_REGISTRATION.LAST_NAME' | translate"
           [ngClass]="{'invalid': userForm.get('lastName')?.errors && 
             (userForm.get('lastName')?.touched || submitted)}"
         >
-        <div class="error-message">{{ getErrorMessage('lastName') }}</div>
+        <div class="error-message">{{ getErrorMessage('lastName') | translate }}</div>
       </div>
 
       <div class="form-group">
@@ -54,19 +54,19 @@
           [ngClass]="{'invalid': userForm.get('dateOfBirth')?.errors && 
             (userForm.get('dateOfBirth')?.touched || submitted)}"
         >
-        <div class="error-message">{{ getErrorMessage('dateOfBirth') }}</div>
+        <div class="error-message">{{ getErrorMessage('dateOfBirth') | translate }}</div>
       </div>
 
       <div class="form-group">
         <input 
           type="password" 
           formControlName="password" 
-          placeholder="Password"
+          [placeholder]="'USER_REGISTRATION.PASSWORD' | translate"
           (input)="onPasswordInput($event)"
           [ngClass]="{'invalid': userForm.get('password')?.errors && 
             (userForm.get('password')?.touched || submitted)}"
         >
-        <div class="error-message">{{ getErrorMessage('password') }}</div>
+        <div class="error-message">{{ getErrorMessage('password') | translate }}</div>
       </div>
 
       <app-password-strength
@@ -79,11 +79,11 @@
           <input 
             type="password" 
             formControlName="confirmPassword" 
-            placeholder="Confirm Password"
+            [placeholder]="'USER_REGISTRATION.CONFIRM_PASSWORD' | translate"
             [ngClass]="{'invalid': userForm.get('confirmPassword')?.errors && 
               (userForm.get('confirmPassword')?.touched || submitted)}"
           >
-          <div class="error-message">{{ getErrorMessage('confirmPassword') }}</div>
+          <div class="error-message">{{ getErrorMessage('confirmPassword') | translate }}</div>
         </div>
       </ng-container>
 
@@ -93,7 +93,7 @@
           class="submit-btn" 
           [disabled]="!userForm.valid"
         >
-          {{ isEditing ? 'Update' : 'Create' }} User
+          {{ 'USER_REGISTRATION.SUBMIT' | translate }}
         </button>
         <button 
           *ngIf="isEditing" 
@@ -107,7 +107,6 @@
     </form>
   </div>
 
-  <!-- Ažurirana tablica -->
   <div class="table-container">
     <h2>Users Data</h2>
     <table class="users-table">
@@ -159,3 +158,4 @@
     </button>
   </div>
 </div>
+ 

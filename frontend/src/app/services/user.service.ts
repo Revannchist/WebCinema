@@ -53,17 +53,17 @@ export class UserService {
   }
 
   login(loginData: { username: string, password: string }): Observable<UserDisplayDto> {
-    // Prvo dohvatimo sve korisnike
+    
     return this.getAllUsers().pipe(
       map(users => {
-        // Tražimo korisnika s odgovarajućim username-om
+        
         const user = users.find(u => u.username === loginData.username);
         
         if (!user) {
           throw new Error('User not found');
         }
         
-        // Ovdje bi inače bila prava provjera lozinke, ali za sad ćemo samo simulirati
+        
         if (loginData.password !== user.password) {
           throw new Error('Invalid password');
         }
