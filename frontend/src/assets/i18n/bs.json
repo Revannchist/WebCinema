@@ -36,7 +36,9 @@
       "EMAIL_INVALID": "Unesite validnu email adresu",
       "PASSWORD_LENGTH": "Lozinka mora imati najmanje 5 karaktera",
       "PASSWORD_NUMBER": "Lozinka mora sadržavati najmanje jedan broj",
-      "PASSWORDS_MATCH": "Lozinke se ne podudaraju"
+      "PASSWORDS_MATCH": "Lozinke se ne podudaraju",
+      "USERNAME_TAKEN": "Korisničko ime već postoji",
+      "EMAIL_TAKEN": "Email već postoji"
     }
   }
 } 

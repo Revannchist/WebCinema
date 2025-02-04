@@ -37,7 +37,7 @@ const routes:Routes=[
   {path:'users',component:UsersComponent}
 ]
 
-// Factory funkcija za učitavanje prevoda
+
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }

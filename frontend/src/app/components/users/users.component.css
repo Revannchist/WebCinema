@@ -39,8 +39,19 @@ h2 {
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 input {
@@ -231,4 +242,15 @@ button:hover {
   font-size: 14px;
   color: #495057;
   font-weight: 500;
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 5px;
+}
+
+.is-invalid {
+  border-color: #dc3545;
 }

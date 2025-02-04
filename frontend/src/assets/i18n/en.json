@@ -36,7 +36,9 @@
       "EMAIL_INVALID": "Please enter a valid email",
       "PASSWORD_LENGTH": "Password must be at least 5 characters long",
       "PASSWORD_NUMBER": "Password must contain at least one number",
-      "PASSWORDS_MATCH": "Passwords do not match"
+      "PASSWORDS_MATCH": "Passwords do not match",
+      "USERNAME_TAKEN": "Username already exists",
+      "EMAIL_TAKEN": "Email already exists"
     }
   }
 } 

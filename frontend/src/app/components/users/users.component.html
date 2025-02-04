@@ -7,44 +7,48 @@
         <input 
           type="text" 
           formControlName="username" 
-          [placeholder]="'USER_REGISTRATION.USERNAME' | translate"
-          [ngClass]="{'invalid': userForm.get('username')?.errors && 
-            (userForm.get('username')?.touched || submitted)}"
+          placeholder="{{ 'USER_REGISTRATION.USERNAME' | translate }}"
+          [ngClass]="{ 'is-invalid': userForm.get('username')?.errors?.['usernameTaken'] }"
         >
-        <div class="error-message">{{ getErrorMessage('username') | translate }}</div>
+        <div class="invalid-feedback" *ngIf="isCreateMode && userForm.get('username')?.errors?.['usernameTaken']">
+          {{ 'USER_REGISTRATION.VALIDATION.USERNAME_TAKEN' | translate }}
+        </div>
       </div>
 
       <div class="form-group">
         <input 
           type="email" 
           formControlName="email" 
-          [placeholder]="'USER_REGISTRATION.EMAIL' | translate"
-          [ngClass]="{'invalid': userForm.get('email')?.errors && 
-            (userForm.get('email')?.touched || submitted)}"
-        >
-        <div class="error-message">{{ getErrorMessage('email') | translate }}</div>
+          placeholder="{{ 'USER_REGISTRATION.EMAIL' | translate }}"
+          [ngClass]="{ 'is-invalid': userForm.get('email')?.errors }"
+        />
+        <div class="invalid-feedback" *ngIf="isCreateMode && userForm.get('email')?.errors?.['emailTaken']">
+          {{ 'USER_REGISTRATION.VALIDATION.EMAIL_TAKEN' | translate }}
+        </div>
       </div>
 
       <div class="form-group">
         <input 
           type="text" 
           formControlName="firstName" 
-          [placeholder]="'USER_REGISTRATION.FIRST_NAME' | translate"
-          [ngClass]="{'invalid': userForm.get('firstName')?.errors && 
-            (userForm.get('firstName')?.touched || submitted)}"
+          placeholder="{{ 'USER_REGISTRATION.FIRST_NAME' | translate }}"
+          [ngClass]="{ 'is-invalid': userForm.get('firstName')?.errors }"
         >
-        <div class="error-message">{{ getErrorMessage('firstName') | translate }}</div>
+        <div class="invalid-feedback" *ngIf="isCreateMode">
+          {{ getErrorMessage('firstName') | translate }}
+        </div>
       </div>
 
       <div class="form-group">
         <input 
           type="text" 
           formControlName="lastName" 
-          [placeholder]="'USER_REGISTRATION.LAST_NAME' | translate"
-          [ngClass]="{'invalid': userForm.get('lastName')?.errors && 
-            (userForm.get('lastName')?.touched || submitted)}"
+          placeholder="{{ 'USER_REGISTRATION.LAST_NAME' | translate }}"
+          [ngClass]="{ 'is-invalid': userForm.get('lastName')?.errors }"
         >
-        <div class="error-message">{{ getErrorMessage('lastName') | translate }}</div>
+        <div class="invalid-feedback" *ngIf="isCreateMode">
+          {{ getErrorMessage('lastName') | translate }}
+        </div>
       </div>
 
       <div class="form-group">
@@ -93,7 +97,7 @@
           class="submit-btn" 
           [disabled]="!userForm.valid"
         >
-          {{ 'USER_REGISTRATION.SUBMIT' | translate }}
+          {{ isCreateMode ? 'Create User' : 'Update User' }}
         </button>
         <button 
           *ngIf="isEditing" 

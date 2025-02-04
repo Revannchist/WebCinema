@@ -5,6 +5,8 @@ import { UserCreateDto } from '../../models/dto/user-create-dto';
 import { UserDisplayDto } from '../../models/dto/user-display-dto';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { debounceTime, distinctUntilChanged, switchMap, map, first, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-users',
@@ -25,6 +27,7 @@ export class UsersComponent implements OnInit {
   totalPages: number = 1;
   totalUsers: number = 0;
   password: string = '';
+  public isCreateMode: boolean = true;
 
   constructor(
     private fb: FormBuilder,
@@ -33,7 +36,11 @@ export class UsersComponent implements OnInit {
     private route: ActivatedRoute,
     private translate: TranslateService
   ) {
+    this.translate.use('en');
     this.initializeEmptyForm();
+    this.route.queryParams.subscribe(params => {
+      this.isCreateMode = params['mode'] === 'create';
+    });
   }
 
   private initializeEmptyForm(): void {
@@ -84,6 +91,66 @@ export class UsersComponent implements OnInit {
         this.loadUsers();
       }
     });
+
+    if (this.isCreateMode) {
+      this.userForm.get('username')?.valueChanges.pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(username => {
+          if (!username) return [];
+          
+          const testUser = {
+            username: username,
+            email: 'test@test.com',
+            password: 'Test123',
+            firstName: 'Test',
+            lastName: 'Test',
+            dateOfBirth: new Date(),
+            roleId: 2
+          };
+          
+          return this.userService.createUser(testUser).pipe(
+            map(() => null),
+            first(),
+            catchError(error => {
+              if (error.error === 'Username already exists') {
+                this.userForm.get('username')?.setErrors({ usernameTaken: true });
+              }
+              return [];
+            })
+          );
+        })
+      ).subscribe();
+
+      this.userForm.get('email')?.valueChanges.pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(email => {
+          if (!email || !this.userForm.get('email')?.valid) return [];
+          
+          const testUser = {
+            username: 'test_' + new Date().getTime(),
+            email: email,
+            password: 'Test123',
+            firstName: 'Test',
+            lastName: 'Test',
+            dateOfBirth: new Date(),
+            roleId: 2
+          };
+          
+          return this.userService.createUser(testUser).pipe(
+            map(() => null),
+            first(),
+            catchError(error => {
+              if (error?.error?.includes('Email already exists')) {
+                this.userForm.get('email')?.setErrors({ emailTaken: true });
+              }
+              return [];
+            })
+          );
+        })
+      ).subscribe();
+    }
   }
   
   private clearEverything(): void {
@@ -244,6 +311,8 @@ export class UsersComponent implements OnInit {
         return 'USER_REGISTRATION.VALIDATION.PASSWORD_LENGTH';
       if (control.errors['pattern'] && controlName === 'password') 
         return 'USER_REGISTRATION.VALIDATION.PASSWORD_NUMBER';
+      if (control.errors['usernameTaken']) 
+        return 'USER_REGISTRATION.VALIDATION.USERNAME_TAKEN';
     }
     if (controlName === 'confirmPassword' && this.userForm.hasError('mismatch')) {
       return 'USER_REGISTRATION.VALIDATION.PASSWORDS_MATCH';

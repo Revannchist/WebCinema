@@ -58,6 +58,6 @@ export class LoginComponent {
 
   goToCreateAccount(): void {
     sessionStorage.setItem('fromLoginCreate', 'true');
-    this.router.navigate(['/users']);
+    this.router.navigate(['/users'], { queryParams: { mode: 'create' } });
   }
 }
