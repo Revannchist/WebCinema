@@ -105,34 +105,39 @@ export class AdminPanelUserAdminComponent implements OnInit {
     this.submitted = true;
 
     if (this.adminForm.valid) {
-      const { confirmPassword, password, ...userData } = this.adminForm.value;
+      const formData = this.adminForm.value;
       
       if (this.isEditing && this.selectedUserId) {
         const userToUpdate = {
-          ...userData,
           id: this.selectedUserId,
-          roleId: 2 // Za obične korisnike
+          username: formData.username,
+          email: formData.email,
+          password: formData.password || this.admins.find(a => a.id === this.selectedUserId)?.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          dateOfBirth: formData.dateOfBirth,
+          roleId: 1,
+          registrationTime: this.admins.find(a => a.id === this.selectedUserId)?.registrationTime
         };
 
         this.userService.updateUser(this.selectedUserId, userToUpdate).subscribe({
           next: () => {
-            alert('User successfully updated');
+            alert('Admin successfully updated');
             this.resetForm();
-            this.loadUsers();
+            this.loadAdmins();
           },
           error: (error) => {
             if (error.error && typeof error.error === 'string') {
               alert(error.error);
             } else {
-              alert('Error updating user. Please try again.');
+              alert('Error updating admin. Please try again.');
             }
           }
         });
       } else {
         // Postojeća logika za kreiranje novog admina
         const userToCreate = {
-          ...userData,
-          password,
+          ...formData,
           roleId: 1
         };
 
@@ -172,6 +177,11 @@ export class AdminPanelUserAdminComponent implements OnInit {
       confirmPassword: user.password
     });
 
+    this.adminForm.get('password')?.clearValidators();
+    this.adminForm.get('confirmPassword')?.clearValidators();
+    this.adminForm.get('password')?.updateValueAndValidity();
+    this.adminForm.get('confirmPassword')?.updateValueAndValidity();
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -180,7 +190,11 @@ export class AdminPanelUserAdminComponent implements OnInit {
       this.userService.deleteUser(id).subscribe({
         next: () => {
           alert('User successfully deleted');
-          this.loadUsers();
+          if (this.admins.some(admin => admin.id === id)) {
+            this.loadAdmins();
+          } else {
+            this.loadUsers();
+          }
         },
         error: (error) => {
           alert(error.error || 'Error deleting user. Please try again.');
@@ -200,6 +214,15 @@ export class AdminPanelUserAdminComponent implements OnInit {
     this.isEditing = false;
     this.selectedUserId = null;
     this.submitted = false;
+    
+    this.adminForm.get('password')?.setValidators([
+      Validators.required, 
+      Validators.minLength(5),
+      Validators.pattern(/^(?=.*[0-9])/)
+    ]);
+    this.adminForm.get('confirmPassword')?.setValidators([Validators.required]);
+    this.adminForm.get('password')?.updateValueAndValidity();
+    this.adminForm.get('confirmPassword')?.updateValueAndValidity();
   }
 
   getErrorMessage(controlName: string): string {
