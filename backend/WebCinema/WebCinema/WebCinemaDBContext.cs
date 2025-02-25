@@ -37,10 +37,16 @@ namespace WebCinema
                 new Roles { Id = 3, Name = "Moderator" }
                 );
 
-            //modelBuilder.Entity<Halls>().HasData(
-            //    new Halls { Id = 1, TheatersID = 1, HallName = "Hala1", Capacity=40, HallType = "Srednja" },
-            //    new Halls { Id = 1, TheatersID = 1, HallName = "Hala2", Capacity = 60, HallType = "Velika" }
-            //    );
+            modelBuilder.Entity<Theaters>().HasData(
+                new Theaters { Id = 1, Name = "Teatar1", CityId = 1, Adress = "Adress1", PostalCode = "88000", PhoneNumber = "061 467 946" },
+                new Theaters { Id = 2, Name = "Teatar2", CityId = 1, Adress = "Adress2", PostalCode = "88000", PhoneNumber = "061 675 875" },
+                new Theaters { Id = 3, Name = "Teatar3", CityId = 2, Adress = "Adress3", PostalCode = "71000", PhoneNumber = "061 864 079" }
+                );
+
+            modelBuilder.Entity<Halls>().HasData(
+                new Halls { Id = 1, TheatersID = 1, HallName = "Hall1", Capacity = 40, HallType = "Medium" },
+                new Halls { Id = 2, TheatersID = 1, HallName = "Hall2", Capacity = 60, HallType = "Big" }
+                );
 
 
             //------------------------------------------------------//

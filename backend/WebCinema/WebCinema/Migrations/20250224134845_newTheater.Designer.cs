@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250224134845_newTheater")]
+    partial class newTheater
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,24 +244,6 @@ namespace WebCinema.Migrations
                     b.HasIndex("TheatersID");
 
                     b.ToTable("Halls");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Capacity = 40,
-                            HallName = "Hall1",
-                            HallType = "Medium",
-                            TheatersID = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Capacity = 60,
-                            HallName = "Hall2",
-                            HallType = "Big",
-                            TheatersID = 1
-                        });
                 });
 
             modelBuilder.Entity("WebCinema.Models.MoviePoster", b =>
@@ -556,7 +541,7 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 1,
-                            Adress = "Adress1",
+                            Adress = "Ulica1",
                             CityId = 1,
                             Name = "Teatar1",
                             PhoneNumber = "061 467 946",
@@ -565,7 +550,7 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 2,
-                            Adress = "Adress2",
+                            Adress = "Ulica2",
                             CityId = 1,
                             Name = "Teatar2",
                             PhoneNumber = "061 675 875",
@@ -574,7 +559,7 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 3,
-                            Adress = "Adress3",
+                            Adress = "Ulica3",
                             CityId = 2,
                             Name = "Teatar3",
                             PhoneNumber = "061 864 079",

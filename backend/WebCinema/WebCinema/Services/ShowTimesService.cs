@@ -47,7 +47,7 @@ namespace WebCinema.Services
                     MovieTitle = s.Movies.Title,
                     HallsId = s.HallsId,
                     HallName = s.Halls.HallName,
-                    ShowDateTieme = s.ShowDateTieme,
+                    ShowDateTieme = s.ShowDateTime,
                     TicketPrice = s.TicketPrice
                 })
                 .ToListAsync();
@@ -68,7 +68,7 @@ namespace WebCinema.Services
                     MovieTitle = s.Movies.Title,
                     HallsId = s.HallsId,
                     HallName = s.Halls.HallName,
-                    ShowDateTieme = s.ShowDateTieme,
+                    ShowDateTieme = s.ShowDateTime,
                     TicketPrice = s.TicketPrice
                 })
                 .FirstOrDefaultAsync();
@@ -81,7 +81,7 @@ namespace WebCinema.Services
             var existingShowtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
             if (existingShowtime != null)
             {
-                existingShowtime.ShowDateTieme = showtimes.ShowDateTieme;
+                existingShowtime.ShowDateTime = showtimes.ShowDateTime;
                 existingShowtime.TicketPrice = showtimes.TicketPrice;
                 _dbContext.ShowTimes.Update(existingShowtime);
                 await _dbContext.SaveChangesAsync();

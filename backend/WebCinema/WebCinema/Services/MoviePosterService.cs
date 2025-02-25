@@ -69,19 +69,6 @@ namespace WebCinema.Services
         {
             try
             {
-                var movieExists = await _dbContext.Movies.AnyAsync(m => m.Id == posterDto.MovieId);
-                if (!movieExists)
-                {
-                    _logger.LogWarning($"Movie with ID {posterDto.MovieId} not found");
-                    return false;
-                }
-
-                if (string.IsNullOrEmpty(posterDto.Image))
-                {
-                    _logger.LogWarning("Image data is empty");
-                    return false;
-                }
-
                 int commaIndex = posterDto.Image.IndexOf(',');
                 var format = posterDto.Image.Substring(0, commaIndex + 1);
                 var imageString = posterDto.Image.Substring(commaIndex + 1);
@@ -95,7 +82,6 @@ namespace WebCinema.Services
 
                 var existingPoster = await _dbContext.MoviePoster
                     .FirstOrDefaultAsync(x => x.MovieId == posterDto.MovieId);
-
                 if (existingPoster != null)
                 {
                     _dbContext.MoviePoster.Remove(existingPoster);

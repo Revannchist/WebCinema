@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { Modal } from 'bootstrap'; //npm install bootstrap
 import { MovieService } from '../../services/movie-service';
 import { GenreService } from '../../services/genre-service';
@@ -6,6 +6,8 @@ import { ActorService } from '../../services/actor-service';
 import { DirectorService } from '../../services/director-service';
 import { CountryService } from '../../services/country-service';
 import { MovieCreateDto, MovieUpdateDto, MovieGetDto, MovieParameters, MoviePagedResponse } from '../../models/dto/movie.dto';
+import { MoviePosterService } from '../../services/movie-poster-service';
+import { CreateMoviePosterDto } from '../../models/dto/move-poster.dto';
 import { DirectorDto } from '../../models/dto/director.dto';
 import { CountryDto } from '../../models/dto/country.dto';
 
@@ -17,17 +19,19 @@ import { CountryDto } from '../../models/dto/country.dto';
 
 export class AdminPanelMoviesComponent {
 
+  @ViewChild('fileInput') fileInput!: ElementRef;
+
   constructor(
     private movieService: MovieService,
     private genreService: GenreService,
     private actorService: ActorService,
     private directorService: DirectorService,
-    private countryService: CountryService
+    private countryService: CountryService,
+    private moviePosterService: MoviePosterService
   ) { }
 
   movies: MovieGetDto[] = [];
   filteredMovies: MovieGetDto[] = [];
-
 
   public movieToAdd: MovieCreateDto = {
     title: '',
@@ -41,6 +45,9 @@ export class AdminPanelMoviesComponent {
     genreIds: [],
     actorIds: []
   };
+
+  public selectedImage: string | null = null;
+  public imagePreview: string | null = null;
 
   private movieToEditId: number | null = null;
   public movieToEdit: MovieUpdateDto = {
@@ -99,21 +106,12 @@ export class AdminPanelMoviesComponent {
   public actors: { id: number; firstName: string; lastName: string; }[] = [];
 
   movieToDelete: MovieGetDto | null = null;
-  //movieToDelete: any = null;
-
 
   isGenreDropdownOpen = false;
   isActorDropdownOpen = false;
 
   isModalGenreDropdownOpen = false;
   isModalActorDropdownOpen = false;
-
-  private formatDate(date: string | null): string | null {
-    if (!date) return null;
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return null;
-    return d.toISOString();
-  }
 
   ngOnInit(): void {
     this.loadMovies();
@@ -224,8 +222,36 @@ export class AdminPanelMoviesComponent {
     this.isModalActorDropdownOpen = false;
   }
 
-  addMovie(movieData: any): void {
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
 
+      if (!file.type.match(/image\/(jpeg|png)/)) {
+        alert('Only JPEG and PNG images are allowed');
+        this.fileInput.nativeElement.value = '';
+        this.selectedImage = null;
+        this.imagePreview = null;
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should not exceed 5MB');
+        this.fileInput.nativeElement.value = '';
+        this.selectedImage = null;
+        this.imagePreview = null;
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.selectedImage = e.target.result;
+        this.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  addMovie(movieData: any): void {
     if (!this.validateMovie(movieData)) {
       return;
     }
@@ -244,33 +270,48 @@ export class AdminPanelMoviesComponent {
     };
 
     this.movieService.createMovie(movieToCreate).subscribe({
-      next: (response) => {
-        this.movieToAdd = {
-          title: '',
-          description: '',
-          releaseDate: '',
-          duration: 0,
-          language: '',
-          ageRating: '',
-          directorId: 0,
-          countryId: 0,
-          genreIds: [],
-          actorIds: []
-        };
-        this.isModalGenreDropdownOpen = false;
-        this.isModalActorDropdownOpen = false;
-        this.loadMovies();
-        this.loadGenres();
-        this.loadActors();
+      next: (response: any) => {
+        console.log('Movie created successfully:', response);
+
+        if (this.selectedImage) {
+          const posterDto: CreateMoviePosterDto = {
+            id: 0,
+            movieId: response.id,
+            image: this.selectedImage
+          };
+
+          this.moviePosterService.addMoviePoster(posterDto).subscribe({
+            next: (posterResponse) => {
+              console.log('Poster added successfully:', posterResponse);
+              this.clearModalTextBox();
+              this.loadMovies();
+              this.loadGenres();
+              this.loadActors();
+            },
+            error: (error) => {
+              console.error('Error adding poster:', error);
+              this.clearModalTextBox();
+              this.loadMovies();
+              this.loadGenres();
+              this.loadActors();
+            }
+          });
+        } else {
+          this.clearModalTextBox();
+          this.loadMovies();
+          this.loadGenres();
+          this.loadActors();
+        }
       },
       error: (error) => console.error('Error adding movie:', error)
     });
   }
 
+
   prepareEditMovie(movie: MovieGetDto): void {
-    console.log('Movie being prepared for edit:', movie); // Debug log
+    console.log('Movie being prepared for edit:', movie);
     this.movieToEditId = movie.id;
-    console.log('Set movieToEditId to:', this.movieToEditId); // Debug log
+    console.log('Set movieToEditId to:', this.movieToEditId);
     this.movieToEdit = {
       title: movie.title,
       description: movie.description,
@@ -284,14 +325,27 @@ export class AdminPanelMoviesComponent {
       actorIds: movie.moviesActorsIds
     };
 
-    //this.movieToEditId = movie.id;
+    this.selectedImage = null;
+    this.imagePreview = null;
+
+    if (this.movieToEditId) {
+      this.moviePosterService.getPosterByMovieId(this.movieToEditId).subscribe({
+        next: (poster) => {
+          if (poster && poster.image) {
+            this.imagePreview = poster.image;
+          }
+        },
+        error: (error) => {
+          console.log('No existing poster or error fetching poster:', error);
+        }
+      });
+    }
 
     this.isModalGenreDropdownOpen = false;
     this.isModalActorDropdownOpen = false;
   }
 
   updateMovie(movieData: any): void {
-
     if (!this.validateMovie(movieData)) {
       return;
     }
@@ -301,28 +355,27 @@ export class AdminPanelMoviesComponent {
       return;
     }
 
-    const movieToUpdate: MovieUpdateDto = {
-      title: movieData.title,
-      description: movieData.description,
-      releaseDate: movieData.releaseDate,
-      duration: movieData.duration,
-      language: movieData.language,
-      ageRating: movieData.ageRating,
-      directorId: movieData.directorId,
-      countryId: movieData.countryId,
-      genreIds: movieData.genreIds,
-      actorIds: movieData.actorIds
-    };
-
-    console.log('Sending update request with ID:', this.movieToEditId);
-
-    this.movieService.updateMovie(this.movieToEditId, movieToUpdate).subscribe({
-      next: (response) => {
-        console.log('Movie updated:', response);
-        this.ngOnInit();
+    this.movieService.updateMovie(this.movieToEditId, movieData).subscribe({
+      next: () => {
+        this.moviePosterService.updateMoviePoster(this.movieToEditId!, this.selectedImage)
+          .subscribe({
+            next: () => this.ngOnInit(),
+            error: error => {
+              console.error('Error with poster:', error);
+              this.ngOnInit();
+            }
+          });
       },
-      error: (error) => console.error('Error updating movie:', error)
+      error: error => console.error('Error updating movie:', error)
     });
+  }
+
+  clearPosterImage(): void {
+    this.imagePreview = null;
+    this.selectedImage = "DELETE_POSTER";
+    if (this.fileInput && this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
   onPageChange(page: number): void {

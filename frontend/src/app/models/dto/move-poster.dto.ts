@@ -1,7 +1,7 @@
 export interface CreateMoviePosterDto {
     id: number;
     movieId: number;
-    image: string;
+    image: string | null;
 }
 
 export interface MoviePosterResponseDto {

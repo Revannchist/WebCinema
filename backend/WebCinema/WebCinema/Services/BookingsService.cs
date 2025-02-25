@@ -49,7 +49,7 @@ namespace WebCinema.Services
                     UserName = b.User.Username,
                     MovieTitle = b.ShowTimes.Movies.Title,
                     HallName = b.ShowTimes.Halls.HallName,
-                    ShowDateTime = b.ShowTimes.ShowDateTieme,
+                    ShowDateTime = b.ShowTimes.ShowDateTime,
                     BookingDateTime = b.BookingDateTime,
                     TotalPrice = b.TotalPrice,
                     BookingStatus = b.BookingStatus
@@ -74,7 +74,7 @@ namespace WebCinema.Services
                     UserName = b.User.Username,
                     MovieTitle = b.ShowTimes.Movies.Title,
                     HallName = b.ShowTimes.Halls.HallName,
-                    ShowDateTime = b.ShowTimes.ShowDateTieme,
+                    ShowDateTime = b.ShowTimes.ShowDateTime,
                     BookingDateTime = b.BookingDateTime,
                     TotalPrice = b.TotalPrice,
                     BookingStatus = b.BookingStatus

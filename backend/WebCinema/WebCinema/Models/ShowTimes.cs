@@ -14,7 +14,7 @@ namespace WebCinema.Models
         [ForeignKey("HallsId")]
         [JsonIgnore]
         public Halls? Halls { get; set; }
-        public DateTime ShowDateTieme { get; set; }
+        public DateTime ShowDateTime { get; set; }
         public decimal TicketPrice { get; set; }
     }
 }
