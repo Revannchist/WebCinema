@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250225133142_BookedSeats")]
+    partial class BookedSeats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -504,9 +507,6 @@ namespace WebCinema.Migrations
                     b.Property<int>("HallsId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<int>("MoviesId")
                         .HasColumnType("int");
 
@@ -666,13 +666,13 @@ namespace WebCinema.Migrations
             modelBuilder.Entity("WebCinema.Models.BookedSeats", b =>
                 {
                     b.HasOne("WebCinema.Models.Bookings", "Bookings")
-                        .WithMany("BookedSeats")
+                        .WithMany("Booked_Seats")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("WebCinema.Models.Seats", "Seats")
-                        .WithMany("BookedSeats")
+                        .WithMany("Booked_Seats")
                         .HasForeignKey("SeatsId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -881,7 +881,7 @@ namespace WebCinema.Migrations
 
             modelBuilder.Entity("WebCinema.Models.Bookings", b =>
                 {
-                    b.Navigation("BookedSeats");
+                    b.Navigation("Booked_Seats");
                 });
 
             modelBuilder.Entity("WebCinema.Models.Countries", b =>
@@ -913,7 +913,7 @@ namespace WebCinema.Migrations
 
             modelBuilder.Entity("WebCinema.Models.Seats", b =>
                 {
-                    b.Navigation("BookedSeats");
+                    b.Navigation("Booked_Seats");
                 });
 #pragma warning restore 612, 618
         }

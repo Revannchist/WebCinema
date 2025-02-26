@@ -47,8 +47,9 @@ namespace WebCinema.Services
                     MovieTitle = s.Movies.Title,
                     HallsId = s.HallsId,
                     HallName = s.Halls.HallName,
-                    ShowDateTieme = s.ShowDateTime,
-                    TicketPrice = s.TicketPrice
+                    ShowDateTime = s.ShowDateTime,
+                    TicketPrice = s.TicketPrice,
+                    IsActive = s.IsActive,
                 })
                 .ToListAsync();
 
@@ -68,8 +69,9 @@ namespace WebCinema.Services
                     MovieTitle = s.Movies.Title,
                     HallsId = s.HallsId,
                     HallName = s.Halls.HallName,
-                    ShowDateTieme = s.ShowDateTime,
-                    TicketPrice = s.TicketPrice
+                    ShowDateTime = s.ShowDateTime,
+                    TicketPrice = s.TicketPrice,
+                    IsActive = s.IsActive,
                 })
                 .FirstOrDefaultAsync();
 

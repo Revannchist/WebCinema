@@ -1,0 +1,230 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Showtimes</h2>
+    <button (click)="clearShowtimeModalTextBox()" data-bs-toggle="modal" data-bs-target="#createShowtime"
+      class="btn btn-primary">Create Showtime</button>
+  </div>
+
+  <!-- Showtimes Table -->
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>Movie Title</th>
+          <th>Hall Name</th>
+          <th>Show Date</th>
+          <th>Show Time</th>
+          <th>Ticket Price</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let showtime of paginatedShowtimes">
+          <td>{{ getMovieTitle(showtime.moviesId) }}</td>
+          <td>{{ getHallName(showtime.hallsId) }}</td>
+          <td>{{ formatDate(showtime.showDateTime) }}</td>
+          <td>{{ formatTime(showtime.showDateTime) }}</td>
+          <td>{{ showtime.ticketPrice | currency: 'EUR' }}</td>
+          <td>
+            <span class="badge" [ngClass]="showtime.isActive ? 'bg-success' : 'bg-danger'">
+              {{ showtime.isActive ? 'Yes' : 'No' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-primary me-2" (click)="openEditModal(showtime)">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteShowtime(showtime.id)">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="showtimes.length === 0">
+          <td colspan="7" class="text-center">No showtimes available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav aria-label="Showtimes pagination">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="changePage(currentPage - 1)" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item" *ngFor="let page of getPagesArray()" [class.active]="page === currentPage">
+        <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="changePage(currentPage + 1)" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <!-- Modal for Creating Showtime -->
+  <div class="modal fade" id="createShowtime" tabindex="-1" aria-labelledby="showtimeModalLabel" aria-hidden="true"
+    (hidden.bs.modal)="clearShowtimeModalTextBox()">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="showtimeModalLabel">Create Showtime</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="clearShowtimeModalTextBox()"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form #showtimeForm="ngForm" (ngSubmit)="showtimeForm.valid && addShowtime(); clearShowtimeModalTextBox()">
+
+            <div class="form-group mb-3">
+              <label for="moviesId">Movie:</label>
+              <select id="moviesId" class="form-control" [(ngModel)]="showtimeToAdd.moviesId" name="moviesId"
+                #moviesId="ngModel" required>
+                <option value="" disabled selected>Select a movie</option>
+                <option *ngFor="let movie of movies" [value]="movie.id">{{ movie.title }}</option>
+              </select>
+              <div *ngIf="moviesId.invalid && (moviesId.dirty || moviesId.touched)" class="text-danger">
+                <small *ngIf="moviesId.errors?.['required']">Movie is required</small>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="hallsId">Hall:</label>
+              <select id="hallsId" class="form-control" [(ngModel)]="showtimeToAdd.hallsId" name="hallsId"
+                #hallsId="ngModel" required>
+                <option value="" disabled selected>Select a hall</option>
+                <option *ngFor="let hall of halls" [value]="hall.id">{{ hall.hallName }}</option>
+              </select>
+              <div *ngIf="hallsId.invalid && (hallsId.dirty || hallsId.touched)" class="text-danger">
+                <small *ngIf="hallsId.errors?.['required']">Hall is required</small>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="showtimeDate">Show Date:</label>
+              <input type="date" id="showtimeDate" class="form-control" [(ngModel)]="showtimeDate" name="showtimeDate"
+                #datePicker="ngModel" required>
+              <div *ngIf="datePicker.invalid && (datePicker.dirty || datePicker.touched)" class="text-danger">
+                <small *ngIf="datePicker.errors?.['required']">Show date is required</small>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="showtimeTime">Show Time:</label>
+              <input type="time" id="showtimeTime" class="form-control" [(ngModel)]="showtimeTime" name="showtimeTime"
+                #timePicker="ngModel" required>
+              <div *ngIf="timePicker.invalid && (timePicker.dirty || timePicker.touched)" class="text-danger">
+                <small *ngIf="timePicker.errors?.['required']">Show time is required</small>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="ticketPrice">Ticket Price:</label>
+              <input type="number" id="ticketPrice" class="form-control" [(ngModel)]="showtimeToAdd.ticketPrice"
+                name="ticketPrice" #ticketPrice="ngModel" required min="0" step="0.01">
+              <div *ngIf="ticketPrice.invalid && (ticketPrice.dirty || ticketPrice.touched)" class="text-danger">
+                <small *ngIf="ticketPrice.errors?.['required']">Ticket price is required</small>
+                <small *ngIf="ticketPrice.errors?.['min']">Ticket price must be positive</small>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <div class="form-check">
+                <input type="checkbox" id="isActive" class="form-check-input" [(ngModel)]="showtimeToAdd.isActive"
+                  name="isActive">
+                <label class="form-check-label" for="isActive">Active</label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" [disabled]="!showtimeForm.valid" data-bs-dismiss="modal">
+              Create
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Editing Showtime -->
+<div class="modal fade" id="editShowtime" tabindex="-1" aria-labelledby="editShowtimeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editShowtimeModalLabel">Edit Showtime</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #editShowtimeForm="ngForm" (ngSubmit)="editShowtimeForm.valid && updateShowtime()">
+
+          <div class="form-group mb-3">
+            <label for="editMoviesId">Movie:</label>
+            <select id="editMoviesId" class="form-control" [(ngModel)]="showtimeToEdit.moviesId" name="editMoviesId"
+              #editMoviesId="ngModel" required>
+              <option value="" disabled>Select a movie</option>
+              <option *ngFor="let movie of movies" [value]="movie.id">{{ movie.title }}</option>
+            </select>
+            <div *ngIf="editMoviesId.invalid && (editMoviesId.dirty || editMoviesId.touched)" class="text-danger">
+              <small *ngIf="editMoviesId.errors?.['required']">Movie is required</small>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="editHallsId">Hall:</label>
+            <select id="editHallsId" class="form-control" [(ngModel)]="showtimeToEdit.hallsId" name="editHallsId"
+              #editHallsId="ngModel" required>
+              <option value="" disabled>Select a hall</option>
+              <option *ngFor="let hall of halls" [value]="hall.id">{{ hall.hallName }}</option>
+            </select>
+            <div *ngIf="editHallsId.invalid && (editHallsId.dirty || editHallsId.touched)" class="text-danger">
+              <small *ngIf="editHallsId.errors?.['required']">Hall is required</small>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="editShowtimeDate">Show Date:</label>
+            <input type="date" id="editShowtimeDate" class="form-control" [(ngModel)]="editShowtimeDate"
+              name="editShowtimeDate" #editDatePicker="ngModel" required>
+            <div *ngIf="editDatePicker.invalid && (editDatePicker.dirty || editDatePicker.touched)" class="text-danger">
+              <small *ngIf="editDatePicker.errors?.['required']">Show date is required</small>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="editShowtimeTime">Show Time:</label>
+            <input type="time" id="editShowtimeTime" class="form-control" [(ngModel)]="editShowtimeTime"
+              name="editShowtimeTime" #editTimePicker="ngModel" required>
+            <div *ngIf="editTimePicker.invalid && (editTimePicker.dirty || editTimePicker.touched)" class="text-danger">
+              <small *ngIf="editTimePicker.errors?.['required']">Show time is required</small>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="editTicketPrice">Ticket Price:</label>
+            <input type="number" id="editTicketPrice" class="form-control" [(ngModel)]="showtimeToEdit.ticketPrice"
+              name="editTicketPrice" #editTicketPrice="ngModel" required min="0" step="0.01">
+            <div *ngIf="editTicketPrice.invalid && (editTicketPrice.dirty || editTicketPrice.touched)"
+              class="text-danger">
+              <small *ngIf="editTicketPrice.errors?.['required']">Ticket price is required</small>
+              <small *ngIf="editTicketPrice.errors?.['min']">Ticket price must be positive</small>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <div class="form-check">
+              <input type="checkbox" id="editIsActive" class="form-check-input" [(ngModel)]="showtimeToEdit.isActive"
+                name="editIsActive">
+              <label class="form-check-label" for="editIsActive">Active</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="!editShowtimeForm.valid" data-bs-dismiss="modal">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

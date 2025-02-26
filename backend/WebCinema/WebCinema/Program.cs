@@ -41,6 +41,13 @@ namespace WebCinema
                  policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
             }));
 
+            // In Program.cs or Startup.cs
+            //builder.Services.AddControllers()
+            //    .AddJsonOptions(options =>
+            //    {
+            //        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            //    });
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",

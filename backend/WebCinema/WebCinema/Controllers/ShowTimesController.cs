@@ -16,7 +16,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddShowTimes(ShowTimes showTimes)
+        public async Task<IActionResult> AddShowTime(ShowTimes showTimes)
         {
             var createdShowTimes = await _showtimesService.CreateShowTimesAsync(showTimes);
             if (createdShowTimes == null)
@@ -27,7 +27,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteShowTimesById(int id)
+        public async Task<IActionResult> DeleteShowTimeById(int id)
         {
             var deletedShowtimes = await _showtimesService.DeleteShowTimesByIdAsync(id);
             if (deletedShowtimes == null)
@@ -38,7 +38,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateShowTimes(int id, ShowTimes showTimes)
+        public async Task<IActionResult> UpdateShowTime(int id, ShowTimes showTimes)
         {
             var updatedShowTimes = await _showtimesService.UpdateShowTimesAsync(id, showTimes);
             if (updatedShowTimes == null)
@@ -49,7 +49,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetShowTimesById(int id)
+        public async Task<IActionResult> GetShowTimeById(int id)
         {
             var showtimes = await _showtimesService.GetShowTimesByIdAsync(id);
             if (showtimes == null)
@@ -60,7 +60,7 @@ namespace WebCinema.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllShowTiemes()
+        public async Task<IActionResult> GetAllShowTimes()
         {
             var showtimes = await _showtimesService.GetAllShowTimesAsync();
             if (showtimes == null || !showtimes.Any())

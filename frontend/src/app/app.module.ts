@@ -22,6 +22,7 @@ import { UsersComponent } from './components/users/users.component';
 import { AdminPanelUserAdminComponent } from './admin-panel/admin-panel-user-admin/admin-panel-user-admin.component';
 import { LoginComponent } from './components/login/login.component';
 import { PasswordStrengthComponent } from './components/password-strength/password-strength.component';
+import { AdminPanelShowtimesComponent } from './admin-panel/admin-panel-showtimes/admin-panel-showtimes.component';
 
 
 const routes:Routes=[
@@ -34,7 +35,8 @@ const routes:Routes=[
   {path:'landing-page',component:LandingPageComponent},
   {path:'admin-panel-movies',component:AdminPanelMoviesComponent},
   {path:'movie-list',component:MovieListComponent},
-  {path:'users',component:UsersComponent}
+  {path:'users',component:UsersComponent},
+  {path:'admin-panel-showtimes',component:AdminPanelShowtimesComponent}
 ]
 
 
@@ -58,8 +60,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     UsersComponent,
     AdminPanelUserAdminComponent,
     LoginComponent,
-    PasswordStrengthComponent
-  ],
+    PasswordStrengthComponent,
+    AdminPanelShowtimesComponent
+    ],
   imports: [
     BrowserModule,
     AppRoutingModule,

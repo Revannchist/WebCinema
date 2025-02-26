@@ -14,8 +14,6 @@ namespace WebCinema.Models
         public int SeatNumber { get; set; }
         public string SeatType { get; set; }
         [JsonIgnore]
-        public ICollection<BookedSeats>? Booked_Seats { get; set; }
-
-
+        public ICollection<BookedSeats>? BookedSeats { get; set; }
     }
 }

@@ -9,12 +9,12 @@ namespace WebCinema.Interfaces
 
         Task<List<BookingsDto>> GetAllBookingsAsync();
 
-        Task<BookingsDto> GetBookingsByIdAsync(int id);
+        //Task<BookingsDto> GetBookingsByIdAsync(int id);
 
-        Task<Bookings> DeleteBookingsByIdAsync(int id);
+        Task<bool> DeleteBookingsByIdAsync(int id);
 
-        Task<Bookings> UpdateBookingsAsync(int id, Bookings bookings);
+        //Task<Bookings> UpdateBookingsAsync(int id, Bookings bookings);
 
-        Task<Bookings>UpdateBookingsBasicInfoAsync(int id,BookingsEditDto dto);
+        //Task<Bookings>UpdateBookingsBasicInfoAsync(int id,BookingsEditDto dto);
     }
 }

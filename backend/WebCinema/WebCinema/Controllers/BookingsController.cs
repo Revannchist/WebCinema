@@ -17,25 +17,43 @@ namespace WebCinema.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBookings(Bookings bookings)
+        public async Task<ActionResult<Bookings>> AddBooking(BookingsAddDto bookingDto)
         {
-            var createdBookings = await _bookingsService.CreateBookingsAsync(bookings);
-            if (createdBookings == null)
+            var booking = new Bookings
             {
-                return BadRequest("Greska!");
-            }
-            return Ok(createdBookings);
-        }
-        [HttpPost]
-        public async Task<IActionResult> UpdateBooking(int id, BookingsEditDto dto)
-        {
-            var updatedBooking = await _bookingsService.UpdateBookingsBasicInfoAsync(id, dto);
-            if (updatedBooking == null)
+                UsersId = bookingDto.UsersId,
+                ShowTimesId = bookingDto.ShowTimesId,
+                TicketQuantity = bookingDto.TicketQuantity, // Will be overridden by service if Booked_Seats exists
+                TotalPrice = bookingDto.TotalPrice, // Will be overridden by service if Booked_Seats exists
+                BookingStatus = bookingDto.BookingStatus,
+                BookingDate = bookingDto.BookingDate ?? DateTime.UtcNow,
+                BookedSeats = bookingDto.BookedSeatsIds.Select(seatId => new BookedSeats
+                {
+                    SeatsId = seatId
+                }).ToList()
+            };
+
+            var result = await _bookingsService.CreateBookingsAsync(booking);
+            return Ok(new
             {
-                return BadRequest("Error | Booking not found or update failed!");
-            }
-            return Ok(updatedBooking);
+                success = true,
+                message = "Booking added successfully",
+                bookingId = result.Id
+            });
         }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> UpdateBooking(int id, BookingsEditDto dto)
+        //{
+        //    var updatedBooking = await _bookingsService.UpdateBookingsBasicInfoAsync(id, dto);
+        //    if (updatedBooking == null)
+        //    {
+        //        return BadRequest("Error | Booking not found or update failed!");
+        //    }
+        //    return Ok(updatedBooking);
+        //}
+
         [HttpPost]
         public async Task<IActionResult> DeleteBookingsById(int id)
         {
@@ -47,27 +65,27 @@ namespace WebCinema.Controllers
             return Ok(deletedBookings);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateBookings(int id, Bookings bookings)
-        {
-            var updatedBookings = await _bookingsService.UpdateBookingsAsync(id, bookings);
-            if (updatedBookings == null)
-            {
-                return BadRequest("Greska!");
-            }
-            return Ok(updatedBookings);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> UpdateBookings(int id, Bookings bookings)
+        //{
+        //    var updatedBookings = await _bookingsService.UpdateBookingsAsync(id, bookings);
+        //    if (updatedBookings == null)
+        //    {
+        //        return BadRequest("Greska!");
+        //    }
+        //    return Ok(updatedBookings);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> GetBookingsById(int id)
-        {
-            var bookings = await _bookingsService.GetBookingsByIdAsync(id);
-            if (bookings == null)
-            {
-                return BadRequest("Error | Bad Request!");
-            }
-            return Ok(bookings);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetBookingsById(int id)
+        //{
+        //    var bookings = await _bookingsService.GetBookingsByIdAsync(id);
+        //    if (bookings == null)
+        //    {
+        //        return BadRequest("Error | Bad Request!");
+        //    }
+        //    return Ok(bookings);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> GetAllBookings()
@@ -75,7 +93,7 @@ namespace WebCinema.Controllers
             var bookings = await _bookingsService.GetAllBookingsAsync();
             if (bookings == null || !bookings.Any())
             {
-                return BadRequest("Error | Bad Request!");
+                return BadRequest("No bookings");
             }
             return Ok(bookings);
         }

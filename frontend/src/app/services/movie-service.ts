@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Movie, PagedResponse, FilterParams } from '../models/movie.model';
 import { MyConfig } from '../my-config';
+import { map } from 'rxjs/operators';
 //import { MovieCreateDto, MovieUpdateDto, MovieGetDto, MovieParameters, MoviePagedResponse } from '../../models/dto/movie.dto';
 import { MovieCreateDto, MovieUpdateDto, MovieGetDto, MovieParameters, MoviePagedResponse } from '../models/dto/movie.dto';
 
@@ -46,6 +47,13 @@ export class MovieService {
         if (filterParams.countryId) params = params.set('countryId', filterParams.countryId.toString());
 
         return this.http.get<MoviePagedResponse<MovieGetDto>>(`${MyConfig.APIurl}/api/Movies/GetAllMovies`, { params });
+    }
+
+    getAllMoviesSimple(): Observable<MovieGetDto[]> {
+        return this.http.get<MoviePagedResponse<MovieGetDto>>(`${MyConfig.APIurl}/api/Movies/GetAllMovies`)
+            .pipe(
+                map(response => response.items)
+            );
     }
 
     createMovie(movie: MovieCreateDto): Observable<MovieGetDto> {

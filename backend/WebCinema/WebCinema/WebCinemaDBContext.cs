@@ -94,13 +94,13 @@ namespace WebCinema
 
             modelBuilder.Entity<BookedSeats>()
                 .HasOne(bs => bs.Bookings)
-                .WithMany(b => b.Booked_Seats)
+                .WithMany(b => b.BookedSeats)
                 .HasForeignKey(bs => bs.BookingId)
                 .OnDelete(DeleteBehavior.Restrict); // Ovdje Restrict umjesto CASCADE
 
             modelBuilder.Entity<BookedSeats>()
                 .HasOne(bs => bs.Seats)
-                .WithMany(s => s.Booked_Seats)
+                .WithMany(s => s.BookedSeats)
                 .HasForeignKey(bs => bs.SeatsId)
                 .OnDelete(DeleteBehavior.Restrict);
             //------------------------------------------------------//
@@ -139,5 +139,7 @@ namespace WebCinema
         public DbSet<MoviePoster> MoviePoster { get; set; }
         public DbSet<UsersImage>UsersImages { get; set; }
         public DbSet<Roles> Roles { get; set; }
+        public DbSet<BookedSeats> BookedSeats { get; set; } 
+
     }
 }

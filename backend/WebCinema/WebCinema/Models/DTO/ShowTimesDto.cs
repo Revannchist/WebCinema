@@ -1,13 +1,34 @@
-﻿namespace WebCinema.Models.DTO
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace WebCinema.Models.DTO
 {
     public class ShowTimesDto
     {
         public int Id { get; set; }
+
+        [Required]
         public int MoviesId { get; set; }
-        public string MovieTitle { get; set; }
+
+        [Required]
+        [StringLength(100, MinimumLength = 1)]
+        public string MovieTitle { get; set; } = string.Empty;
+
+        [Required]
         public int HallsId { get; set; }
-        public string HallName { get; set; }
-        public DateTime ShowDateTieme { get; set; }
+
+        [Required]
+        [StringLength(50, MinimumLength = 1)]
+        public string HallName { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime ShowDateTime { get; set; }
+
+        [Required]
+        [Range(0.01, 999.99)]
         public decimal TicketPrice { get; set; }
+
+        [Required]
+        public bool IsActive { get; set; }
     }
 }

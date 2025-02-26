@@ -28,6 +28,7 @@ export class AdminPanelMoviesComponent {
     private directorService: DirectorService,
     private countryService: CountryService,
     private moviePosterService: MoviePosterService
+  
   ) { }
 
   movies: MovieGetDto[] = [];
