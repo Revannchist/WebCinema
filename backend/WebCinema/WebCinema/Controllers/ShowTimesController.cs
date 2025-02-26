@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
+using WebCinema.Models.DTO;
 using WebCinema.Services;
 
 namespace WebCinema.Controllers
@@ -21,7 +22,7 @@ namespace WebCinema.Controllers
             var createdShowTimes = await _showtimesService.CreateShowTimesAsync(showTimes);
             if (createdShowTimes == null)
             {
-                return BadRequest("Greska!");
+                return BadRequest("Error!");
             }
             return Ok(createdShowTimes);
         }
@@ -32,18 +33,18 @@ namespace WebCinema.Controllers
             var deletedShowtimes = await _showtimesService.DeleteShowTimesByIdAsync(id);
             if (deletedShowtimes == null)
             {
-                return BadRequest("Greska!");
+                return BadRequest("Error!");
             }
             return Ok(deletedShowtimes);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateShowTime(int id, ShowTimes showTimes)
+        public async Task<IActionResult> UpdateShowTime(int id, ShowTimesUpdateDto updateDto)
         {
-            var updatedShowTimes = await _showtimesService.UpdateShowTimesAsync(id, showTimes);
+            var updatedShowTimes = await _showtimesService.UpdateShowTimesAsync(id, updateDto);
             if (updatedShowTimes == null)
             {
-                return BadRequest("Greska!");
+                return BadRequest("Error!");
             }
             return Ok(updatedShowTimes);
         }

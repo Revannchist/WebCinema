@@ -26,13 +26,29 @@ namespace WebCinema.Services
 
         public async Task<ShowTimes> DeleteShowTimesByIdAsync(int id)
         {
-            var showtimes = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
-            if (showtimes != null)
+            var showtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
+            if (showtime != null)
             {
-                _dbContext.ShowTimes.Remove(showtimes);
+                var relatedBookings = await _dbContext.Bookings
+                    .Where(b => b.ShowTimesId == id)
+                    .ToListAsync();
+
+                foreach (var booking in relatedBookings)
+                {
+                    var bookedSeats = await _dbContext.BookedSeats
+                        .Where(bs => bs.BookingId == booking.Id)
+                        .ToListAsync();
+
+                    _dbContext.BookedSeats.RemoveRange(bookedSeats);
+                }
+
+                _dbContext.Bookings.RemoveRange(relatedBookings);
+
+                _dbContext.ShowTimes.Remove(showtime);
+
                 await _dbContext.SaveChangesAsync();
             }
-            return showtimes;
+            return showtime;
         }
 
         public async Task<List<ShowTimesDto>> GetAllShowTimesAsync()
@@ -78,17 +94,40 @@ namespace WebCinema.Services
             return showtime;
         }
 
-        public async Task<ShowTimes> UpdateShowTimesAsync(int id, ShowTimes showtimes)
+        public async Task<ShowTimesDto?> UpdateShowTimesAsync(int id, ShowTimesUpdateDto updateDto)
         {
             var existingShowtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
-            if (existingShowtime != null)
+            if (existingShowtime == null)
             {
-                existingShowtime.ShowDateTime = showtimes.ShowDateTime;
-                existingShowtime.TicketPrice = showtimes.TicketPrice;
-                _dbContext.ShowTimes.Update(existingShowtime);
-                await _dbContext.SaveChangesAsync();
+                return null; // Handle not found case
             }
-            return existingShowtime;
+
+            // Update only the allowed fields
+            existingShowtime.MoviesId = updateDto.MoviesId;
+            existingShowtime.HallsId = updateDto.HallsId;
+            existingShowtime.ShowDateTime = updateDto.ShowDateTime;
+            existingShowtime.TicketPrice = updateDto.TicketPrice;
+            existingShowtime.IsActive = updateDto.IsActive;
+
+            // Save changes
+            _dbContext.ShowTimes.Update(existingShowtime);
+            await _dbContext.SaveChangesAsync();
+
+            // Return updated data as ShowTimesDto
+            return new ShowTimesDto
+            {
+                Id = existingShowtime.Id,
+                MoviesId = existingShowtime.MoviesId,
+                MovieTitle = existingShowtime.Movies?.Title ?? string.Empty,
+                HallsId = existingShowtime.HallsId,
+                HallName = existingShowtime.Halls?.HallName ?? string.Empty,
+                ShowDateTime = existingShowtime.ShowDateTime,
+                TicketPrice = existingShowtime.TicketPrice,
+                IsActive = existingShowtime.IsActive
+            };
         }
+
+
+
     }
 }

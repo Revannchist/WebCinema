@@ -16,6 +16,15 @@ export interface AddShowTimeDto {
     isActive: boolean;
 }
 
+export interface UpdateShowTimeDto {
+    moviesId: number;
+    hallsId: number;
+    showDateTime: string;
+    ticketPrice: number;
+    isActive: boolean;
+}
+
+
 export interface GetShowTimeDto {
     id: number;
     moviesId: number;

@@ -13,6 +13,6 @@ namespace WebCinema.Interfaces
 
         Task<ShowTimes> DeleteShowTimesByIdAsync(int id);
 
-        Task<ShowTimes> UpdateShowTimesAsync(int id, ShowTimes showtimes);
+        Task<ShowTimesDto?> UpdateShowTimesAsync(int id, ShowTimesUpdateDto updateDto);
     }
 }

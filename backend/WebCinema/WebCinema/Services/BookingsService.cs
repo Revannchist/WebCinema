@@ -21,7 +21,6 @@ namespace WebCinema.Services
                 return null;
             }
 
-            // Fetch the ShowTimes entity first to get ticket price
             var showTimes = await _dbContext.ShowTimes.FindAsync(bookings.ShowTimesId);
             if (showTimes == null)
             {
@@ -57,9 +56,6 @@ namespace WebCinema.Services
             return bookings;
         }
 
-
-
-
         public async Task<bool> DeleteBookingsByIdAsync(int id)
         {
             var booking = await _dbContext.Bookings
@@ -68,12 +64,10 @@ namespace WebCinema.Services
 
             if (booking != null)
             {
-                // Remove the related BookedSeats first
                 if (booking.BookedSeats != null)
                 {
                     _dbContext.BookedSeats.RemoveRange(booking.BookedSeats);
                 }
-                // Then remove the booking
                 _dbContext.Bookings.Remove(booking);
                 await _dbContext.SaveChangesAsync();
                 return true;
