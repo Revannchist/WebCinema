@@ -1,4 +1,3 @@
-/* Table styles */
 .table-responsive {
     overflow-x: auto;
 }
@@ -34,7 +33,6 @@
     vertical-align: middle;
 }
 
-/* Badge styling */
 .badge {
     display: inline-block;
     padding: 0.25em 0.4em;
@@ -99,7 +97,10 @@
 }
 
 .filters {
-    margin-bottom: 1.5rem;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .form-control {
@@ -163,12 +164,12 @@
     white-space: nowrap;
 }
 
-/* Apply custom size only to the Create Movie and Reset All Filters buttons */
 .custom-btn-size {
-    height: 40px;   /* Set the height you want */
-    width: 150px;   /* Set the width you want */
-  }
-  
+    height: 40px;
+    width: 150px;
+
+}
+
 
 .remove-btn {
     background: none;
@@ -221,13 +222,13 @@
 .placeholder {
     position: absolute;
     z-index: 10;
-    background: white; /* Match the dropdown background */
-    color: #000000; /* Default placeholder color */
-    left: 12px; /* Align properly */
+    background: white;
+    color: #000000;
+    left: 12px;
     top: 50%;
-    transform: translateY(-50%); /* Center vertically */
+    transform: translateY(-50%);
     padding: 0 5px;
-    white-space: nowrap; /* Prevents text from breaking */
+    white-space: nowrap;
 }
 
 .dropdown-item:first-child {
@@ -235,5 +236,29 @@
     border-bottom: 1px solid #eee;
 }
 
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    display: inline-block;
+    vertical-align: middle;
+}
 
+.truncate-container {
+    position: relative;
+}
 
+.truncate-container:hover::after {
+    content: attr(data-fulltext);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: normal;
+    max-width: 400px;
+    z-index: 10;
+}

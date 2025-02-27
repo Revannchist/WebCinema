@@ -20,8 +20,22 @@ declare var bootstrap: any; // For Bootstrap modal access
 export class AdminPanelShowtimesComponent implements OnInit {
 
   showtimes: GetShowTimeDto[] = [];
+  filteredShowtimes: GetShowTimeDto[] = [];
   movies: MovieGetDto[] = [];
   halls: HallDisplayDto[] = [];
+
+  //Search and filtering
+  movieSearchText: string = '';
+  selectedHallId: number | null = null;
+  showInactiveShowtimes: boolean = false;
+  fromDate: string = '';
+  toDate: string = '';
+
+  //Modal movie search
+  movieSearchTerm: string = '';
+  filteredMovies: MovieGetDto[] = [];
+  showMovieDropdown: boolean = false;
+  isValidMovieSelected: boolean = false;
 
   showtimeToAdd: AddShowTimeDto = {
     id: 0,
@@ -59,13 +73,21 @@ export class AdminPanelShowtimesComponent implements OnInit {
     this.loadShowtimes();
     this.loadMovies();
     this.loadHalls();
+
+    document.addEventListener('click', this.onDocumentClick.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('click', this.onDocumentClick.bind(this));
   }
 
   loadShowtimes(): void {
     this.showtimeService.getAllShowTimes().subscribe({
       next: (data) => {
         this.showtimes = data;
+        this.filteredShowtimes = [...data];
         this.calculateTotalPages();
+        this.applyFilters();
       },
       error: (error) => {
         console.error('Error fetching showtimes:', error);
@@ -94,6 +116,97 @@ export class AdminPanelShowtimesComponent implements OnInit {
       }
     });
   }
+
+  applyFilters(): void {
+    let filtered = [...this.showtimes];
+
+    if (this.movieSearchText && this.movieSearchText.trim() !== '') {
+      const searchText = this.movieSearchText.toLowerCase().trim();
+      filtered = filtered.filter(showtime => {
+        const movie = this.movies.find(m => m.id === showtime.moviesId);
+        return movie && movie.title.toLowerCase().includes(searchText);
+      });
+    }
+
+    if (this.selectedHallId !== null) {
+      filtered = filtered.filter(showtime => showtime.hallsId === Number(this.selectedHallId));
+    }
+
+    if (this.fromDate) {
+      const fromDateObj = new Date(this.fromDate);
+      fromDateObj.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(showtime => {
+        const showtimeDate = new Date(showtime.showDateTime);
+        return showtimeDate >= fromDateObj;
+      });
+    }
+
+    if (this.toDate) {
+      const toDateObj = new Date(this.toDate);
+      toDateObj.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(showtime => {
+        const showtimeDate = new Date(showtime.showDateTime);
+        return showtimeDate <= toDateObj;
+      });
+    }
+
+    if (!this.showInactiveShowtimes) {
+      filtered = filtered.filter(showtime => showtime.isActive);
+    }
+
+    this.filteredShowtimes = filtered;
+    this.calculateTotalPages();
+
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = 1;
+    }
+  }
+
+  resetFilters(): void {
+    this.movieSearchText = '';
+    this.selectedHallId = null;
+    this.showInactiveShowtimes = false;
+    this.fromDate = '';
+    this.toDate = '';
+    this.filteredShowtimes = [...this.showtimes];
+    this.calculateTotalPages();
+    this.currentPage = 1;
+    this.applyFilters();
+
+  }
+
+filterMovies(): void {
+  this.showMovieDropdown = true;
+  
+  if (!this.movieSearchTerm) {
+    this.filteredMovies = [...this.movies];
+    return;
+  }
+  
+  const searchTerm = this.movieSearchTerm.toLowerCase();
+  this.filteredMovies = this.movies.filter(movie => 
+    movie.title.toLowerCase().includes(searchTerm)
+  );
+}
+
+selectMovie(movie: MovieGetDto): void {
+  this.showtimeToAdd.moviesId = movie.id;
+  this.movieSearchTerm = movie.title;
+  this.showMovieDropdown = false;
+  this.isValidMovieSelected = true;
+}
+
+onMovieInputChange(): void {
+  this.isValidMovieSelected = false;
+  this.filterMovies();
+}
+
+onDocumentClick(event: MouseEvent): void {
+  const target = event.target as HTMLElement;
+  if (!target.closest('#movieSearch')) {
+    this.showMovieDropdown = false;
+  }
+}
 
   addShowtime(): void {
     this.showtimeToAdd.showDateTime = `${this.showtimeDate}T${this.showtimeTime}`;
@@ -132,7 +245,6 @@ export class AdminPanelShowtimesComponent implements OnInit {
   }
 
   openEditModal(showtime: GetShowTimeDto): void {
-
     this.showtimeToEdit = {
       id: showtime.id,
       moviesId: showtime.moviesId,
@@ -145,7 +257,6 @@ export class AdminPanelShowtimesComponent implements OnInit {
     const dateObj = new Date(showtime.showDateTime);
 
     this.editShowtimeDate = this.datePipe.transform(dateObj, 'yyyy-MM-dd') || '';
-
     this.editShowtimeTime = this.datePipe.transform(dateObj, 'HH:mm') || '';
 
     this.editModal = new bootstrap.Modal(document.getElementById('editShowtime'));
@@ -176,7 +287,6 @@ export class AdminPanelShowtimesComponent implements OnInit {
     });
   }
 
-
   clearShowtimeModalTextBox(): void {
     this.showtimeToAdd = {
       id: 0,
@@ -188,6 +298,9 @@ export class AdminPanelShowtimesComponent implements OnInit {
     };
     this.showtimeDate = '';
     this.showtimeTime = '';
+    this.movieSearchTerm = '';
+    this.showMovieDropdown = false;
+    this.isValidMovieSelected = false;
   }
 
   formatDateTime(dateTimeString: string): string {
@@ -232,7 +345,7 @@ export class AdminPanelShowtimesComponent implements OnInit {
   get paginatedShowtimes() {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    return this.showtimes.slice(startIndex, endIndex);
+    return this.filteredShowtimes.slice(startIndex, endIndex);
   }
 
   getPagesArray(): number[] {
@@ -246,11 +359,10 @@ export class AdminPanelShowtimesComponent implements OnInit {
   }
 
   calculateTotalPages(): void {
-    this.totalPages = Math.ceil(this.showtimes.length / this.pageSize);
+    this.totalPages = Math.ceil(this.filteredShowtimes.length / this.pageSize);
 
-    if (this.currentPage > this.totalPages) {
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
       this.currentPage = 1;
     }
   }
-
 }

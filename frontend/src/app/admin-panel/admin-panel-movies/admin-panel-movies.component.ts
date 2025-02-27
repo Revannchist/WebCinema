@@ -453,6 +453,16 @@ export class AdminPanelMoviesComponent {
     this.filterMovies();
   }
 
+  //mozda ovo kasnije uradim
+  getGenresString(movie: MovieGetDto): string {
+    return movie?.moviesGenresIds?.map(genreId => this.getGenreName(genreId)).join(', ') || 'N/A';
+  }
+  
+  getActorsString(movie: MovieGetDto): string {
+    return movie?.moviesActorsIds?.map(actorId => this.getActorName(actorId)).join(', ') || 'N/A';
+  }
+  
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: any) {
     if (!event.target.closest('.dropdown-container')) {

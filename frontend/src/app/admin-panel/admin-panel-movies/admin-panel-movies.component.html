@@ -2,13 +2,14 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Movies</h2>
     <button (click)="clearModalTextBox()" data-bs-toggle="modal" data-bs-target="#kreiraj"
-      class="btn btn-primary custom-btn-size">Create Movie</button>
+      class="btn btn-primary custom-btn-size me-3">Create Movie</button>
   </div>
 
 
   <!-- Filters Section -->
   <div class="filters mb-4">
     <div class="row g-3 align-items-center">
+      
       <!-- Search -->
       <div class="col">
         <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="search"
@@ -103,41 +104,47 @@
     <table class="table table-striped table-bordered">
       <thead class="table-dark">
         <tr>
-          <th>Title</th>
-          <th>Description</th>
-          <th>Release Date</th>
+          <th style="width: 200px;">Title</th>
+          <!-- <th>Description</th> -->
+          <th style="width: 160px;">Release Date</th>
           <th>Duration</th>
           <th>Language</th>
-          <th>Age Rating</th>
+          <th style="width: 110px;">Age Rating</th>
           <th>Director</th>
           <th>Country</th>
           <th>Genres</th>
           <th>Actors</th>
-          <th>Actions</th>
+          <th style="width: 160px;">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let movie of filteredMovies">
-          <td>{{ movie?.title || 'N/A' }}</td>
-          <td>{{ movie?.description || 'N/A' }}</td>
+          <td>
+            <span class="truncate-container" [attr.data-fulltext]="movie?.title || 'N/A'">
+              <span class="truncate-text">{{ movie?.title || 'N/A' }}</span>
+            </span>
+          </td>
+          <!-- <td>{{ movie?.description || 'N/A' }}</td> -->
           <td>{{ movie?.releaseDate | date:'MM-dd-yyyy' }}</td>
           <td>{{ movie?.duration ? movie?.duration + ' min' : 'N/A' }}</td>
           <td>{{ movie?.language || 'N/A' }}</td>
           <td>{{ movie?.ageRating || 'N/A' }}</td>
           <td>{{ getDirectorName(movie?.directorId)|| 'N/A' }}</td>
           <td>{{ getCountryName(movie?.countryId) || 'N/A' }}</td>
+
           <td>
-            <span *ngFor="let genreId of movie?.moviesGenresIds; let i = index">
-              {{ getGenreName(genreId) }}
-              <span *ngIf="i < movie.moviesGenresIds.length - 1">, </span>
+            <span class="truncate-text" [title]="getGenresString(movie)">
+              {{ getGenresString(movie) }}
             </span>
           </td>
+          
           <td>
-            <span *ngFor="let actorId of movie?.moviesActorsIds; let i = index">
-              {{ getActorName(actorId) }}
-              <span *ngIf="i < movie.moviesActorsIds.length - 1">, </span>
+            <span class="truncate-text" [title]="getActorsString(movie)">
+              {{ getActorsString(movie) }}
             </span>
           </td>
+          
+
           <td class="d-flex">
             <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editModal"
               (click)="prepareEditMovie(movie)">

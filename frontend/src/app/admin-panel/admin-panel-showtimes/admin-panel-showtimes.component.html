@@ -2,7 +2,55 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Showtimes</h2>
     <button (click)="clearShowtimeModalTextBox()" data-bs-toggle="modal" data-bs-target="#createShowtime"
-      class="btn btn-primary">Create Showtime</button>
+      class="btn btn-primary custom-btn-size me-3">Create Showtime</button>
+
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters mb-4">
+    <div class="row g-3 align-items-center">
+      <!-- Movie Search -->
+      <div class="col">
+        <input type="text" class="form-control" placeholder="Search by movie title..." [(ngModel)]="movieSearchText"
+          (ngModelChange)="applyFilters()">
+      </div>
+
+      <!-- Date Range Filters -->
+      <div class="col">
+        <input type="date" class="form-control" [(ngModel)]="fromDate" (ngModelChange)="applyFilters()"
+          placeholder="From Date">
+      </div>
+      <div class="col">
+        <input type="date" class="form-control" [(ngModel)]="toDate" (ngModelChange)="applyFilters()"
+          placeholder="To Date">
+      </div>
+
+      <!-- Hall Filter -->
+      <div class="col">
+        <select class="form-control" [(ngModel)]="selectedHallId" (ngModelChange)="applyFilters()">
+          <option [ngValue]="null" selected>All Halls</option>
+          <option *ngFor="let hall of halls" [value]="hall.id">
+            {{ hall.hallName }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Show Inactive Toggle -->
+      <div class="col">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="showInactive" [(ngModel)]="showInactiveShowtimes"
+            (change)="applyFilters()">
+          <label class="form-check-label" for="showInactive">Show Inactive</label>
+        </div>
+      </div>
+
+      <!-- Reset Filters Button -->
+      <div class="col-auto">
+        <button class="btn btn-secondary custom-btn-size" (click)="resetFilters()">
+          Reset All Filters
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Showtimes Table -->
@@ -10,13 +58,14 @@
     <table class="table table-striped table-bordered">
       <thead class="table-dark">
         <tr>
-          <th>Movie Title</th>
-          <th>Hall Name</th>
+          <th style="width: 200px;">Title</th>
+          <th>Hall</th>
           <th>Show Date</th>
           <th>Show Time</th>
           <th>Ticket Price</th>
           <th>Active</th>
           <th style="width: 160px;">Actions</th>
+          
         </tr>
       </thead>
       <tbody>
@@ -31,9 +80,6 @@
               {{ showtime.isActive ? 'Yes' : 'No' }}
             </span>
           </td>
-          
-          
-
           <td class="d-flex">
             <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editShowtimeModal"
               (click)="openEditModal(showtime)">
@@ -43,15 +89,15 @@
               <i class="fas fa-trash"></i> Delete
             </button>
           </td>
-
         </tr>
-        <tr *ngIf="showtimes.length === 0">
+        <tr *ngIf="filteredShowtimes.length === 0">
           <td colspan="7" class="text-center">No showtimes available</td>
         </tr>
       </tbody>
     </table>
   </div>
 
+  <!-- Pagination -->
   <nav aria-label="Showtimes pagination">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="currentPage === 1">
@@ -81,15 +127,27 @@
             aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form #showtimeForm="ngForm" (ngSubmit)="showtimeForm.valid && addShowtime(); clearShowtimeModalTextBox()">
+          <form #showtimeForm="ngForm"
+            (ngSubmit)="showtimeForm.valid && isValidMovieSelected && addShowtime(); clearShowtimeModalTextBox()">
 
             <div class="form-group mb-3">
-              <label for="moviesId">Movie:</label>
-              <select id="moviesId" class="form-control" [(ngModel)]="showtimeToAdd.moviesId" name="moviesId"
-                #moviesId="ngModel" required>
-                <option value="" disabled selected>Select a movie</option>
-                <option *ngFor="let movie of movies" [value]="movie.id">{{ movie.title }}</option>
-              </select>
+              <label for="movieSearch">Movie:</label>
+              <div class="position-relative">
+                <input type="text" id="movieSearch" class="form-control" [(ngModel)]="movieSearchTerm"
+                  name="movieSearch" (input)="onMovieInputChange()" placeholder="Type to search movies"
+                  autocomplete="off" #movieSearch="ngModel" required>
+                <input type="hidden" [(ngModel)]="showtimeToAdd.moviesId" name="moviesId" #moviesId="ngModel" required>
+                <div *ngIf="showMovieDropdown && filteredMovies.length > 0"
+                  class="dropdown-menu show w-100 position-absolute">
+                  <button *ngFor="let movie of filteredMovies" type="button" class="dropdown-item"
+                    (click)="selectMovie(movie)">
+                    {{ movie.title }}
+                  </button>
+                </div>
+                <div *ngIf="movieSearchTerm && !isValidMovieSelected" class="text-danger">
+                  <small>Please select a movie from the dropdown</small>
+                </div>
+              </div>
               <div *ngIf="moviesId.invalid && (moviesId.dirty || moviesId.touched)" class="text-danger">
                 <small *ngIf="moviesId.errors?.['required']">Movie is required</small>
               </div>
@@ -128,10 +186,11 @@
             <div class="form-group mb-3">
               <label for="ticketPrice">Ticket Price:</label>
               <input type="number" id="ticketPrice" class="form-control" [(ngModel)]="showtimeToAdd.ticketPrice"
-                name="ticketPrice" #ticketPrice="ngModel" required min="0" step="0.01">
+                name="ticketPrice" #ticketPrice="ngModel" required min="0.01" max="999.99" step="0.01">
               <div *ngIf="ticketPrice.invalid && (ticketPrice.dirty || ticketPrice.touched)" class="text-danger">
                 <small *ngIf="ticketPrice.errors?.['required']">Ticket price is required</small>
-                <small *ngIf="ticketPrice.errors?.['min']">Ticket price must be positive</small>
+                <small *ngIf="ticketPrice.errors?.['min']">Ticket price must be greater than zero</small>
+                <small *ngIf="ticketPrice.errors?.['max']">Ticket price cannot exceed 999.99</small>
               </div>
             </div>
 
@@ -143,7 +202,8 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" [disabled]="!showtimeForm.valid" data-bs-dismiss="modal">
+            <button type="submit" class="btn btn-primary" [disabled]="!showtimeForm.valid || !isValidMovieSelected"
+              data-bs-dismiss="modal">
               Create
             </button>
           </form>
