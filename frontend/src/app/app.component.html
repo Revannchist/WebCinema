@@ -336,5 +336,19 @@
 <!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
-<router-outlet></router-outlet>
+<!-- <router-outlet></router-outlet> -->
 <!--  <router-outlet /> -->
+
+<div class="app-container">
+  <app-sidebar
+    *ngIf="isAdminRoute"
+    [collapsed]="sidebarCollapsed"
+    (collapsedChange)="onSidebarCollapsedChange($event)">
+  </app-sidebar>
+  
+  <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed && isAdminRoute" [class.no-sidebar]="!isAdminRoute">
+    <div class="content-wrapper" [@fadeAnimation]>
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,31 @@
+<div class="sidebar bg-white shadow-lg" [class.collapsed]="collapsed">
+  <div class="sidebar-header border-b border-gray-200">
+    <div class="logo-container">
+      <!-- <img src="assets/logo-icon.png" alt="Logo" class="logo-small"> -->
+      <div class="logo-text">Movie App</div>
+    </div>
+    <button (click)="toggleSidebar()" class="toggle-btn"
+      [attr.aria-label]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+      [attr.title]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+      <i class="fas" [class.fa-angle-right]="collapsed" [class.fa-angle-left]="!collapsed"></i>
+    </button>
+  </div>
+  <a *ngFor="let item of menuItems" [routerLink]="item.route" routerLinkActive="active"
+    [routerLinkActiveOptions]="{exact: item.route === '/admin'}" class="menu-item"
+    [attr.data-tooltip]="collapsed ? item.label : null">
+    <div class="menu-icon">
+      <i [class]="'fas fa-' + item.icon"></i>
+    </div>
+    <span class="menu-label">{{item.label}}</span>
+  </a>
+  
+  <div class="sidebar-footer" [class.collapsed]="collapsed">
+    <div class="user-info">
+      <img src="assets/avatar.jpg" alt="User" class="avatar">
+      <div class="user-details">
+        <span class="username">Admin User</span>
+        <span class="role">Administrator</span>
+      </div>
+    </div>
+  </div>
+</div>

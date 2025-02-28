@@ -10,11 +10,23 @@ import { MoviePosterService } from '../../services/movie-poster-service';
 import { CreateMoviePosterDto } from '../../models/dto/move-poster.dto';
 import { DirectorDto } from '../../models/dto/director.dto';
 import { CountryDto } from '../../models/dto/country.dto';
+import { trigger, transition, style, animate } from '@angular/animations';
+
 
 @Component({
   selector: 'app-admin-panel-movies',
   templateUrl: './admin-panel-movies.component.html',
-  styleUrl: './admin-panel-movies.component.css'
+  styleUrl: './admin-panel-movies.component.css',
+
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms', style({ opacity: 1 }))
+      ])
+    ])
+  ]
+  
 })
 
 export class AdminPanelMoviesComponent {

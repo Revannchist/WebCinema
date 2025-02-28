@@ -1,0 +1,24 @@
+
+/* Ovo treba popraviti jer se globalno na cjelu stranicu apply iako ima admin-page tag i trebo bi se samo na sidebar u admin-page komponentama :") */
+.admin-page .app-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.admin-page .main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 256px;
+}
+
+.admin-page .main-content.sidebar-collapsed {
+  margin-left: 64px;
+}
+
+.admin-page .content-wrapper {
+  height: 100%;
+}

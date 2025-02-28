@@ -6,8 +6,8 @@ import { HallService } from '../../services/hall-service';
 import { HallDisplayDto } from '../../models/dto/showtime.dto';
 import { AddShowTimeDto, GetShowTimeDto, UpdateShowTimeDto } from '../../models/dto/showtime.dto';
 import { DatePipe } from '@angular/common';
-import { Modal } from 'bootstrap'; //npm install bootstrap
-
+import { Modal } from 'bootstrap';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 declare var bootstrap: any; // For Bootstrap modal access
 
@@ -15,7 +15,15 @@ declare var bootstrap: any; // For Bootstrap modal access
   selector: 'app-admin-panel-showtimes',
   templateUrl: './admin-panel-showtimes.component.html',
   styleUrl: './admin-panel-showtimes.component.css',
-  providers: [DatePipe]
+  providers: [DatePipe],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms', style({ opacity: 1 }))
+      ])
+    ])
+  ]
 })
 export class AdminPanelShowtimesComponent implements OnInit {
 
