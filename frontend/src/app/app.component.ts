@@ -13,13 +13,22 @@ export class AppComponent {
   title = 'kino';
   sidebarCollapsed = false;
   isAdminRoute = false;
+  showNavbar = false; // Default to hidden
+
+  // Define routes where navbar should be visible
+  navbarRoutes = [ 
+    '/home',
+    '/movie-list',
+  ];
 
   constructor(private router: Router) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-
       this.isAdminRoute = event.url.startsWith('/admin');
+      
+      // Show navbar only if the current route is in navbarRoutes
+      this.showNavbar = this.navbarRoutes.includes(event.url);
     });
   }
 

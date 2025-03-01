@@ -339,6 +339,20 @@
 <!-- <router-outlet></router-outlet> -->
 <!--  <router-outlet /> -->
 
+<!-- Navigation Bar -->
+<nav *ngIf="showNavbar" class="navbar">
+  <div class="logo">
+    <a routerLink="/">🎬 WebCinema</a>
+  </div>
+  <ul class="nav-links">
+    <li><a routerLink="/" routerLinkActive="active">Home</a></li>
+    <li><a routerLink="/movie-list" routerLinkActive="active">Movies</a></li>
+    <!-- <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>  Namjestit da se dashboard samo pojavi kad je admin l-->
+    <li><a routerLink="/login" class="login-btn">Login</a></li>
+  </ul>
+</nav>
+
+<!-- Sidebar & Main Content -->
 <div class="app-container">
   <app-sidebar
     *ngIf="isAdminRoute"
