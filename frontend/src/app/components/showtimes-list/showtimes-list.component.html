@@ -1,0 +1,128 @@
+<div class="container">
+  <h2>Showtimes</h2>
+
+  <!-- Search and Filters -->
+  <div class="filters mb-4">
+    <div class="row g-3">
+      <!-- Filters remain the same as in your original code -->
+      <div class="col-md-3">
+        <label for="date-filter" class="form-label">Date</label>
+        <input type="date" id="date-filter" class="form-control" [(ngModel)]="filterParams.date"
+          (ngModelChange)="applyFilters()">
+      </div>
+
+      <div class="col-md-3">
+        <label for="title-filter" class="form-label">Movie</label>
+        <select id="title-filter" class="form-select" [(ngModel)]="filterParams.movieTitle"
+          (ngModelChange)="applyFilters()">
+          <option value="">All Movies</option>
+          <option *ngFor="let title of uniqueMovieTitles" [value]="title">{{title}}</option>
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="price-filter" class="form-label">Price Range</label>
+        <div class="input-group">
+          <input type="number" class="form-control" placeholder="Min" [(ngModel)]="filterParams.minPrice"
+            (ngModelChange)="applyFilters()">
+          <span class="input-group-text">-</span>
+          <input type="number" class="form-control" placeholder="Max" [(ngModel)]="filterParams.maxPrice"
+            (ngModelChange)="applyFilters()">
+        </div>
+      </div>
+
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-secondary w-100" (click)="resetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No results message -->
+  <div *ngIf="filteredShowtimes.length === 0" class="alert alert-info">
+    No showtimes match your filters. Please try different criteria.
+  </div>
+
+  <!-- Movie Cards Display - New Layout -->
+  <div *ngIf="filteredShowtimes.length > 0">
+    <div class="movie-cards">
+      <!-- Loop through each movie -->
+      <div *ngFor="let movieGroup of groupShowtimesByMovie() | keyvalue" class="movie-card mb-4">
+        <div class="card">
+          <div class="row g-0">
+            <!-- Movie Poster - Left side -->
+            <div class="col-md-3">
+              <img *ngIf="moviePosters[+movieGroup.key]"
+                [src]="moviePosters[+movieGroup.key]?.image || 'assets/default-poster.jpg'"
+                class="img-fluid rounded-start movie-poster"
+                [alt]="movieGroup.value[0].movieTitle + ' poster'">
+              
+              <!-- Placeholder if no poster -->
+              <div *ngIf="!moviePosters[+movieGroup.key]"
+                class="poster-placeholder d-flex justify-content-center align-items-center h-100 rounded-start">
+                <span>No Poster Available</span>
+              </div>
+            </div>
+            
+            <!-- Movie Details - Right side -->
+            <div class="col-md-9">
+              <div class="card-body">
+                <!-- Movie Title with Genre/Duration (if available) -->
+                <div class="movie-header">
+                  <h3 class="card-title mb-1">{{ movieGroup.value[0].movieTitle }}</h3>
+                  <div class="movie-metadata text-muted mb-3">
+                    <!-- Add movie metadata if available in your data model -->
+                    <span *ngIf="getMovieGenre(+movieGroup.key)">{{ getMovieGenre(+movieGroup.key) }} | </span>
+                    <span *ngIf="getMovieDuration(+movieGroup.key)">{{ getMovieDuration(+movieGroup.key) }}</span>
+                  </div>
+                </div>
+                
+                <!-- Group showtimes by date -->
+                <div *ngFor="let dateGroup of groupMovieShowtimesByDate(+movieGroup.key) | keyvalue" class="showtime-date-group mb-3">
+                  <h5 class="showtime-date mb-2">{{ dateGroup.key }}</h5>
+                  
+                  <!-- Showtimes for this date -->
+                  <div class="showtimes-container">
+                    <div class="row">
+                      <div *ngFor="let showtime of dateGroup.value" class="col-auto mb-2">
+                        <div class="showtime-box text-center p-2 border rounded">
+                          <div class="showtime-time fw-bold">{{ formatTime(showtime.showDateTime) }}</div>
+                          <div class="showtime-hall small">{{ showtime.hallName }}</div>
+                          <div class="showtime-price small">{{ showtime.ticketPrice | currency }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div>
+        Showing {{(currentPage - 1) * pageSize + 1}} to
+        {{Math.min(currentPage * pageSize, totalItems)}} of {{totalItems}} movies
+      </div>
+
+      <nav>
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
+          </li>
+          <li class="page-item" [class.active]="currentPage === page"
+            *ngFor="let page of [].constructor(Math.ceil(totalItems / pageSize)); let i = index">
+            <a class="page-link" (click)="onPageChange(i + 1)">{{i + 1}}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage >= Math.ceil(totalItems / pageSize)">
+            <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

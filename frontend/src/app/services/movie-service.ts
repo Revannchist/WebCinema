@@ -67,6 +67,10 @@ export class MovieService {
         return this.http.post<MovieGetDto>(url, movie);
     }
 
+    getMovieById(id: number): Observable<MovieGetDto> {
+        return this.http.get<MovieGetDto>(`${MyConfig.APIurl}/api/Movies/GetMovieById?id=${id}`);
+      }
+
     deleteMovie(id: number): Observable<any> {
         return this.http.post(`${MyConfig.APIurl}/api/Movies/DeleteMovieById?id=${id}`, [{}]);
     }

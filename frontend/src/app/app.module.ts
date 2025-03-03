@@ -25,6 +25,7 @@ import { PasswordStrengthComponent } from './components/password-strength/passwo
 import { AdminPanelShowtimesComponent } from './admin-panel/admin-panel-showtimes/admin-panel-showtimes.component';
 import { SidebarComponent } from './admin-panel/sidebar/sidebar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ShowtimesListComponent } from './components/showtimes-list/showtimes-list.component';
 
 const routes: Routes = [
   { path: 'genres', component: GenresComponent },
@@ -34,6 +35,8 @@ const routes: Routes = [
   { path: 'landing-page', component: LandingPageComponent },
   { path: 'movie-list', component: MovieListComponent },
   { path: 'users', component: UsersComponent },
+  {path:'showtimes-list',component:ShowtimesListComponent},
+
 
   { path: 'movies', component: MoviesComponent },
   { path: 'admin-panel-showtimes', component: AdminPanelShowtimesComponent },
@@ -80,6 +83,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminPanelShowtimesComponent,
     AdminPanelMoviesComponent,
     AdminPanelUserAdminComponent,
+    ShowtimesListComponent,
 
   ],
   imports: [
