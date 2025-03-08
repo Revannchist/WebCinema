@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
 using WebCinema.Models.DTO;
@@ -11,91 +12,151 @@ namespace WebCinema.Controllers
     public class BookingsController : ControllerBase
     {
         private readonly IBookingsService _bookingsService;
-        public BookingsController(IBookingsService bookingsService)
+        private readonly ILogger<BookingsService> _logger;
+
+        public BookingsController(ILogger<BookingsService> logger, IBookingsService bookingsService)
         {
             _bookingsService = bookingsService;
+            _logger = logger;
         }
 
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Bookings>> AddBooking(BookingsAddDto bookingDto)
+        public async Task<IActionResult> AddBooking(BookingsAddDto bookingDto, CancellationToken cancellationToken)
         {
-            var booking = new Bookings
+            try
             {
-                UsersId = bookingDto.UsersId,
-                ShowTimesId = bookingDto.ShowTimesId,
-                TicketQuantity = bookingDto.TicketQuantity, // Will be overridden by service if Booked_Seats exists
-                TotalPrice = bookingDto.TotalPrice, // Will be overridden by service if Booked_Seats exists
-                BookingStatus = bookingDto.BookingStatus,
-                BookingDate = bookingDto.BookingDate ?? DateTime.UtcNow,
-                BookedSeats = bookingDto.BookedSeatsIds.Select(seatId => new BookedSeats
+                var createdBooking = await _bookingsService.CreateBookingsAsync(bookingDto, cancellationToken);
+                if (createdBooking == null)
                 {
-                    SeatsId = seatId
-                }).ToList()
-            };
-
-            var result = await _bookingsService.CreateBookingsAsync(booking);
-            return Ok(new
+                    return BadRequest("Error creating booking!");
+                }
+                return Ok(createdBooking);
+            }
+            catch (OperationCanceledException)
             {
-                success = true,
-                message = "Booking added successfully",
-                bookingId = result.Id
-            });
+                _logger.LogInformation("Create booking operation was canceled");
+                return StatusCode(499, "Request canceled");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while creating booking");
+                return StatusCode(500, "An unexpected error occurred");
+            }
+        }
+
+        //[Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteBookingsById(int id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var deletedBookings = await _bookingsService.DeleteBookingsByIdAsync(id, cancellationToken);
+                if (!deletedBookings)
+                {
+                    return BadRequest("Error deleting booking!");
+                }
+                return Ok(new { success = true, message = "Booking deleted successfully" });
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Delete booking operation was canceled");
+                return StatusCode(499, "Request canceled");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while deleting booking");
+                return StatusCode(500, "An unexpected error occurred");
+            }
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateBooking(int id, BookingsEditDto dto)
-        //{
-        //    var updatedBooking = await _bookingsService.UpdateBookingsBasicInfoAsync(id, dto);
-        //    if (updatedBooking == null)
-        //    {
-        //        return BadRequest("Error | Booking not found or update failed!");
-        //    }
-        //    return Ok(updatedBooking);
-        //}
+        //[Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "User")]
 
         [HttpPost]
-        public async Task<IActionResult> DeleteBookingsById(int id)
+        public async Task<IActionResult> UpdateBookings(int id, BookingsEditDto bookingsDto, CancellationToken cancellationToken)
         {
-            var deletedBookings = await _bookingsService.DeleteBookingsByIdAsync(id);
-            if (deletedBookings == null)
+            try
             {
-                return BadRequest("Greska!");
+                var updatedBookings = await _bookingsService.UpdateBookingsAsync(id, bookingsDto, cancellationToken);
+                if (updatedBookings == null)
+                {
+                    return BadRequest("Error updating booking!");
+                }
+                return Ok(updatedBookings);
             }
-            return Ok(deletedBookings);
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Update booking operation was canceled");
+                return StatusCode(499, "Request canceled");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating booking");
+                return StatusCode(500, "An unexpected error occurred");
+            }
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateBookings(int id, Bookings bookings)
-        //{
-        //    var updatedBookings = await _bookingsService.UpdateBookingsAsync(id, bookings);
-        //    if (updatedBookings == null)
-        //    {
-        //        return BadRequest("Greska!");
-        //    }
-        //    return Ok(updatedBookings);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetBookingsById(int id)
-        //{
-        //    var bookings = await _bookingsService.GetBookingsByIdAsync(id);
-        //    if (bookings == null)
-        //    {
-        //        return BadRequest("Error | Bad Request!");
-        //    }
-        //    return Ok(bookings);
-        //}
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBookings()
+        public async Task<IActionResult> GetBookingsById(int id, CancellationToken cancellationToken)
         {
-            var bookings = await _bookingsService.GetAllBookingsAsync();
-            if (bookings == null || !bookings.Any())
+            try
             {
-                return BadRequest("No bookings");
+                var bookings = await _bookingsService.GetBookingsByIdAsync(id, cancellationToken);
+                if (bookings == null)
+                {
+                    return NotFound("Booking not found");
+                }
+                return Ok(bookings);
             }
-            return Ok(bookings);
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Get booking operation was canceled");
+                return StatusCode(499, "Request canceled");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving booking");
+                return StatusCode(500, "An unexpected error occurred");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllBookings(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var bookings = await _bookingsService.GetAllBookingsAsync(cancellationToken);
+                if (bookings == null || !bookings.Any())
+                {
+                    return NotFound("No bookings found");
+                }
+                return Ok(bookings);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Get all bookings operation was canceled");
+                return StatusCode(499, "Request canceled");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving bookings");
+                return StatusCode(500, "An unexpected error occurred");
+            }
         }
     }
 }

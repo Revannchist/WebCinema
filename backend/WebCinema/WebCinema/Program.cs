@@ -1,8 +1,10 @@
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using WebCinema.Interfaces;
 using WebCinema.Services;
-using Microsoft.AspNetCore.Cors;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
 
 namespace WebCinema
 {
@@ -11,10 +13,12 @@ namespace WebCinema
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddScoped<ICountriesService,CountriesService>(); //za svaki par interface-service
+
+            // Register application services
+            builder.Services.AddScoped<ICountriesService, CountriesService>();
             builder.Services.AddScoped<IGenresService, GenresService>();
             builder.Services.AddScoped<IUsersService, UsersService>();
-            builder.Services.AddScoped<IDirectorsService,DirectorsService>();
+            builder.Services.AddScoped<IDirectorsService, DirectorsService>();
             builder.Services.AddScoped<IActorsService, ActorsService>();
             builder.Services.AddScoped<ICitiesService, CitiesService>();
             builder.Services.AddScoped<ITheatersService, TheatersService>();
@@ -27,43 +31,93 @@ namespace WebCinema
             builder.Services.AddScoped<IPaymentsService, PaymentsService>();
             builder.Services.AddScoped<IMoviesImageService, MoviePosterService>();
             builder.Services.AddScoped<IUsersImageService, UsersImageService>();
-            builder.Services.AddScoped<IRolesService,RoleService>();
-            // Add services to the container.
+            builder.Services.AddScoped<IRolesService, RoleService>();
 
+            //Controllers
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            //Swagger support
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<WebCinemaDBContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddCors(options => options.AddPolicy(name: "AngularPolicy",
-            policy =>
-            {
-                 policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-            }));
 
-            // In Program.cs or Startup.cs
-            //builder.Services.AddControllers()
-            //    .AddJsonOptions(options =>
-            //    {
-            //        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-            //    });
+            // Configure database connection
+            builder.Services.AddDbContext<WebCinemaDBContext>(o =>
+                o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 
+            //CORS policy for Angular frontend
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll",
-                    builder =>
+                options.AddPolicy("AngularPolicy",
+                    policy =>
                     {
-                        builder
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")//Allow both HTTP & HTTPS
+                              .AllowAnyMethod()
+                              .AllowAnyHeader()
+                              .AllowCredentials(); // Required for cookies, authentication headers, etc.
                     });
             });
+
+            //WT Authentication Configuration
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["Issuer"],
+                        ValidAudience = jwtSettings["Audience"],
+                        IssuerSigningKey = key,
+                        ClockSkew = TimeSpan.Zero // Removes default 5-minute clock skew
+
+                        //,
+                        //RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+                        //NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+
+                        ,
+                        RoleClaimType = ClaimTypes.Role,
+                        NameClaimType = ClaimTypes.Name
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            Console.WriteLine("Token validated successfully");
+                            var userClaims = context.Principal.Claims;
+                            foreach (var claim in userClaims)
+                            {
+                                Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
+                            }
+                            return Task.CompletedTask;
+                        },
+                        OnChallenge = context =>
+                        {
+                            Console.WriteLine("Challenge issued. Authentication requirement not met.");
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+
+
             var app = builder.Build();
 
-            app.UseCors("AllowAll");
+            //CORS before authentication & authorization
+            app.UseCors("AngularPolicy");
 
-            // Configure the HTTP request pipeline.
+            //Swagger
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -71,13 +125,13 @@ namespace WebCinema
             }
 
             app.UseHttpsRedirection();
-
-            app.UseCors("AngularPolicy");
-
-            app.UseAuthorization();
-
             app.UseRouting();
 
+            //Authentication & Authorization after CORS
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            //Map API controllers
             app.MapControllers();
 
             app.Run();

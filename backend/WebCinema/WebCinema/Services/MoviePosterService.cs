@@ -2,7 +2,8 @@
 using WebCinema.Interfaces;
 using WebCinema.Models.DTO;
 using WebCinema.Models;
-using static System.Net.Mime.MediaTypeNames;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace WebCinema.Services
 {
@@ -11,61 +12,13 @@ namespace WebCinema.Services
         private readonly WebCinemaDBContext _dbContext;
         private readonly ILogger<MoviePosterService> _logger;
 
-        public MoviePosterService(WebCinemaDBContext dbcontext, ILogger<MoviePosterService> logger)
+        public MoviePosterService(WebCinemaDBContext dbContext, ILogger<MoviePosterService> logger)
         {
-            _dbContext = dbcontext;
+            _dbContext = dbContext;
             _logger = logger;
         }
 
-
-        // Service method
-        //public async Task<bool> CreateMoviePosterAsync(MovieCreatePosterDto posterDto)
-        //{
-        //    try
-        //    {
-        //        var movieExists = await _dbContext.Movies.AnyAsync(m => m.Id == posterDto.MovieId);
-        //        if (!movieExists)
-        //        {
-        //            _logger.LogWarning($"Movie with ID {posterDto.MovieId} not found");
-        //            return false;
-        //        }
-
-        //        if (string.IsNullOrEmpty(posterDto.Image))
-        //        {
-        //            _logger.LogWarning("Image data is empty");
-        //            return false;
-        //        }
-
-        //        // Create new poster and extract format/image data all at once
-        //        var moviePoster = new MoviePoster
-        //        {
-        //            MovieId = posterDto.MovieId,
-        //            PosterImage = Convert.FromBase64String(posterDto.Image),
-        //            ImageFormat = posterDto.Image.Substring(0, posterDto.Image.IndexOf(",") + 1)
-        //        };
-
-        //        // Check for existing poster and remove it
-        //        var existingPoster = await _dbContext.MoviePoster
-        //            .FirstOrDefaultAsync(x => x.MovieId == posterDto.MovieId);
-
-        //        if (existingPoster != null)
-        //        {
-        //            _dbContext.MoviePoster.Remove(existingPoster);
-        //        }
-
-        //        await _dbContext.MoviePoster.AddAsync(moviePoster);
-        //        await _dbContext.SaveChangesAsync();
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error creating movie poster");
-        //        return false;
-        //    }
-        //}
-
-
-        public async Task<bool> CreateMoviePosterAsync(MovieCreatePosterDto posterDto)
+        public async Task<bool> CreateMoviePosterAsync(MovieCreatePosterDto posterDto, CancellationToken cancellationToken)
         {
             try
             {
@@ -81,14 +34,14 @@ namespace WebCinema.Services
                 };
 
                 var existingPoster = await _dbContext.MoviePoster
-                    .FirstOrDefaultAsync(x => x.MovieId == posterDto.MovieId);
+                    .FirstOrDefaultAsync(x => x.MovieId == posterDto.MovieId, cancellationToken);
                 if (existingPoster != null)
                 {
                     _dbContext.MoviePoster.Remove(existingPoster);
                 }
 
-                await _dbContext.MoviePoster.AddAsync(moviePoster);
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.MoviePoster.AddAsync(moviePoster, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
                 return true;
             }
             catch (Exception ex)
@@ -98,11 +51,11 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<bool> DeleteMoviePosterByIdAsync(int imageId)
+        public async Task<bool> DeleteMoviePosterByIdAsync(int imageId, CancellationToken cancellationToken)
         {
             try
             {
-                var movieImage = await _dbContext.MoviePoster.FindAsync(imageId);
+                var movieImage = await _dbContext.MoviePoster.FindAsync(new object[] { imageId }, cancellationToken);
                 if (movieImage == null)
                 {
                     _logger.LogWarning($"Image with ID {imageId} not found");
@@ -110,7 +63,7 @@ namespace WebCinema.Services
                 }
 
                 _dbContext.MoviePoster.Remove(movieImage);
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync(cancellationToken);
                 return true;
             }
             catch (Exception ex)
@@ -120,20 +73,18 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<List<MoviePosterResponseDto>> GetAllMoviePostersAsync()
+        public async Task<List<MoviePosterResponseDto>> GetAllMoviePostersAsync(CancellationToken cancellationToken)
         {
             try
             {
-                var moviePosters = await _dbContext.MoviePoster
+                return await _dbContext.MoviePoster
                     .Select(mp => new MoviePosterResponseDto
                     {
                         Id = mp.Id,
                         Image = mp.ImageFormat + Convert.ToBase64String(mp.PosterImage),
                         ImageFormat = mp.ImageFormat
                     })
-                    .ToListAsync();
-
-                return moviePosters;
+                    .ToListAsync(cancellationToken);
             }
             catch (Exception ex)
             {
@@ -142,7 +93,7 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<MoviePosterResponseDto?> GetPosterByMovieIdAsync(int id)
+        public async Task<MoviePosterResponseDto?> GetPosterByMovieIdAsync(int id, CancellationToken cancellationToken)
         {
             try
             {
@@ -154,10 +105,7 @@ namespace WebCinema.Services
                         Image = mp.ImageFormat + Convert.ToBase64String(mp.PosterImage),
                         ImageFormat = mp.ImageFormat
                     })
-                    .FirstOrDefaultAsync();
-
-                _logger.LogInformation($"Poster format: {poster?.ImageFormat}");
-                _logger.LogInformation($"Image data length: {poster?.Image?.Length}");
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 return poster;
             }
@@ -168,14 +116,14 @@ namespace WebCinema.Services
             }
         }
 
-        public async Task<MoviePosterResponseDto?> GetMoviePosterByTitleAsync(string title)
+        public async Task<MoviePosterResponseDto?> GetMoviePosterByTitleAsync(string title, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrEmpty(title))
                     return null;
 
-                var poster = await _dbContext.MoviePoster
+                return await _dbContext.MoviePoster
                     .Include(mp => mp.Movies)
                     .Where(mp => mp.Movies.Title.Contains(title))
                     .Select(mp => new MoviePosterResponseDto
@@ -184,9 +132,7 @@ namespace WebCinema.Services
                         Image = mp.ImageFormat + Convert.ToBase64String(mp.PosterImage),
                         ImageFormat = mp.ImageFormat
                     })
-                    .FirstOrDefaultAsync();
-
-                return poster;
+                    .FirstOrDefaultAsync(cancellationToken);
             }
             catch (Exception ex)
             {
@@ -194,6 +140,5 @@ namespace WebCinema.Services
                 return null;
             }
         }
-
     }
 }

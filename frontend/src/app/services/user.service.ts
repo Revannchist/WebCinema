@@ -5,6 +5,7 @@ import { map, switchMap } from 'rxjs/operators';
 import { UserCreateDto } from '../models/dto/user-create-dto';
 import { UserDisplayDto } from '../models/dto/user-display-dto';
 import { environment } from '../../environments/environment';
+import { AuthService } from '../auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,10 @@ import { environment } from '../../environments/environment';
 export class UserService {
   private baseUrl = `${environment.apiUrl}/api/Users`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authservice: AuthService
+  ) { }
 
   addUser(user: UserCreateDto): Observable<UserDisplayDto> {
     return this.http.post<UserDisplayDto>(`${this.baseUrl}/AddUser`, user);
@@ -44,7 +48,7 @@ export class UserService {
     };
 
     console.log('Service sending data:', updateData);
-    
+
     return this.http.post<UserDisplayDto>(`${this.baseUrl}/UpdateUser?id=${id}`, updateData);
   }
 
@@ -53,21 +57,37 @@ export class UserService {
   }
 
   login(loginData: { username: string, password: string }): Observable<UserDisplayDto> {
-    
+
     return this.getAllUsers().pipe(
       map(users => {
-        
+
         const user = users.find(u => u.username === loginData.username);
-        
+
         if (!user) {
           throw new Error('User not found');
         }
-        
-        
+
         if (loginData.password !== user.password) {
           throw new Error('Invalid password');
         }
-        
+
+        //-------------------------------------
+        this.authservice.login(loginData).subscribe({
+          next: (response) => {
+
+
+            localStorage.setItem('token', response.token)
+
+            //console.log("Response token in user service: ", response.token)
+
+          },
+          error: (err) => {
+
+            console.error(err);
+          }
+        });
+        //-------------------------------------
+
         return user;
       })
     );

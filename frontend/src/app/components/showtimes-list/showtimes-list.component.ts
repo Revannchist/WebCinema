@@ -28,7 +28,7 @@ export class ShowtimesListComponent implements OnInit {
   movieDetails: { [key: number]: MovieGetDto } = {};
 
   currentPage = 1;
-  pageSize = 4; // Show fewer movies per page to fit the new card layout
+  pageSize = 4; 
   totalItems = 0;
   Math = Math;
 

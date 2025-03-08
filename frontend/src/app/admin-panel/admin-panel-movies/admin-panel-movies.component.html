@@ -282,7 +282,7 @@
                 <label for="directorId">Director:</label>
                 <select id="directorId" class="form-control" [(ngModel)]="movieToAdd.directorId" name="directorId"
                   #directorId="ngModel" required>
-                  <option value="" disabled selected>Select a director</option>
+                  <option value="0" disabled selected>Select a director</option>
                   <option *ngFor="let director of director" [value]="director.id">
                     {{ director.firstName }} {{ director.lastName }}
                   </option>
@@ -296,7 +296,7 @@
                 <label for="countryId">Country:</label>
                 <select id="countryId" class="form-control" [(ngModel)]="movieToAdd.countryId" name="countryId"
                   #countryId="ngModel" required>
-                  <option value="" disabled selected>Select a country</option>
+                  <option value="0" disabled selected>Select a country</option>
                   <option *ngFor="let c of country" [value]="c.id">{{ c.name }}</option>
                 </select>
                 <div *ngIf="countryId.invalid && (countryId.dirty || countryId.touched)" class="text-danger">
@@ -408,6 +408,17 @@
                   class="text-danger">
                   <small *ngIf="editDescription.errors?.['required']">Description is required</small>
                   <small *ngIf="editDescription.errors?.['maxlength']">Description cannot exceed 2000 characters</small>
+                </div>
+              </div>
+
+              <!-- Release Date -->
+              <div class="form-group">
+                <label for="editReleaseDate">Release Date:</label>
+                <input type="date" id="editReleaseDate" class="form-control" [(ngModel)]="movieToEdit.releaseDate"
+                  name="releaseDate" #editReleaseDate="ngModel" required>
+                <div *ngIf="editReleaseDate.invalid && (editReleaseDate.dirty || editReleaseDate.touched)"
+                  class="text-danger">
+                  <small *ngIf="editReleaseDate.errors?.['required']">Release date is required</small>
                 </div>
               </div>
 

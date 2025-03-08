@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
 using WebCinema.Models.DTO;
@@ -16,6 +17,7 @@ namespace WebCinema.Controllers
             _showtimesService = showtimesService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddShowTime(ShowTimes showTimes)
         {
@@ -27,6 +29,7 @@ namespace WebCinema.Controllers
             return Ok(createdShowTimes);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> DeleteShowTimeById(int id)
         {
@@ -38,6 +41,7 @@ namespace WebCinema.Controllers
             return Ok(deletedShowtimes);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> UpdateShowTime(int id, ShowTimesUpdateDto updateDto)
         {
@@ -49,6 +53,7 @@ namespace WebCinema.Controllers
             return Ok(updatedShowTimes);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetShowTimeById(int id)
         {
@@ -60,6 +65,7 @@ namespace WebCinema.Controllers
             return Ok(showtimes);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllShowTimes()
         {

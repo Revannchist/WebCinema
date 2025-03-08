@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models.DTO;
-using WebCinema.Services;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace WebCinema.Controllers
 {
@@ -11,131 +12,105 @@ namespace WebCinema.Controllers
     public class MoviesPostersController : ControllerBase
     {
         private readonly IMoviesImageService _moviesImageService;
-        private readonly WebCinemaDBContext _dbContext;
-        private readonly ILogger<MoviePosterService> _logger;
+        private readonly ILogger<MoviesPostersController> _logger;
 
-
-        public MoviesPostersController(IMoviesImageService moviesImageService, WebCinemaDBContext dbcontext, ILogger<MoviePosterService> logger)
+        public MoviesPostersController(IMoviesImageService moviesImageService, ILogger<MoviesPostersController> logger)
         {
             _moviesImageService = moviesImageService;
-            _dbContext = dbcontext;
             _logger = logger;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> AddMoviePoster([FromBody] MovieCreatePosterDto imageDto)
+        public async Task<IActionResult> AddMoviePoster([FromBody] MovieCreatePosterDto imageDto, CancellationToken cancellationToken)
         {
-            // Validate the movie exists
-            var movieExists = await _dbContext.Movies.AnyAsync(m => m.Id == imageDto.MovieId);
-            if (!movieExists)
-            {
-                _logger.LogWarning($"Movie with ID {imageDto.MovieId} not found");
-                return BadRequest("Movie not found");
-            }
-
-            // Validate image data
-            if (string.IsNullOrEmpty(imageDto.Image))
-            {
-                _logger.LogWarning("Image data is empty");
-                return BadRequest("Image data is required");
-            }
-
-            if (!imageDto.Image.StartsWith("data:image/"))
-            {
-                _logger.LogWarning("Invalid image format: not an image data URI");
-                return BadRequest("Invalid image format: not a valid data URI");
-            }
-
-            if (!imageDto.Image.StartsWith("data:image/jpeg") &&
-                !imageDto.Image.StartsWith("data:image/png"))
-            {
-                _logger.LogWarning("Unsupported image format. Only JPEG and PNG are allowed");
-                return BadRequest("Unsupported image format. Only JPEG and PNG are allowed");
-            }
-
-            int commaIndex = imageDto.Image.IndexOf(',');
-            if (commaIndex < 0)
-            {
-                _logger.LogWarning("Invalid image format: missing data URI comma separator");
-                return BadRequest("Invalid image format: missing data URI comma separator");
-            }
-
-            var imageString = imageDto.Image.Substring(commaIndex + 1);
-            if (string.IsNullOrEmpty(imageString))
-            {
-                _logger.LogWarning("Image data is empty");
-                return BadRequest("Image data is empty");
-            }
-
             try
             {
-                var imageBytes = Convert.FromBase64String(imageString);
-                if (imageBytes.Length == 0)
+                var created = await _moviesImageService.CreateMoviePosterAsync(imageDto, cancellationToken);
+                if (!created)
                 {
-                    _logger.LogWarning("Image has zero bytes");
-                    return BadRequest("Image has zero bytes");
+                    return BadRequest("Error creating movie poster");
                 }
+                return Ok(created);
             }
-            catch (FormatException)
+            catch (OperationCanceledException)
             {
-                _logger.LogWarning("Invalid base64 string");
-                return BadRequest("Invalid base64 string");
+                _logger.LogInformation("Add movie poster operation was canceled");
+                return StatusCode(499, "Request canceled");
             }
-
-            // If all validations pass, create the poster
-            var created = await _moviesImageService.CreateMoviePosterAsync(imageDto);
-            if (!created)
-            {
-                return BadRequest("Error creating movie poster");
-            }
-
-            return Ok(created);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> DeleteMoviePosterById(int imageId)
+        public async Task<IActionResult> DeleteMoviePosterById(int imageId, CancellationToken cancellationToken)
         {
-            var deleted = await _moviesImageService.DeleteMoviePosterByIdAsync(imageId);
-            if (!deleted)
+            try
             {
-                return BadRequest("Error | Bad Request!");
+                var deleted = await _moviesImageService.DeleteMoviePosterByIdAsync(imageId, cancellationToken);
+                if (!deleted)
+                {
+                    return NotFound($"Movie poster with ID {imageId} not found");
+                }
+                return Ok(deleted);
             }
-            return Ok(deleted);
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Delete movie poster operation was canceled for ID: {ImageId}", imageId);
+                return StatusCode(499, "Request canceled");
+            }
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllMoviePosters()
+        public async Task<IActionResult> GetAllMoviePosters(CancellationToken cancellationToken)
         {
-            var images = await _moviesImageService.GetAllMoviePostersAsync();
-            if (images == null)
+            try
             {
-                return BadRequest("Error | Bad Request!");
+                var posters = await _moviesImageService.GetAllMoviePostersAsync(cancellationToken);
+                return Ok(posters);
             }
-            return Ok(images);
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Get all movie posters operation was canceled");
+                return StatusCode(499, "Request canceled");
+            }
         }
 
         [HttpGet]
-        public async Task<ActionResult<MoviePosterResponseDto>> GetPosterByMovieId(/*[FromQuery]*/ int movieId)
+        public async Task<IActionResult> GetPosterByMovieId(int movieId, CancellationToken cancellationToken)
         {
-            var poster = await _moviesImageService.GetPosterByMovieIdAsync(movieId);
-            if (poster == null)
+            try
             {
-                return NotFound($"No poster found for movie ID: {movieId}"); 
+                var poster = await _moviesImageService.GetPosterByMovieIdAsync(movieId, cancellationToken);
+                if (poster == null)
+                {
+                    return NotFound($"No poster found for movie ID: {movieId}");
+                }
+                return Ok(poster);
             }
-            return Ok(poster);
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Get poster by movie ID operation was canceled for ID: {MovieId}", movieId);
+                return StatusCode(499, "Request canceled");
+            }
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMoviePosterByMovieTitle(string title)
+        public async Task<IActionResult> GetMoviePosterByMovieTitle(string title, CancellationToken cancellationToken)
         {
-            var images = await _moviesImageService.GetMoviePosterByTitleAsync(title);
-            if (images == null)
+            try
             {
-                return BadRequest("Error | Bad Request!");
+                var poster = await _moviesImageService.GetMoviePosterByTitleAsync(title, cancellationToken);
+                if (poster == null)
+                {
+                    return NotFound($"No poster found for movie title: {title}");
+                }
+                return Ok(poster);
             }
-            return Ok(images);
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Get poster by movie title operation was canceled for title: {Title}", title);
+                return StatusCode(499, "Request canceled");
+            }
         }
-
-
     }
 }

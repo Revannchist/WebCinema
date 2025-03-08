@@ -35,12 +35,12 @@ export class LoginComponent {
             localStorage.setItem('currentUser', JSON.stringify(response));
             localStorage.setItem('isAdmin', 'true');
             alert('Successfully logged in as Admin');
-            this.router.navigate(['/admin-panel-user-admin']);
+            this.router.navigate(['/admin']);
           } else { // Regular user
             localStorage.setItem('currentUser', JSON.stringify(response));
             localStorage.setItem('currentUserId', response.id.toString());
             alert('Successfully logged in');
-            this.router.navigate(['/users']);
+            this.router.navigate(['/movie-list']);
           }
         },
         error: (error) => {

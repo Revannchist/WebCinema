@@ -5,16 +5,16 @@ namespace WebCinema.Interfaces
 {
     public interface IMoviesService
     {
-        Task<MoviesResponseDto> CreateMovieAsync(MovieCreateDto movieDto);
+        Task<MoviesResponseDto> CreateMovieAsync(MovieCreateDto movieDto, CancellationToken cancellationToken = default);
 
-        Task<MoviesPagedResponse<MoviesGetDto>> GetAllMoviesAsync(MoviesParameters parameters);
+        Task<MoviesPagedResponse<MoviesGetDto>> GetAllMoviesAsync(MoviesParameters parameters, CancellationToken cancellationToken = default);
 
-        Task<MoviesGetDto> GetMovieByIdAsync(int id);
+        Task<MoviesGetDto> GetMovieByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<Movies> DeleteMovieByIdAsync(int id);
+        Task<Movies> DeleteMovieByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<MoviesResponseDto> UpdateMovieAsync(int id, MoviesUpdateDto movieDto);
+        Task<MoviesResponseDto> UpdateMovieAsync(int id, MoviesUpdateDto movieDto, CancellationToken cancellationToken = default);
 
-        Task<Movies> UpdateMovieBasicInfoAsync(int id, MoviesUpdateBasicDto dto);
+        Task<Movies> UpdateMovieBasicInfoAsync(int id, MoviesUpdateBasicDto dto, CancellationToken cancellationToken = default);
     }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Movie, PagedResponse, FilterParams } from '../models/movie.model';
 import { MyConfig } from '../my-config';
@@ -13,10 +13,16 @@ import { MovieCreateDto, MovieUpdateDto, MovieGetDto, MovieParameters, MoviePage
 export class MovieService {
     constructor(private http: HttpClient) { }
 
-    private formatDate(date: string | null): string | null {
-        if (!date) return null;
-        const d = new Date(date);
-        return isNaN(d.getTime()) ? null : d.toISOString();
+    private getHeaders(): HttpHeaders {
+
+        const token = localStorage.getItem('token');
+
+        //console.log('Auth token:', token);
+
+        return new HttpHeaders({
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        });
     }
 
     getMovies(filterParams: MovieParameters): Observable<MoviePagedResponse<MovieGetDto>> {
@@ -60,16 +66,27 @@ export class MovieService {
         return this.http.post<MovieGetDto>(`${MyConfig.APIurl}/api/Movies/CreateMovie`, movie);
     }
 
+
+
+    /*
     updateMovie(id: number, movie: MovieUpdateDto): Observable<MovieGetDto> {
         const url = `${MyConfig.APIurl}/api/Movies/UpdateMovie?id=${id}`;
-        console.log('Service - Final URL:', url);
-        console.log('Service - ID being used:', id);
         return this.http.post<MovieGetDto>(url, movie);
     }
+    */
+
+    updateMovie(id: number, movie: MovieUpdateDto): Observable<MovieGetDto> {
+        //console.log('Using updated method with headers');
+        const headers = this.getHeaders();
+        const url = `${MyConfig.APIurl}/api/Movies/UpdateMovie?id=${id}`;
+        return this.http.post<MovieGetDto>(url, movie, { headers });
+    }
+    
+
 
     getMovieById(id: number): Observable<MovieGetDto> {
         return this.http.get<MovieGetDto>(`${MyConfig.APIurl}/api/Movies/GetMovieById?id=${id}`);
-      }
+    }
 
     deleteMovie(id: number): Observable<any> {
         return this.http.post(`${MyConfig.APIurl}/api/Movies/DeleteMovieById?id=${id}`, [{}]);

@@ -17,7 +17,7 @@ namespace WebCinema.Services
             _logger = logger;
         }
 
-        public async Task<MoviesResponseDto> CreateMovieAsync(MovieCreateDto movieDto)
+        public async Task<MoviesResponseDto> CreateMovieAsync(MovieCreateDto movieDto, CancellationToken cancellationToken = default)
         {
             var movie = new Movies
             {
@@ -33,29 +33,29 @@ namespace WebCinema.Services
                 MoviesActors = movieDto.ActorIds?.Select(actorId => new MoviesActors { ActorId = actorId }).ToList()
             };
 
-            await _dbContext.Movies.AddAsync(movie);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.Movies.AddAsync(movie, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             // Load related data for response
             await _dbContext.Entry(movie)
                 .Reference(m => m.Director)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
             await _dbContext.Entry(movie)
                 .Reference(m => m.Country)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
             await _dbContext.Entry(movie)
                 .Collection(m => m.MoviesGenres)
                 .Query()
                 .Include(mg => mg.Genre)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
             await _dbContext.Entry(movie)
                 .Collection(m => m.MoviesActors)
                 .Query()
                 .Include(ma => ma.Actor)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
             return new MoviesResponseDto
             {
@@ -88,13 +88,13 @@ namespace WebCinema.Services
                 Actors = movie.MoviesActors?.Select(ma => new ActorDto
                 {
                     Id = ma.Actor.Id,
-                    FirstName = ma.Actor.FirstName, 
+                    FirstName = ma.Actor.FirstName,
                     LastName = ma.Actor.LastName
                 }).ToList()
             };
         }
 
-        public async Task<MoviesGetDto> GetMovieByIdAsync(int id)
+        public async Task<MoviesGetDto> GetMovieByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -110,8 +110,8 @@ namespace WebCinema.Services
                         Duration = m.Duration,
                         Language = m.Language,
                         AgeRating = m.AgeRating,
-                        DirectorId = m.Director != null ? new DirectorDto 
-                        {                                                 
+                        DirectorId = m.Director != null ? new DirectorDto
+                        {
                             Id = m.Director.Id,
                             FirstName = m.Director.FirstName,
                             LastName = m.Director.LastName
@@ -128,7 +128,7 @@ namespace WebCinema.Services
                             .Select(ma => ma.ActorId)
                             .ToList()
                     })
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 if (movie == null)
                 {
@@ -137,14 +137,14 @@ namespace WebCinema.Services
 
                 return movie;
             }
-            catch (Exception ex) when (ex is not KeyNotFoundException)
+            catch (Exception ex) when (ex is not KeyNotFoundException && ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "Error retrieving movie with ID {MovieId}", id);
                 throw;
             }
         }
 
-        public async Task<MoviesPagedResponse<MoviesGetDto>> GetAllMoviesAsync(MoviesParameters parameters)
+        public async Task<MoviesPagedResponse<MoviesGetDto>> GetAllMoviesAsync(MoviesParameters parameters, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -154,8 +154,7 @@ namespace WebCinema.Services
                 if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
                 {
                     query = query.Where(m =>
-                        m.Title.Contains(parameters.SearchTerm)); //||
-                       //m.Description.Contains(parameters.SearchTerm));
+                        m.Title.Contains(parameters.SearchTerm));
                 }
 
                 if (parameters.FromDate.HasValue)
@@ -200,10 +199,10 @@ namespace WebCinema.Services
                         .Any(mg => parameters.ActorIds.Contains(mg.ActorId)));
                 }
 
-                // Get total count for pagination
-                var totalCount = await query.CountAsync();
+                var totalCount = await query.CountAsync(cancellationToken);
 
-                // Apply pagination
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var movies = await query
                     .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                     .Take(parameters.PageSize)
@@ -234,7 +233,7 @@ namespace WebCinema.Services
                             .Select(ma => ma.ActorId)
                             .ToList()
                     })
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 // paged response
                 var response = new MoviesPagedResponse<MoviesGetDto>
@@ -248,43 +247,43 @@ namespace WebCinema.Services
 
                 return response;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, "Error retrieving paged movies");
                 throw;
             }
         }
 
-        public async Task<Movies?> DeleteMovieByIdAsync(int id)
+        public async Task<Movies?> DeleteMovieByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             try
             {
-                var movie = await _dbContext.Movies.FindAsync(id);
+                var movie = await _dbContext.Movies.FindAsync(new object[] { id }, cancellationToken);
 
-                if(movie == null)
+                if (movie == null)
                 {
                     _logger.LogWarning($"Attempt to delete non-existent movie: {id}");
                     return null;
                 }
                 _dbContext.Movies.Remove(movie);
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation($"Movie deleted successfully: {id}");
                 return movie;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, $"Error deleting movie with ID: {id}");
                 throw;
             }
         }
 
-        public async Task<MoviesResponseDto> UpdateMovieAsync(int id, MoviesUpdateDto movieDto)
+        public async Task<MoviesResponseDto> UpdateMovieAsync(int id, MoviesUpdateDto movieDto, CancellationToken cancellationToken = default)
         {
             var existingMovie = await _dbContext.Movies
                 .Include(m => m.MoviesGenres)
                 .Include(m => m.MoviesActors)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
 
             if (existingMovie == null)
             {
@@ -292,11 +291,13 @@ namespace WebCinema.Services
                 throw new InvalidOperationException($"Movie with ID {id} not found");
             }
 
-            // Check for duplicate movie
+            cancellationToken.ThrowIfCancellationRequested();
+
             var duplicateExists = await _dbContext.Movies
                 .AnyAsync(m => m.Title == movieDto.Title
                     && m.ReleaseDate == movieDto.ReleaseDate
-                    && m.Id != id);
+                    && m.Id != id,
+                    cancellationToken);
 
             if (duplicateExists)
             {
@@ -314,55 +315,50 @@ namespace WebCinema.Services
             existingMovie.DirectorId = movieDto.DirectorId;
             existingMovie.CountryId = movieDto.CountryId;
 
-            // Update genres
             if (movieDto.GenreIds != null)
             {
-                // Remove existing genres
                 existingMovie.MoviesGenres.Clear();
 
-                // Add new genres
                 existingMovie.MoviesGenres = movieDto.GenreIds
                     .Select(genreId => new MoviesGenres { MovieId = id, GenreId = genreId })
                     .ToList();
             }
 
-            // Update actors
             if (movieDto.ActorIds != null)
             {
-                // Remove existing actors
                 existingMovie.MoviesActors.Clear();
 
-                // Add new actors
                 existingMovie.MoviesActors = movieDto.ActorIds
                     .Select(actorId => new MoviesActors { MovieId = id, ActorId = actorId })
                     .ToList();
             }
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation($"Movie updated successfully: {id}");
 
-            // Load related data for response
+            // Check for cancellation before loading related data
+            cancellationToken.ThrowIfCancellationRequested();
+
             await _dbContext.Entry(existingMovie)
                 .Reference(m => m.Director)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
             await _dbContext.Entry(existingMovie)
                 .Reference(m => m.Country)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
             await _dbContext.Entry(existingMovie)
                 .Collection(m => m.MoviesGenres)
                 .Query()
                 .Include(mg => mg.Genre)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
             await _dbContext.Entry(existingMovie)
                 .Collection(m => m.MoviesActors)
                 .Query()
                 .Include(ma => ma.Actor)
-                .LoadAsync();
+                .LoadAsync(cancellationToken);
 
-            // Map to response DTO
             return new MoviesResponseDto
             {
                 Id = existingMovie.Id,
@@ -399,11 +395,12 @@ namespace WebCinema.Services
                 }).ToList()
             };
         }
-        public async Task<Movies> UpdateMovieBasicInfoAsync(int id, MoviesUpdateBasicDto dto)
+
+        public async Task<Movies> UpdateMovieBasicInfoAsync(int id, MoviesUpdateBasicDto dto, CancellationToken cancellationToken = default)
         {
             try
             {
-                var movie = await _dbContext.Movies.FindAsync(id);
+                var movie = await _dbContext.Movies.FindAsync(new object[] { id }, cancellationToken);
 
                 if (movie == null)
                 {
@@ -411,11 +408,15 @@ namespace WebCinema.Services
                     return null;
                 }
 
+                // Check for cancellation before next database operation
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var duplicateMovie = await _dbContext.Movies
                     .FirstOrDefaultAsync(m =>
                         m.Title == dto.Title &&
                         m.ReleaseDate == dto.ReleaseDate &&
-                        m.Id != id);
+                        m.Id != id,
+                        cancellationToken);
 
                 if (duplicateMovie != null)
                 {
@@ -427,12 +428,12 @@ namespace WebCinema.Services
                 movie.Description = dto.Description;
                 movie.ReleaseDate = dto.ReleaseDate;
 
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation($"Movie basic info updated successfully: {id}");
                 return movie;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _logger.LogError(ex, $"Error updating basic movie info for ID: {id}");
                 throw;

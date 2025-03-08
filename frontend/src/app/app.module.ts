@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-
+import { JwtModule } from '@auth0/angular-jwt';
 import { AppComponent } from './app.component';
+import { AuthInterceptor } from './auth.interceptor';
 import { RouterModule, Routes } from '@angular/router';
 import { GenresComponent } from './components/genres/genres.component';
 import { CountriesComponent } from './components/countries/countries.component';
@@ -27,6 +28,10 @@ import { SidebarComponent } from './admin-panel/sidebar/sidebar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ShowtimesListComponent } from './components/showtimes-list/showtimes-list.component';
 
+export function tokenGetter() {
+  return localStorage.getItem('token');
+}
+
 const routes: Routes = [
   { path: 'genres', component: GenresComponent },
   { path: 'countries', component: CountriesComponent },
@@ -35,7 +40,7 @@ const routes: Routes = [
   { path: 'landing-page', component: LandingPageComponent },
   { path: 'movie-list', component: MovieListComponent },
   { path: 'users', component: UsersComponent },
-  {path:'showtimes-list',component:ShowtimesListComponent},
+  { path: 'showtimes-list', component: ShowtimesListComponent },
 
 
   { path: 'movies', component: MoviesComponent },
@@ -57,9 +62,7 @@ const routes: Routes = [
   },
 
   { path: '**', redirectTo: 'landing-page' }
-]
-
-
+];
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -99,7 +102,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       scrollPositionRestoration: 'enabled',
       anchorScrolling: 'enabled',
     }),
-    
+
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -107,10 +110,23 @@ export function HttpLoaderFactory(http: HttpClient) {
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
+    }),
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: tokenGetter,
+        allowedDomains: ['localhost:44318'],
+        disallowedRoutes: ['https://localhost:44318/api/auth/login'] // Routes where JWT should not be sent
+      }
     })
   ],
 
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

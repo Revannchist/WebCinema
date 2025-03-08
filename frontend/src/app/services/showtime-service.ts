@@ -18,7 +18,6 @@ export class ShowtimeService {
         const url = `${MyConfig.APIurl}/api/ShowTimes/UpdateShowTime?id=${id}`;
         return this.http.post<AddShowTimeDto>(url, showTime);
     }
-    
 
     getShowTimeById(id: number): Observable<GetShowTimeDto> {
         return this.http.get<GetShowTimeDto>(`${MyConfig.APIurl}/api/ShowTimes/GetShowTimeById?id=${id}`);

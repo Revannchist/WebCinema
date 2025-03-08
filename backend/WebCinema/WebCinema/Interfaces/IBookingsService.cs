@@ -5,16 +5,14 @@ namespace WebCinema.Interfaces
 {
     public interface IBookingsService
     {
-        Task<Bookings> CreateBookingsAsync(Bookings bookings);
+        Task<BookingsResponseDto> CreateBookingsAsync(BookingsAddDto bookingsDto, CancellationToken cancellationToken = default);
 
-        Task<List<BookingsDto>> GetAllBookingsAsync();
+        Task<List<BookingsDto>> GetAllBookingsAsync(CancellationToken cancellationToken = default);
 
-        //Task<BookingsDto> GetBookingsByIdAsync(int id);
+        Task<BookingsDto> GetBookingsByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<bool> DeleteBookingsByIdAsync(int id);
+        Task<bool> DeleteBookingsByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        //Task<Bookings> UpdateBookingsAsync(int id, Bookings bookings);
-
-        //Task<Bookings>UpdateBookingsBasicInfoAsync(int id,BookingsEditDto dto);
+        Task<BookingsResponseDto> UpdateBookingsAsync(int id, BookingsEditDto bookingsDto, CancellationToken cancellationToken = default);
     }
 }
