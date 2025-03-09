@@ -5,14 +5,14 @@ namespace WebCinema.Interfaces
 {
     public interface IShowTimesService
     {
-        Task<ShowTimes> CreateShowTimesAsync(ShowTimes showtimes);
+        Task<ShowTimes> CreateShowTimesAsync(ShowTimes showtimes, CancellationToken cancellationToken = default);
 
-        Task<List<ShowTimesDto>> GetAllShowTimesAsync();
+        Task<List<ShowTimesDto>> GetAllShowTimesAsync(CancellationToken cancellationToken = default);
 
-        Task<ShowTimesDto> GetShowTimesByIdAsync(int id);
+        Task<ShowTimesDto> GetShowTimesByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<ShowTimes> DeleteShowTimesByIdAsync(int id);
+        Task<ShowTimes> DeleteShowTimesByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<ShowTimesDto?> UpdateShowTimesAsync(int id, ShowTimesUpdateDto updateDto);
+        Task<ShowTimesDto?> UpdateShowTimesAsync(int id, ShowTimesUpdateDto updateDto, CancellationToken cancellationToken = default);
     }
 }

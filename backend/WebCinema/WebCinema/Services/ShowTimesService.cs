@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading;
 using WebCinema.Interfaces;
 using WebCinema.Models;
 using WebCinema.Models.DTO;
@@ -13,31 +14,31 @@ namespace WebCinema.Services
             _dbContext = dbContext;
         }
 
-        public async Task<ShowTimes> CreateShowTimesAsync(ShowTimes showtimes)
+        public async Task<ShowTimes> CreateShowTimesAsync(ShowTimes showtimes, CancellationToken cancellationToken = default)
         {
             if (showtimes == null)
             {
                 return null;
             }
-            await _dbContext.ShowTimes.AddAsync(showtimes);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.ShowTimes.AddAsync(showtimes, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
             return showtimes;
         }
 
-        public async Task<ShowTimes> DeleteShowTimesByIdAsync(int id)
+        public async Task<ShowTimes> DeleteShowTimesByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var showtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
+            var showtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             if (showtime != null)
             {
                 var relatedBookings = await _dbContext.Bookings
                     .Where(b => b.ShowTimesId == id)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 foreach (var booking in relatedBookings)
                 {
                     var bookedSeats = await _dbContext.BookedSeats
                         .Where(bs => bs.BookingId == booking.Id)
-                        .ToListAsync();
+                        .ToListAsync(cancellationToken);
 
                     _dbContext.BookedSeats.RemoveRange(bookedSeats);
                 }
@@ -46,12 +47,12 @@ namespace WebCinema.Services
 
                 _dbContext.ShowTimes.Remove(showtime);
 
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync(cancellationToken);
             }
             return showtime;
         }
 
-        public async Task<List<ShowTimesDto>> GetAllShowTimesAsync()
+        public async Task<List<ShowTimesDto>> GetAllShowTimesAsync(CancellationToken cancellationToken = default)
         {
             var showtimes = await _dbContext.ShowTimes
                 .Include(s => s.Movies)
@@ -67,12 +68,12 @@ namespace WebCinema.Services
                     TicketPrice = s.TicketPrice,
                     IsActive = s.IsActive,
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return showtimes;
         }
 
-        public async Task<ShowTimesDto> GetShowTimesByIdAsync(int id)
+        public async Task<ShowTimesDto> GetShowTimesByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var showtime = await _dbContext.ShowTimes
                 .Include(s => s.Movies)
@@ -89,14 +90,14 @@ namespace WebCinema.Services
                     TicketPrice = s.TicketPrice,
                     IsActive = s.IsActive,
                 })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             return showtime;
         }
 
-        public async Task<ShowTimesDto?> UpdateShowTimesAsync(int id, ShowTimesUpdateDto updateDto)
+        public async Task<ShowTimesDto?> UpdateShowTimesAsync(int id, ShowTimesUpdateDto updateDto, CancellationToken cancellationToken = default)
         {
-            var existingShowtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id);
+            var existingShowtime = await _dbContext.ShowTimes.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             if (existingShowtime == null)
             {
                 return null; // Handle not found case
@@ -111,7 +112,7 @@ namespace WebCinema.Services
 
             // Save changes
             _dbContext.ShowTimes.Update(existingShowtime);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             // Return updated data as ShowTimesDto
             return new ShowTimesDto
@@ -126,8 +127,5 @@ namespace WebCinema.Services
                 IsActive = existingShowtime.IsActive
             };
         }
-
-
-
     }
 }
