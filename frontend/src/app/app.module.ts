@@ -27,6 +27,7 @@ import { AdminPanelShowtimesComponent } from './admin-panel/admin-panel-showtime
 import { SidebarComponent } from './admin-panel/sidebar/sidebar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ShowtimesListComponent } from './components/showtimes-list/showtimes-list.component';
+import { SeatsComponent } from './components/seats/seats.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -48,6 +49,7 @@ const routes: Routes = [
   { path: 'admin-panel-movies', component: AdminPanelMoviesComponent },
   { path: 'showtimes', component: AdminPanelShowtimesComponent },
   { path: 'admin-panel-users', component: AdminPanelUserAdminComponent },
+  { path: 'seats', component: SeatsComponent },
 
 
   {
@@ -87,7 +89,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminPanelMoviesComponent,
     AdminPanelUserAdminComponent,
     ShowtimesListComponent,
-
+    SeatsComponent,
   ],
   imports: [
     BrowserModule,

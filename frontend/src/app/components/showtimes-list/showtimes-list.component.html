@@ -86,7 +86,8 @@
                   <div class="showtimes-container">
                     <div class="row">
                       <div *ngFor="let showtime of dateGroup.value" class="col-auto mb-2">
-                        <div class="showtime-box text-center p-2 border rounded">
+                        <div class="showtime-box text-center p-2 border rounded"      (click)="navigateToSeats(showtime.id)" >
+                          
                           <div class="showtime-time fw-bold">{{ formatTime(showtime.showDateTime) }}</div>
                           <div class="showtime-hall small">{{ showtime.hallName }}</div>
                           <div class="showtime-price small">{{ showtime.ticketPrice | currency }}</div>

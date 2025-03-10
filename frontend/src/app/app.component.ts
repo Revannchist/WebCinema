@@ -27,7 +27,8 @@ export class AppComponent {
     ).subscribe((event: any) => {
       this.isAdminRoute = event.url.startsWith('/admin');
       
-      this.showNavbar = this.navbarRoutes.includes(event.url);
+      const isSeatRoute = event.url.startsWith('/seats/');
+      this.showNavbar = this.navbarRoutes.includes(event.url) || isSeatRoute;
     });
   }
 

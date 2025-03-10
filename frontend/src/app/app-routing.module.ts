@@ -6,12 +6,14 @@ import { AdminPanelUserAdminComponent } from './admin-panel/admin-panel-user-adm
 import { LoginComponent } from './components/login/login.component';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { AuthGuard } from './auth.guard';
+import { SeatsComponent } from './components/seats/seats.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'users', component: UsersComponent },
-  { path: 'admin-panel-user-admin', component: AdminPanelUserAdminComponent }
+  { path: 'admin-panel-user-admin', component: AdminPanelUserAdminComponent },
+  { path: 'seats/:id', component: SeatsComponent },
 
   //,
   //{ path: 'movie-list', component: MovieListComponent, canActivate: [AuthGuard] },

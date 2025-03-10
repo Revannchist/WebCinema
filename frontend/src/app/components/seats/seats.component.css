@@ -1,0 +1,300 @@
+/* Base container styles */
+.cinema-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .cinema-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  /* Showtime information styles */
+  .showtime-info {
+    margin-top: 10px;
+    color: #555;
+  }
+  
+  .showtime-info h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  /* Booking information styles */
+  .booking-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .seats-counter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .counter-btn {
+    width: 30px;
+    height: 30px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* Price display styles */
+  .price-display {
+    background-color: #f5f5f5;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: right;
+  }
+  
+  .price-display p {
+    margin: 5px 0;
+  }
+  
+  .total-price {
+    font-weight: bold;
+    font-size: 18px;
+    color: #007bff;
+  }
+  
+  /* Loading and error styles */
+  .loading-spinner {
+    text-align: center;
+    padding: 40px 0;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #dc3545;
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+  
+  /* Hall selection tabs */
+  .hall-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 5px;
+  }
+  
+  .hall-tab {
+    padding: 8px 15px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+  }
+  
+  .hall-tab.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  
+  /* Cinema screen */
+  .cinema-screen {
+    background: linear-gradient(180deg, #999, #ccc);
+    height: 20px;
+    margin-bottom: 30px;
+    border-radius: 50% / 100% 100% 0 0;
+    position: relative;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .screen-label {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 30px;
+    font-size: 12px;
+    color: #777;
+  }
+  
+  /* Seats layout */
+  .seats-layout {
+    margin-top: 20px;
+  }
+  
+  .seats-container {
+    margin: 0 auto;
+    max-width: 90%;
+  }
+  
+  /* Seat legend */
+  .seat-legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .seat-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+  }
+  
+  .seat-icon.regular {
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+  }
+  
+  .seat-icon.accessible {
+    background-color: #90caf9;
+    border: 1px solid #64b5f6;
+  }
+  
+  .seat-icon.love {
+    background-color: #f8bbd0;
+    border: 1px solid #f48fb1;
+  }
+  
+  .seat-icon.selected {
+    background-color: #4caf50;
+    border: 1px solid #388e3c;
+  }
+  
+  .seat-icon.unavailable {
+    background-color: #9e9e9e;
+    border: 1px solid #757575;
+    position: relative;
+  }
+  
+  .seat-icon.unavailable::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #555;
+    top: 50%;
+    left: 0;
+    transform: rotate(45deg);
+  }
+  
+  /* Seats grid */
+  .seats-grid {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    gap: 5px;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  
+  .row-divider {
+    grid-column: 1 / -1;
+    height: 10px;
+  }
+  
+  .seat-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    position: relative;
+    font-size: 0;
+  }
+  
+  .seat-btn.seat-regular {
+    background-color: #e0e0e0;
+  }
+  
+  .seat-btn.seat-accessible {
+    background-color: #90caf9;
+  }
+  
+  .seat-btn.seat-love {
+    background-color: #f8bbd0;
+  }
+  
+  .seat-btn.selected {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .seat-btn:disabled {
+    background-color: #9e9e9e;
+    cursor: not-allowed;
+    position: relative;
+  }
+  
+  .seat-btn:disabled::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #555;
+    top: 50%;
+    left: 0;
+    transform: rotate(45deg);
+  }
+  
+  .heart-icon, .accessible-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+  }
+  
+  /* Action buttons */
+  .action-buttons {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .btn-confirm {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .btn-confirm:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  /* Responsive design */
+  @media (min-width: 768px) {
+    .booking-info {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .seats-grid {
+      grid-template-columns: repeat(10, 1fr);
+    }
+    
+    .seat-btn {
+      width: 25px;
+      height: 25px;
+    }
+  }

@@ -1,0 +1,111 @@
+<div class="cinema-container">
+    <div class="cinema-header">
+      <div>
+        <h2>Select your seats</h2>
+        <!-- Add movie and showtime info -->
+        <div *ngIf="showtime" class="showtime-info">
+          <h3>{{ showtime.movieTitle }}</h3>
+          <p>{{ showtime.hallName }} | {{ showtime.showDateTime | date:'MMM d, y h:mm a' }}</p>
+        </div>
+      </div>
+      <div class="booking-info">
+        <div class="seats-counter">
+          <button class="counter-btn" (click)="maxSeats = Math.max(1, maxSeats - 1)">-</button>
+          <span>{{ selectedSeats.length }} / {{ maxSeats }}</span>
+          <button class="counter-btn" (click)="maxSeats = maxSeats + 1">+</button>
+        </div>
+        <!-- Add price display -->
+        <div *ngIf="showtime" class="price-display">
+          <p>Ticket price: ${{ showtime.ticketPrice.toFixed(2) }}</p>
+          <p class="total-price">Total: ${{ totalPrice.toFixed(2) }}</p>
+        </div>
+      </div>
+    </div>
+ 
+    <div *ngIf="isLoading" class="loading-spinner">
+      <p>Loading seats...</p>
+    </div>
+   
+    <div *ngIf="error" class="error-message">
+      <p>{{ error }}</p>
+      <button (click)="loadAllSeats()">Try Again</button>
+    </div>
+ 
+    <div *ngIf="!isLoading && !error" class="cinema-content">
+      <!-- Hall selection tabs -->
+       <!--
+      <div class="hall-tabs" *ngIf="getHallNames().length > 1">
+        <button
+          *ngFor="let hall of getHallNames()"
+          [class.active]="selectedHall === hall"
+          (click)="selectHall(hall)"
+          class="hall-tab">
+          {{ hall }}
+        </button>
+      </div>
+      -->
+      
+      <!-- Cinema screen -->
+      <div class="cinema-screen">
+        <div class="screen-label">SCREEN</div>
+      </div>
+     
+      <!-- Seats layout -->
+      <div class="seats-layout" *ngIf="selectedHall">
+        <div class="seats-container">
+          <div class="seat-legend">
+            <div class="legend-item">
+              <div class="seat-icon regular"></div>
+              <span>Regular</span>
+            </div>
+            <div class="legend-item">
+              <div class="seat-icon accessible"></div>
+              <span>Accessible</span>
+            </div>
+            <div class="legend-item">
+              <div class="seat-icon love"></div>
+              <span>Love Seat</span>
+            </div>
+            <div class="legend-item">
+              <div class="seat-icon selected"></div>
+              <span>Selected</span>
+            </div>
+            <div class="legend-item">
+              <div class="seat-icon unavailable"></div>
+              <span>Unavailable</span>
+            </div>
+          </div>
+ 
+          <!-- Create rows with 15 seats per row for visualization -->
+          <div class="seating-rows">
+            <div *ngIf="selectedHall && seatsByHall[selectedHall]" class="seats-grid">
+              <ng-container *ngFor="let seat of seatsByHall[selectedHall]; let i = index">
+                <div *ngIf="i % 15 === 0" class="row-divider"></div>
+                <button
+                  [class.seat-regular]="isRegularSeat(seat)"
+                  [class.seat-accessible]="isSeatAccessible(seat)"
+                  [class.seat-love]="isLoveSeat(seat)"
+                  [class.selected]="isSeatSelected(seat.id)"
+                  [disabled]="seat.seatType === 'Unavailable'"
+                  (click)="toggleSeatSelection(seat)"
+                  class="seat-btn"
+                  [title]="'Seat ' + seat.seatNumber">
+                  <span *ngIf="isLoveSeat(seat)" class="heart-icon">♥</span>
+                  <span *ngIf="isSeatAccessible(seat)" class="accessible-icon">♿</span>
+                </button>
+              </ng-container>
+            </div>
+          </div>
+ 
+          <div class="action-buttons">
+            <button
+              class="btn-confirm"
+              [disabled]="selectedSeats.length === 0"
+              (click)="confirmSelection()">
+              Confirm Selection (${{ totalPrice.toFixed(2) }})
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

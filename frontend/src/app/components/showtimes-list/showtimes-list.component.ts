@@ -6,6 +6,7 @@ import { MoviePosterService } from '../../services/movie-poster-service';
 import { MovieGetDto } from '../../models/dto/movie.dto';
 import { MoviePosterResponseDto } from '../../models/dto/move-poster.dto';
 import { GenreService } from '../../services/genre-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-showtimes-list',
@@ -19,6 +20,7 @@ export class ShowtimesListComponent implements OnInit {
     private movieService: MovieService,
     private moviePosterService: MoviePosterService,
     private genreService: GenreService,
+    private router: Router 
   ) { }
 
   showtimes: GetShowTimeDto[] = [];
@@ -50,6 +52,10 @@ export class ShowtimesListComponent implements OnInit {
 
     //danasnji datum kao default filter
     this.filterParams.date = new Date().toISOString().split('T')[0];
+  }
+
+  navigateToSeats(showtimeId: number): void {
+    this.router.navigate(['/seats', showtimeId]);
   }
 
   loadShowtimes(): void {
@@ -238,4 +244,5 @@ export class ShowtimesListComponent implements OnInit {
     }
     return `${minutes}min`;
   }
+
 }
