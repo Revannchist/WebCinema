@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MyConfig } from '../my-config';
 
@@ -15,7 +15,12 @@ export class BookingService {
     }
 
     deleteBookingById(bookingId: number): Observable<any> {
-        return this.http.post(`${MyConfig.APIurl}/api/Bookings/DeleteBookingsById`, { id: bookingId });
+
+        const params = new HttpParams().set('id', bookingId.toString());
+
+        return this.http.post(`${MyConfig.APIurl}/api/Bookings/DeleteBookingsById`, null, {
+            params: params
+        });
     }
 
     updateBooking(bookingData: any): Observable<any> {

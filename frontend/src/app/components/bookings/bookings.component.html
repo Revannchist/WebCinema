@@ -1,1 +1,61 @@
-<p>bookings works!</p>
+<div class="bookings-container">
+    <h1 class="page-title">My Bookings</h1>
+
+    <div *ngIf="isLoading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading your bookings...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+        <p>{{ error }}</p>
+        <button (click)="loadUserBookings()" class="retry-btn">Try Again</button>
+    </div>
+
+    <div *ngIf="!isLoading && !error">
+        <div *ngIf="bookings.length === 0" class="empty-state">
+            <h2>No Bookings Found</h2>
+            <p>You haven't made any bookings yet.</p>
+            <button routerLink="/showtimes-list" class="cta-btn">Browse Showtimes</button>
+        </div>
+
+        <div *ngIf="bookings.length > 0" class="bookings-list">
+            <div *ngFor="let booking of bookings" class="booking-card">
+                <div class="booking-header">
+                    <div class="booking-title">
+                        <h3>Booking #{{ booking.id }}</h3>
+                        <span [class]="'booking-status ' + getBookingStatusClass(booking.bookingStatus)">
+                            {{ booking.bookingStatus }}
+                        </span>
+                    </div>
+                    <p class="booking-date">{{ formatDate(booking.bookingDate) }}</p>
+                </div>
+
+                <div class="booking-details">
+                    <div class="movie-info">
+                        <h4>{{ booking.movieTitle }}</h4>
+                        <p>{{ formatDate(booking.showDateTime) }}</p>
+                        <p>{{ booking.hallName }}</p>
+                    </div>
+                    <div class="ticket-info">
+                        <p><strong>Tickets:</strong> {{ booking.ticketQuantity }}</p>
+                        <p><strong>Seats:</strong> {{ booking.bookedSeats.join(', ') }}</p>
+                        <p class="total-price"><strong>Total:</strong> ${{ booking.totalPrice.toFixed(2) }}</p>
+                    </div>
+                </div>
+
+                <div class="booking-actions">
+                    <button (click)="viewBookingDetails(booking.id)" class="details-btn">View Details</button>
+
+                    <ng-container *ngIf="booking.bookingStatus.toLowerCase() === 'pending'">
+                        <button (click)="proceedToCheckout(booking.id)" class="checkout-btn">Proceed to
+                            Checkout</button>
+                        <button (click)="deleteBooking(booking.id)" class="cancel-btn">Cancel</button>
+                    </ng-container>
+
+                    <button *ngIf="booking.bookingStatus.toLowerCase() === 'confirmed'" class="ticket-btn">View
+                        Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

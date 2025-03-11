@@ -28,6 +28,8 @@ import { SidebarComponent } from './admin-panel/sidebar/sidebar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ShowtimesListComponent } from './components/showtimes-list/showtimes-list.component';
 import { SeatsComponent } from './components/seats/seats.component';
+import { BookingService } from './services/booking-service';
+import { BookingsComponent } from './components/bookings/bookings.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -90,6 +92,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminPanelUserAdminComponent,
     ShowtimesListComponent,
     SeatsComponent,
+    BookingsComponent
   ],
   imports: [
     BrowserModule,

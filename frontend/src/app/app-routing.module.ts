@@ -7,6 +7,8 @@ import { LoginComponent } from './components/login/login.component';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { AuthGuard } from './auth.guard';
 import { SeatsComponent } from './components/seats/seats.component';
+import { BookingService } from './services/booking-service';
+import { BookingsComponent } from './components/bookings/bookings.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -14,6 +16,7 @@ const routes: Routes = [
   { path: 'users', component: UsersComponent },
   { path: 'admin-panel-user-admin', component: AdminPanelUserAdminComponent },
   { path: 'seats/:id', component: SeatsComponent },
+  { path: 'bookings', component: BookingsComponent },
 
   //,
   //{ path: 'movie-list', component: MovieListComponent, canActivate: [AuthGuard] },
