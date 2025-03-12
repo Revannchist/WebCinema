@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SeatService } from '../../services/seats-service';
 import { ShowtimeService } from '../../services/showtime-service';
 import { SeatsDto } from '../../models/dto/seats.dto';
 import { GetShowTimeDto } from '../../models/dto/showtime.dto';
+import { BookingService } from '../../services/booking-service';
+import { AuthService } from '../../auth.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-seats',
@@ -17,24 +20,28 @@ export class SeatsComponent implements OnInit {
   selectedSeats: number[] = [];
   selectedGroups: { [seatId: number]: number[] } = {};
   selectedHall: string | null = null;
-  maxSeats: number = 4;
+  maxSeats: number = 2; 
+  MAX_ALLOWED_SEATS: number = 10; 
   isLoading = true;
   error: string | null = null;
   
-  // Add new properties for showtime integration
   showtime: GetShowTimeDto | null = null;
   totalPrice: number = 0;
+  
+  reservedSeats: number[] = [];
   
   constructor(
     private seatService: SeatService,
     private showtimeService: ShowtimeService,
-    private route: ActivatedRoute
+    private bookingService: BookingService,
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
   
   ngOnInit(): void {
-    // Get showtime ID from route params
     this.route.params.subscribe((params: any) => {
-      const showtimeId = +params['id']; // Convert to number
+      const showtimeId = +params['id'];
       if (showtimeId) {
         this.loadShowtime(showtimeId);
       } else {
@@ -48,10 +55,9 @@ export class SeatsComponent implements OnInit {
     this.showtimeService.getShowTimeById(showtimeId).subscribe({
       next: (showtime: GetShowTimeDto) => {
         this.showtime = showtime;
-        // Set the hall from showtime
         this.selectedHall = showtime.hallName;
-        // Now load the seats
-        this.loadAllSeats();
+        // Load seats and reserved seats for this showtime
+        this.loadSeatsAndReservations(showtimeId);
       },
       error: (err: any) => {
         this.error = 'Failed to load showtime. Please try again later.';
@@ -61,22 +67,74 @@ export class SeatsComponent implements OnInit {
     });
   }
   
-  loadAllSeats(): void {
+  // Load both seats and reservations simultaneously
+  loadSeatsAndReservations(showtimeId: number): void {
     this.isLoading = true;
-    this.seatService.getAllSeats().subscribe({
-      next: (seats: SeatsDto[]) => {
-        this.groupSeatsByHall(seats);
-        // Filter seats by hall ID if showtime has a hall
+    
+    // Use forkJoin to make parallel requests
+    forkJoin({
+      seats: this.seatService.getAllSeats(),
+      bookings: this.bookingService.getAllBookings()
+    }).subscribe({
+      next: (result) => {
+        // Process all seats
+        this.groupSeatsByHall(result.seats);
+        
+        // Filter bookings for current showtime
+        const currentShowtimeBookings = result.bookings.filter((booking:any) => 
+          booking.showDateTime === this.showtime?.showDateTime && 
+          booking.hallName === this.showtime?.hallName &&
+          (booking.bookingStatus === 'Confirmed' || booking.bookingStatus === 'Pending')
+        );
+        
+        // Extract reserved seat IDs
+        this.reservedSeats = [];
+        currentShowtimeBookings.forEach((booking:any) => {
+          if (booking.bookedSeats && Array.isArray(booking.bookedSeats)) {
+            this.reservedSeats.push(...booking.bookedSeats);
+          }
+        });
+        
+        // Set the selected hall
         if (this.showtime) {
           this.selectedHall = this.showtime.hallName;
         } else {
-          // Fallback to first hall if no showtime
           const hallNames = this.getHallNames();
           if (hallNames.length > 0) {
             this.selectedHall = hallNames[0];
           }
         }
+        
         this.isLoading = false;
+        
+        // Calculate initial price
+        this.totalPrice = this.calculateTotalPrice();
+      },
+      error: (err: any) => {
+        this.error = 'Failed to load seats or bookings. Please try again later.';
+        this.isLoading = false;
+        console.error('Error loading data:', err);
+      }
+    });
+  }
+  
+  loadAllSeats(): void {
+    this.isLoading = true;
+    this.seatService.getAllSeats().subscribe({
+      next: (seats: SeatsDto[]) => {
+        this.groupSeatsByHall(seats);
+
+        if (this.showtime) {
+          this.selectedHall = this.showtime.hallName;
+          // If we have a showtime, load bookings to get reserved seats
+          this.loadBookingsForShowtime();
+        } else {
+          const hallNames = this.getHallNames();
+          if (hallNames.length > 0) {
+            this.selectedHall = hallNames[0];
+          }
+          this.isLoading = false;
+        }
         
         // Calculate initial price
         this.totalPrice = this.calculateTotalPrice();
@@ -89,11 +147,38 @@ export class SeatsComponent implements OnInit {
     });
   }
   
+  // Method to load bookings and extract reserved seats
+  loadBookingsForShowtime(): void {
+    this.bookingService.getAllBookings().subscribe({
+      next: (bookings) => {
+        // Filter bookings for current showtime
+        const currentShowtimeBookings = bookings.filter((booking:any) => 
+          booking.showDateTime === this.showtime?.showDateTime && 
+          booking.hallName === this.showtime?.hallName &&
+          (booking.bookingStatus === 'Confirmed' || booking.bookingStatus === 'Pending')
+        );
+        
+        // Extract reserved seat IDs
+        this.reservedSeats = [];
+        currentShowtimeBookings.forEach((booking:any) => {
+          if (booking.bookedSeats && Array.isArray(booking.bookedSeats)) {
+            this.reservedSeats.push(...booking.bookedSeats);
+          }
+        });
+        
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading bookings:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+  
   private groupSeatsByHall(seats: SeatsDto[]): void {
     this.seatsByHall = {};
     this.seatMap = {};
     
-    // First, group by hall
     seats.forEach(seat => {
       if (!this.seatsByHall[seat.hallName]) {
         this.seatsByHall[seat.hallName] = [];
@@ -101,7 +186,6 @@ export class SeatsComponent implements OnInit {
       }
       this.seatsByHall[seat.hallName].push(seat);
       
-      // Assume each seat has row and column properties or extract them from seatNumber
       const row = Math.floor((seat.id - 1) / 15) + 1; // Assuming 15 seats per row
       const col = (seat.id - 1) % 15 + 1;
       
@@ -128,20 +212,23 @@ export class SeatsComponent implements OnInit {
     this.totalPrice = this.calculateTotalPrice();
   }
   
-  // Add method to calculate total price
+  // Calculate total price
   calculateTotalPrice(): number {
     if (!this.showtime) return 0;
     return this.selectedSeats.length * this.showtime.ticketPrice;
   }
   
   toggleSeatSelection(seat: SeatsDto): void {
+    // Don't allow selection of reserved seats
+    if (this.isSeatReserved(seat.id)) {
+      return;
+    }
+    
     const index = this.selectedSeats.indexOf(seat.id);
     
     if (index === -1) {
-      // If not selected, let's handle the selection
       this.selectSeatAndAdjacent(seat);
     } else {
-      // If already selected, unselect the seat and any adjacent ones from the same group
       this.unselectSeatAndAdjacent(seat);
     }
     
@@ -150,60 +237,78 @@ export class SeatsComponent implements OnInit {
   }
   
   selectSeatAndAdjacent(seat: SeatsDto): void {
-    // If we haven't reached the maximum yet
     if (this.selectedSeats.length < this.maxSeats) {
       const remainingSeats = this.maxSeats - this.selectedSeats.length;
       const row = Math.floor((seat.id - 1) / 15) + 1;
       const col = (seat.id - 1) % 15 + 1;
       
-      // Create a group for tracking seats selected together
       const groupSeats: number[] = [seat.id];
       
-      // First, add the selected seat
+      // Add the clicked seat
       this.selectedSeats.push(seat.id);
       
-      // Then, try to find adjacent seats to select (to the right)
       if (remainingSeats > 1 && this.selectedHall) {
+        // First try to select seats to the right
+        let seatsAdded = 0;
         for (let i = 1; i < remainingSeats; i++) {
           const adjacentCol = col + i;
           
-          // Check if adjacent seat exists and is available
-          if (
-            this.seatMap[this.selectedHall][row] && 
-            this.seatMap[this.selectedHall][row][adjacentCol] &&
-            this.seatMap[this.selectedHall][row][adjacentCol].seatType !== 'Unavailable' &&
-            !this.selectedSeats.includes(this.seatMap[this.selectedHall][row][adjacentCol].id)
-          ) {
+          if (this.isSeatAvailable(row, adjacentCol)) {
             const adjacentSeatId = this.seatMap[this.selectedHall][row][adjacentCol].id;
             this.selectedSeats.push(adjacentSeatId);
             groupSeats.push(adjacentSeatId);
+            seatsAdded++;
           } else {
-            // If we can't select to the right, try to the left
+            break; // Stop if we hit an unavailable seat
+          }
+        }
+        
+        // If we couldn't add all seats to the right, try to the left
+        if (seatsAdded < (remainingSeats - 1) && col > 1) {
+          for (let i = 1; i <= (remainingSeats - 1 - seatsAdded); i++) {
             const leftCol = col - i;
-            if (
-              this.seatMap[this.selectedHall][row] && 
-              this.seatMap[this.selectedHall][row][leftCol] &&
-              this.seatMap[this.selectedHall][row][leftCol].seatType !== 'Unavailable' &&
-              !this.selectedSeats.includes(this.seatMap[this.selectedHall][row][leftCol].id)
-            ) {
+            
+            if (this.isSeatAvailable(row, leftCol)) {
               const leftSeatId = this.seatMap[this.selectedHall][row][leftCol].id;
               this.selectedSeats.push(leftSeatId);
               groupSeats.push(leftSeatId);
             } else {
-              // If we can't select in either direction, stop
-              break;
+              break; // Stop if we hit an unavailable seat
             }
           }
         }
       }
       
-      // Store the group selection information
+      // Track which seats were selected as a group
       groupSeats.forEach(seatId => {
         this.selectedGroups[seatId] = groupSeats;
       });
     } else {
       alert(`You can only select up to ${this.maxSeats} seats.`);
     }
+  }
+  
+  isSeatAvailable(row: number, col: number): boolean {
+    if (!this.selectedHall) return false;
+    
+    // Check if seat exists in the map
+    if (!this.seatMap[this.selectedHall][row] || 
+        !this.seatMap[this.selectedHall][row][col]) {
+      return false;
+    }
+    
+    const seatId = this.seatMap[this.selectedHall][row][col].id;
+    
+    return (
+      this.seatMap[this.selectedHall][row][col].seatType !== 'Unavailable' &&
+      !this.selectedSeats.includes(seatId) &&
+      !this.isSeatReserved(seatId) // Check if seat is reserved
+    );
+  }
+  
+  // Method to check if a seat is reserved
+  isSeatReserved(seatId: number): boolean {
+    return this.reservedSeats.includes(seatId);
   }
   
   unselectSeatAndAdjacent(seat: SeatsDto): void {
@@ -218,6 +323,86 @@ export class SeatsComponent implements OnInit {
       }
       // Clean up the group tracking
       delete this.selectedGroups[seatId];
+    });
+  }
+
+  // Update the max seats with validation
+  updateMaxSeats(increment: number): void {
+    const newValue = this.maxSeats + increment;
+    
+    if (newValue >= 1 && newValue <= this.MAX_ALLOWED_SEATS) {
+      this.maxSeats = newValue;
+      
+      // If reducing max seats, unselect excess seats
+      if (increment < 0 && this.selectedSeats.length > this.maxSeats) {
+        // Find the last group selected and remove it
+        const lastSelectedId = this.selectedSeats[this.selectedSeats.length - 1];
+        const lastGroup = this.selectedGroups[lastSelectedId] || [lastSelectedId];
+        
+        this.unselectSeatAndAdjacent(this.findSeatById(lastSelectedId));
+      }
+    }
+  }
+  
+  findSeatById(seatId: number): SeatsDto {
+    if (this.selectedHall) {
+      return this.seatsByHall[this.selectedHall].find(seat => seat.id === seatId)!;
+    }
+    throw new Error('No seat found with that ID');
+  }
+
+  createBooking(): void {
+    if (!this.showtime) {
+      this.error = 'Cannot create booking: No showtime selected';
+      return;
+    }
+    
+    if (this.selectedSeats.length === 0) {
+      this.error = 'Cannot create booking: No seats selected';
+      return;
+    }
+  
+    // Get the current user ID from the auth service
+    const userId = this.authService.getCurrentUserId();
+    
+    // Check if user is logged in
+    if (userId === null) {
+      // If not logged in, redirect to login page
+      alert('Please log in to complete your booking.');
+      this.router.navigate(['/login'], { 
+        queryParams: { 
+          returnUrl: this.router.url 
+        } 
+      });
+      return;
+    }
+  
+    // Create the booking data object according to the API requirements
+    const bookingData = {
+      usersId: userId,
+      showTimesId: this.showtime.id,
+      bookedSeatsIds: this.selectedSeats,
+      ticketQuantity: this.selectedSeats.length,
+      totalPrice: this.totalPrice,
+      bookingStatus: "Pending",
+      bookingDate: new Date().toISOString()
+    };
+  
+    this.isLoading = true;
+    this.bookingService.addBooking(bookingData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        
+        alert(`Booking initiated! Your booking ID is: ${response.id}`);
+        
+        //this.router.navigate(['/booking-confirmation', response.id]); //ovo kad djeno pravio placanje
+        this.router.navigate(['/bookings', response.id]); //privremena ruta nakon sto user selektira sjedista 
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.error = 'Failed to create booking. Please try again.';
+        console.error('Error creating booking:', err);
+      }
     });
   }
   
@@ -247,13 +432,21 @@ export class SeatsComponent implements OnInit {
       return;
     }
     
+    if (this.selectedSeats.length === 0) {
+      alert('Please select at least one seat');
+      return;
+    }
+  
+    // Show confirmation dialog
     const message = `You have selected ${this.getSelectedSeatsCount()} seats.
       Total price: $${this.totalPrice.toFixed(2)}
       Seats: ${this.selectedSeats.join(', ')}
       Movie: ${this.showtime.movieTitle}
       Showtime: ${new Date(this.showtime.showDateTime).toLocaleString()}`;
       
-    alert(message);
-    //checkout or reservation
+    // Ask for confirmation before proceeding
+    if (confirm(`${message}\n\nProceed with booking?`)) {
+      this.createBooking();
+    }
   }
 }

@@ -40,7 +40,7 @@ export class LoginComponent {
             localStorage.setItem('currentUser', JSON.stringify(response));
             localStorage.setItem('currentUserId', response.id.toString());
             alert('Successfully logged in');
-            this.router.navigate(['/movie-list']);
+            this.router.navigate(['/home']);
           }
         },
         error: (error) => {

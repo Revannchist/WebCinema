@@ -13,13 +13,11 @@
 
       <div class="col-md-3">
         <label for="title-filter" class="form-label">Movie</label>
-        <select id="title-filter" class="form-select" [(ngModel)]="filterParams.movieTitle"
-          (ngModelChange)="applyFilters()">
-          <option value="">All Movies</option>
-          <option *ngFor="let title of uniqueMovieTitles" [value]="title">{{title}}</option>
-        </select>
+        <input type="text" id="title-filter" class="form-control" placeholder="Search Movie..."
+        [(ngModel)]="filterParams.movieTitle" (ngModelChange)="applyFilters()">
       </div>
       
+      <!-- 
       <div class="col-md-2">
         <label for="price-filter" class="form-label">Price Range</label>
         <div class="input-group">
@@ -30,7 +28,8 @@
             (ngModelChange)="applyFilters()">
         </div>
       </div>
-
+      -->
+      
       <div class="col-md-2 d-flex align-items-end">
         <button class="btn btn-secondary w-100" (click)="resetFilters()">
           Reset Filters

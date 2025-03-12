@@ -51,7 +51,7 @@ export class ShowtimesListComponent implements OnInit {
     this.loadGenres();
 
     //danasnji datum kao default filter
-    this.filterParams.date = new Date().toISOString().split('T')[0];
+    //this.filterParams.date = new Date().toISOString().split('T')[0];
   }
 
   navigateToSeats(showtimeId: number): void {
@@ -144,7 +144,8 @@ export class ShowtimesListComponent implements OnInit {
 
   resetFilters(): void {
     this.filterParams = {
-      date: new Date().toISOString().split('T')[0], //trenutni datum
+      //date: new Date().toISOString().split('T')[0], //trenutni datum
+      date: '',
       movieTitle: '',
       hallName: '',
       minPrice: null,

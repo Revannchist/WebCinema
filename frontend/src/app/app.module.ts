@@ -30,6 +30,8 @@ import { ShowtimesListComponent } from './components/showtimes-list/showtimes-li
 import { SeatsComponent } from './components/seats/seats.component';
 import { BookingService } from './services/booking-service';
 import { BookingsComponent } from './components/bookings/bookings.component';
+import { BookingDetailsComponent } from './components/booking-details/booking-details.component';
+import { HomeComponent } from './components/home/home.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -52,6 +54,8 @@ const routes: Routes = [
   { path: 'showtimes', component: AdminPanelShowtimesComponent },
   { path: 'admin-panel-users', component: AdminPanelUserAdminComponent },
   { path: 'seats', component: SeatsComponent },
+  { path: 'booking-details', component: BookingDetailsComponent },
+  { path: 'home', component: HomeComponent },
 
 
   {
@@ -92,7 +96,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     AdminPanelUserAdminComponent,
     ShowtimesListComponent,
     SeatsComponent,
-    BookingsComponent
+    BookingsComponent,
+    BookingDetailsComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

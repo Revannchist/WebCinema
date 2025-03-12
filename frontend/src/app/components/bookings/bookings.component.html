@@ -12,14 +12,14 @@
     </div>
 
     <div *ngIf="!isLoading && !error">
-        <div *ngIf="bookings.length === 0" class="empty-state">
-            <h2>No Bookings Found</h2>
-            <p>You haven't made any bookings yet.</p>
+        <div *ngIf="pendingBookings.length === 0" class="empty-state">
+            <h2>No Pending Bookings</h2>
+            <p>You don't have any pending bookings in your cart.</p>
             <button routerLink="/showtimes-list" class="cta-btn">Browse Showtimes</button>
         </div>
-
-        <div *ngIf="bookings.length > 0" class="bookings-list">
-            <div *ngFor="let booking of bookings" class="booking-card">
+        <div *ngIf="pendingBookings.length > 0" class="bookings-list">
+            <div *ngFor="let booking of pendingBookings" class="booking-card">
+                
                 <div class="booking-header">
                     <div class="booking-title">
                         <h3>Booking #{{ booking.id }}</h3>
@@ -44,8 +44,7 @@
                 </div>
 
                 <div class="booking-actions">
-                    <button (click)="viewBookingDetails(booking.id)" class="details-btn">View Details</button>
-
+                    <button (click)="viewBookingDetails(booking.id)" class="details-btn">View Details</button> 
                     <ng-container *ngIf="booking.bookingStatus.toLowerCase() === 'pending'">
                         <button (click)="proceedToCheckout(booking.id)" class="checkout-btn">Proceed to
                             Checkout</button>

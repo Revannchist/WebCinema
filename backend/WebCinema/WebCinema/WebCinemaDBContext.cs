@@ -16,9 +16,10 @@ namespace WebCinema
                 new Genres { Id = 1, Name = "Horror" },
                 new Genres { Id = 2, Name = "Action" },
                 new Genres { Id = 3, Name = "Thriller" },
-                new Genres { Id = 4, Name = "Western" },
-                new Genres { Id = 5, Name = "Romance" }
-                //dodat ostale zanrove pa samo onda: add-migration GenreData -> update-database
+                new Genres { Id = 4, Name = "Drama" },
+                new Genres { Id = 5, Name = "Science Fiction" },
+                new Genres { Id = 6, Name = "Historical" }
+
                 );
 
             modelBuilder.Entity<Cities>().HasData(
@@ -27,8 +28,11 @@ namespace WebCinema
                 );
 
             modelBuilder.Entity<Countries>().HasData(
-                new Countries { Id = 1, Name = "BiH" },
-                new Countries { Id = 2, Name = "Germany" }
+                new Countries { Id = 1, Name = "United States" },
+                new Countries { Id = 2, Name = "Canada" },
+                new Countries { Id = 3, Name = "Germany" },
+                new Countries { Id = 4, Name = "United Kingdom" },
+                new Countries { Id = 5, Name = "France" }
                 );
 
             modelBuilder.Entity<Roles>().HasData(
@@ -47,6 +51,101 @@ namespace WebCinema
                 new Halls { Id = 1, TheatersID = 1, HallName = "Hall1", Capacity = 40, HallType = "Medium" },
                 new Halls { Id = 2, TheatersID = 1, HallName = "Hall2", Capacity = 60, HallType = "Big" }
                 );
+
+            modelBuilder.Entity<Directors>().HasData(
+                new Directors { Id = 1, FirstName = "Ridley", LastName = "Scott" },
+                new Directors { Id = 2, FirstName = "Denis", LastName = "Villeneuve" }
+                );
+
+            modelBuilder.Entity<Actors>().HasData(
+                new Actors { Id = 1, FirstName = "Timothee", LastName = "Chalamet" },
+                new Actors { Id = 2, FirstName = "Rebecca", LastName = "Ferguson" },
+                new Actors { Id = 3, FirstName = "Oscar", LastName = "Isaac" },
+                new Actors { Id = 4, FirstName = "Russel", LastName = "Crowe" },
+                new Actors { Id = 5, FirstName = "Joaquin", LastName = "Phoenix" }
+                );
+
+            // Setup variables
+            var seatList = new List<Seats>();
+            int seatId = 1;
+
+            // Hall 1: 4 rows of 15 seats (total 60 seats)
+            for (int row = 1; row <= 4; row++)
+            {
+                for (int seatNum = 1; seatNum <= 15; seatNum++)
+                {
+                    string seatType = "Regular";
+
+                    // Define Love seats
+                    if ((row == 1 || row == 2) && (seatNum == 7 || seatNum == 8))
+                    {
+                        seatType = "Love";
+                    }
+                    else if (row == 3 && (seatNum >= 6 && seatNum <= 9))
+                    {
+                        seatType = "Love";
+                    }
+
+                    // Define Accessible seats
+                    if (row == 4 && (seatNum == 1 || seatNum == 2 || seatNum >= 13))
+                    {
+                        seatType = "Accessible";
+                    }
+
+                    // Calculate absolute seat number (1-15 for row 1, 16-30 for row 2, etc.)
+                    int absoluteSeatNum = ((row - 1) * 15) + seatNum;
+
+                    seatList.Add(new Seats
+                    {
+                        Id = seatId++,
+                        HallsId = 1,
+                        SeatNumber = absoluteSeatNum,  // Using absolute seat number
+                        SeatType = seatType
+                    });
+                }
+            }
+
+            // Hall 2: 6 rows of 15 seats (total 90 seats)
+            for (int row = 1; row <= 6; row++)
+            {
+                for (int seatNum = 1; seatNum <= 15; seatNum++)
+                {
+                    string seatType = "Regular";
+
+                    // Define Love seats
+                    if (row == 2 && ((seatNum == 4 || seatNum == 5) || (seatNum == 11 || seatNum == 12)))
+                    {
+                        seatType = "Love";
+                    }
+                    else if (row == 4 && (seatNum >= 5 && seatNum <= 8))
+                    {
+                        seatType = "Love";
+                    }
+
+                    // Define Accessible seats
+                    if (row == 6 && (seatNum >= 1 && seatNum <= 3))
+                    {
+                        seatType = "Accessible";
+                    }
+                    else if (row == 5 && (seatNum >= 13 && seatNum <= 15))
+                    {
+                        seatType = "Accessible";
+                    }
+
+                    // Calculate absolute seat number
+                    int absoluteSeatNum = ((row - 1) * 15) + seatNum;
+
+                    seatList.Add(new Seats
+                    {
+                        Id = seatId++,
+                        HallsId = 2,
+                        SeatNumber = absoluteSeatNum,  // Using absolute seat number
+                        SeatType = seatType
+                    });
+                }
+            }
+
+            modelBuilder.Entity<Seats>().HasData(seatList.ToArray());
 
 
             //------------------------------------------------------//

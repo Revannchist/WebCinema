@@ -13,15 +13,16 @@ export class LandingPageComponent {
 
   onEnterClick(): void {
     console.log('Enter clicked');
+    this.router.navigate(['/home']);
+
   }
 
   onLoginClick(): void {
     console.log('Login clicked');
-  }
-
-  goToLogin(): void {
     this.router.navigate(['/login']);
   }
+
+
 
   /*
   onDemoClick(version: 'dark' | 'light'): void {

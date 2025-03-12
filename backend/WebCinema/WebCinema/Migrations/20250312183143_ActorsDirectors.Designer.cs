@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCinema;
 
@@ -11,9 +12,11 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    partial class WebCinemaDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250312183143_ActorsDirectors")]
+    partial class ActorsDirectors
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,27 +178,12 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "United States"
+                            Name = "BiH"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Canada"
-                        },
-                        new
-                        {
-                            Id = 3,
                             Name = "Germany"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "United Kingdom"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "France"
                         });
                 });
 
@@ -274,7 +262,7 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 5,
-                            Name = "Science Fiction"
+                            Name = "Action"
                         },
                         new
                         {

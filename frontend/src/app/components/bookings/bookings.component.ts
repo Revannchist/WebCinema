@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { BookingService } from '../../services/booking-service';
 import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart-service';
 
 @Component({
@@ -12,42 +11,54 @@ import { CartService } from '../../services/cart-service';
 })
 export class BookingsComponent implements OnInit {
   bookings: any[] = [];
+  pendingBookings: any[] = [];
   isLoading: boolean = false;
   error: string | null = null;
-
+  
   constructor(
     private bookingService: BookingService,
     private authService: AuthService,
     private router: Router,
     private cartService: CartService
   ) { }
-
+  
   ngOnInit(): void {
     this.loadUserBookings();
   }
-
+  
   loadUserBookings(): void {
     this.isLoading = true;
     this.error = null;
-
-    const token = this.authService.getDecodedToken();
-    console.log('Full token payload:', token);
-  
+     
     const userName = this.authService.getCurrentUserName();
+    //console.log('Current User Name:', userName);
+     
     if (!userName) {
       this.error = 'You must be logged in to view bookings';
       this.isLoading = false;
-      console.log('Current User:', userName);
       return;
     }
-  
-    console.log('Current User:', userName);
+     
     this.bookingService.getAllBookings().subscribe({
       next: (bookings) => {
-        console.log('Raw bookings data:', bookings);
-        this.bookings = bookings.filter((booking: any) => booking.userName === userName);
-        console.log('Filtered bookings:', this.bookings);
+        //console.log('All Bookings:', bookings);
+         
+        // Get all bookings for this user
+        this.bookings = bookings.filter((booking: any) =>
+          booking.userName?.trim().toLowerCase() === userName.trim().toLowerCase()
+        );
+         
+        // Filter only pending bookings
+        this.pendingBookings = this.bookings.filter(
+          booking => booking.bookingStatus.toLowerCase() === 'pending'
+        );
+         
+        console.log('Filtered Bookings:', this.bookings);
+        console.log('Pending Bookings:', this.pendingBookings);
         this.isLoading = false;
+         
+        // Update cart count - only include PENDING bookings
+        this.cartService.updateCartCount(this.pendingBookings.length);
       },
       error: (err) => {
         console.error('Error loading bookings:', err);
@@ -57,19 +68,17 @@ export class BookingsComponent implements OnInit {
     });
   }
   
-
   deleteBooking(bookingId: number): void {
     if (confirm('Are you sure you want to cancel this booking?')) {
       this.bookingService.deleteBookingById(bookingId).subscribe({
         next: () => {
+          // Remove the deleted booking from both arrays
           this.bookings = this.bookings.filter(booking => booking.id !== bookingId);
+          this.pendingBookings = this.pendingBookings.filter(booking => booking.id !== bookingId);
           alert('Booking cancelled successfully!');
-          
-          // Update the cart count after deleting a booking
-          const pendingBookings = this.bookings.filter(
-            booking => booking.bookingStatus.toLowerCase() === 'pending'
-          ).length;
-          this.cartService.updateCartCount(pendingBookings);
+           
+          // Update cart count with the new pendingBookings count
+          this.cartService.updateCartCount(this.pendingBookings.length);
         },
         error: (err) => {
           console.error('Error cancelling booking:', err);
@@ -78,15 +87,23 @@ export class BookingsComponent implements OnInit {
       });
     }
   }
-
-  viewBookingDetails(bookingId: number): void {
-    this.router.navigate(['/booking-details', bookingId]);
+  
+  viewBookingDetails(showtimeId: number | undefined) {
+    //console.log('Navigating to seats with showtimeId:', showtimeId);
+  
+    if (!showtimeId) {
+      console.error('Error: showtimeId is undefined!');
+      return;
+    }
+  
+    this.router.navigate(['/seats', showtimeId]);
   }
-
+  
+  
   proceedToCheckout(bookingId: number): void {
     this.router.navigate(['/checkout', bookingId]);
   }
-
+  
   getBookingStatusClass(status: string): string {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -99,7 +116,7 @@ export class BookingsComponent implements OnInit {
         return '';
     }
   }
-
+  
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',

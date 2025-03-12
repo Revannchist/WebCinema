@@ -35,38 +35,30 @@ namespace WebCinema.Controllers
 
             return Unauthorized();
         }
-     
+
         private string GenerateJwtToken(string username)
         {
             var jwtSettings = _config.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var user = _dbContext.Users
                 .Include(u => u.Roles)
                 .FirstOrDefault(u => u.Username == username);
-
             if (user == null)
                 return null;
-
             var role = user.Roles?.Name ?? "User";  // Default to "User" if role is null
-
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, role)
-
-                //new Claim("name", username),
-                //new Claim("role", "Admin")
-            };
-
+                 new Claim(ClaimTypes.Name, username),
+                 new Claim(ClaimTypes.Role, role),
+                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) // Add this line to include user ID
+    };
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: creds);
-
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 

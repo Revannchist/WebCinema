@@ -57,16 +57,17 @@
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col" *ngFor="let movie of movies">
       <div class="card h-100">
-
-        <img *ngIf="moviePosters[movie.id]" [src]="moviePosters[movie.id]?.image" class="card-img-top"
-          [alt]="movie.title + ' poster'" style="height: 300px; object-fit: cover;">
-
-        <!-- Placeholder if no poster -->
-        <div *ngIf="!moviePosters[movie.id]"
-          class="card-img-top bg-secondary d-flex justify-content-center align-items-center" style="height: 300px;">
-          <span class="text-white">No Poster Available</span>
+        <div class="poster-container">
+          <!-- Movie poster with full display -->
+          <img *ngIf="moviePosters[movie.id]" [src]="moviePosters[movie.id]?.image" class="card-img-top"
+            [alt]="movie.title + ' poster'">
+    
+          <!-- Placeholder if no poster -->
+          <div *ngIf="!moviePosters[movie.id]" class="poster-placeholder">
+            <span>No Poster Available</span>
+          </div>
         </div>
-
+    
         <div class="card-body">
           <h5 class="card-title">{{movie.title}}</h5>
           <p class="card-text">{{movie.description}}</p>

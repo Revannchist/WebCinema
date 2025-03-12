@@ -54,46 +54,73 @@ namespace WebCinema.Services
 
         public async Task<List<ShowTimesDto>> GetAllShowTimesAsync(CancellationToken cancellationToken = default)
         {
+            var now = DateTime.UtcNow;
+
             var showtimes = await _dbContext.ShowTimes
                 .Include(s => s.Movies)
                 .Include(s => s.Halls)
-                .Select(s => new ShowTimesDto
-                {
-                    Id = s.Id,
-                    MoviesId = s.MoviesId,
-                    MovieTitle = s.Movies.Title,
-                    HallsId = s.HallsId,
-                    HallName = s.Halls.HallName,
-                    ShowDateTime = s.ShowDateTime,
-                    TicketPrice = s.TicketPrice,
-                    IsActive = s.IsActive,
-                })
                 .ToListAsync(cancellationToken);
 
-            return showtimes;
+            bool changesMade = false;
+            foreach (var showtime in showtimes)
+            {
+                if (showtime.ShowDateTime < now && showtime.IsActive)
+                {
+                    showtime.IsActive = false;
+                    changesMade = true;
+                }
+            }
+
+            if (changesMade)
+            {
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            return showtimes.Select(s => new ShowTimesDto
+            {
+                Id = s.Id,
+                MoviesId = s.MoviesId,
+                MovieTitle = s.Movies.Title,
+                HallsId = s.HallsId,
+                HallName = s.Halls.HallName,
+                ShowDateTime = s.ShowDateTime,
+                TicketPrice = s.TicketPrice,
+                IsActive = s.IsActive
+            }).ToList();
         }
+
 
         public async Task<ShowTimesDto> GetShowTimesByIdAsync(int id, CancellationToken cancellationToken = default)
         {
+            var now = DateTime.UtcNow;
+
             var showtime = await _dbContext.ShowTimes
                 .Include(s => s.Movies)
                 .Include(s => s.Halls)
-                .Where(x => x.Id == id)
-                .Select(s => new ShowTimesDto
-                {
-                    Id = s.Id,
-                    MoviesId = s.MoviesId,
-                    MovieTitle = s.Movies.Title,
-                    HallsId = s.HallsId,
-                    HallName = s.Halls.HallName,
-                    ShowDateTime = s.ShowDateTime,
-                    TicketPrice = s.TicketPrice,
-                    IsActive = s.IsActive,
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-            return showtime;
+            if (showtime == null)
+                return null;
+
+            if (showtime.ShowDateTime < now && showtime.IsActive)
+            {
+                showtime.IsActive = false;
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            return new ShowTimesDto
+            {
+                Id = showtime.Id,
+                MoviesId = showtime.MoviesId,
+                MovieTitle = showtime.Movies.Title,
+                HallsId = showtime.HallsId,
+                HallName = showtime.Halls.HallName,
+                ShowDateTime = showtime.ShowDateTime,
+                TicketPrice = showtime.TicketPrice,
+                IsActive = showtime.IsActive
+            };
         }
+
 
         public async Task<ShowTimesDto?> UpdateShowTimesAsync(int id, ShowTimesUpdateDto updateDto, CancellationToken cancellationToken = default)
         {
