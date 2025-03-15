@@ -264,7 +264,7 @@ export class AdminPanelUserAdminComponent implements OnInit {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUserId');
     
-    this.router.navigate(['/']);
+    this.router.navigate(['/landing-page']); //nakon sto se admin logout vrati ga na landing page
   }
 
   nextPage(): void {

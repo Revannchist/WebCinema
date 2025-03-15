@@ -48,8 +48,8 @@ namespace WebCinema
                 );
 
             modelBuilder.Entity<Halls>().HasData(
-                new Halls { Id = 1, TheatersID = 1, HallName = "Hall1", Capacity = 40, HallType = "Medium" },
-                new Halls { Id = 2, TheatersID = 1, HallName = "Hall2", Capacity = 60, HallType = "Big" }
+                new Halls { Id = 1, TheatersID = 1, HallName = "Hall1", Capacity = 60, HallType = "Medium" },
+                new Halls { Id = 2, TheatersID = 1, HallName = "Hall2", Capacity = 90, HallType = "Big" }
                 );
 
             modelBuilder.Entity<Directors>().HasData(

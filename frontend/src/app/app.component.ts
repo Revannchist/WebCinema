@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
   showNavbar = false;
   isLoggedIn = false;
   cartItemCount = 0;
-  
+
   navbarRoutes = [
     '/home',
     '/movie-list',
@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
     '/login',
     '/register'
   ];
-  
+
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -48,13 +48,13 @@ export class AppComponent implements OnInit {
         currentRoute === route || currentRoute.startsWith(route + '/')) ||
         isSeatRoute || isBookingRoute;
     });
-    
+
     this.cartService.cartItemCount$.subscribe(count => {
       console.log('Cart count in navbar:', count);
       this.cartItemCount = count;
     });
   }
-  
+
   ngOnInit(): void {
     this.checkAuthStatus();
     this.authService.authStatus$.subscribe((isLoggedIn: boolean) => {
@@ -67,22 +67,28 @@ export class AppComponent implements OnInit {
       }
     });
   }
-  
+
   checkAuthStatus(): void {
     this.isLoggedIn = this.authService.isAuthenticated();
     if (this.isLoggedIn) {
       this.cartService.refreshCartCount();
     }
   }
-  
+
   // Remove the loadCartItemCount method from before since we're now using refreshCartCount
-  
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
-  
+
   onSidebarCollapsedChange(collapsed: boolean): void {
     this.sidebarCollapsed = collapsed;
+  }
+
+  // Add this method to your AppComponent class
+  isAdmin(): boolean {
+    const role = this.authService.getUserRole();
+    return role === 'Admin' || role === 'admin';
   }
 }

@@ -239,3 +239,26 @@
     display: none;
   }
 }
+
+.back-to-home-btn {
+  margin-top: auto; /* Pushes it to the bottom */
+  border-top: 1px solid #edf2f7; /* Separate it visually */
+  cursor: pointer; /* Ensures it behaves like a button */
+  user-select: none; /* Prevents text selection */
+}
+
+.back-to-home-btn:hover {
+  background-color: #f7fafc;
+}
+
+.back-to-home-btn .menu-icon {
+  color: #e53e3e; /* Red icon for visibility */
+}
+
+.sidebar.collapsed .back-to-home-btn {
+  justify-content: center;
+}
+
+.sidebar.collapsed .back-to-home-btn .menu-label {
+  opacity: 0;
+}

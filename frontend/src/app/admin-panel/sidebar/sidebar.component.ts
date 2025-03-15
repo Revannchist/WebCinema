@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface MenuItem {
   icon: string;
@@ -13,17 +14,24 @@ interface MenuItem {
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {
+
+  constructor(private router: Router) {}
+
   @Input() collapsed = false;
   @Output() collapsedChange = new EventEmitter<boolean>();
   @Input() rememberState = true;
   isAnimating = false;
   
   menuItems: MenuItem[] = [
-    { icon: 'home', label: 'Dashboard', route: '/admin' },
+    { icon: 'home', label: 'Dashboard', route: '/admin/dashboard' }, // Ensure it's '/admin/dashboard'
     { icon: 'film', label: 'Movies', route: '/admin/movies', badge: 3 },
     { icon: 'calendar', label: 'Showtimes', route: '/admin/showtimes' },
     { icon: 'users', label: 'Users', route: '/admin/users' }
   ];
+
+  goToHome(): void {
+    this.router.navigate(['/home']); // Redirects to home page
+  }
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent): void {
@@ -43,6 +51,8 @@ export class SidebarComponent {
     }
     this.checkScreenSize();
   }
+
+  
 
   @HostListener('window:resize')
   checkScreenSize(): void {

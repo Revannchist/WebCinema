@@ -362,12 +362,10 @@ export class SeatsComponent implements OnInit {
       return;
     }
   
-    // Get the current user ID from the auth service
     const userId = this.authService.getCurrentUserId();
     
     // Check if user is logged in
     if (userId === null) {
-      // If not logged in, redirect to login page
       alert('Please log in to complete your booking.');
       this.router.navigate(['/login'], { 
         queryParams: { 
@@ -393,6 +391,14 @@ export class SeatsComponent implements OnInit {
       next: (response) => {
         this.isLoading = false;
         
+        // to reflect the change in the UI
+        this.reservedSeats = [...this.reservedSeats, ...this.selectedSeats];
+        
+        // Clear the selection
+        this.selectedSeats = [];
+        this.selectedGroups = {};
+        this.totalPrice = 0;
+        
         alert(`Booking initiated! Your booking ID is: ${response.id}`);
         
         //this.router.navigate(['/booking-confirmation', response.id]); //ovo kad djeno pravio placanje
@@ -400,8 +406,20 @@ export class SeatsComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        this.error = 'Failed to create booking. Please try again.';
         console.error('Error creating booking:', err);
+        
+        // Check if there's an error message from the API
+        if (err && err.error) {
+          this.error = `Booking error: ${err.error}`;
+          alert(this.error);
+          
+          // Refresh the seat data to get the latest availability
+          if (this.showtime) {
+            this.loadSeatsAndReservations(this.showtime.id);
+          }
+        } else {
+          this.error = 'Failed to create booking. Please try again.';
+        }
       }
     });
   }

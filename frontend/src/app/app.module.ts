@@ -9,14 +9,13 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { JwtModule } from '@auth0/angular-jwt';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './auth.interceptor';
-import { RouterModule, Routes } from '@angular/router';
 import { GenresComponent } from './components/genres/genres.component';
 import { CountriesComponent } from './components/countries/countries.component';
 import { MoviesComponent } from './components/movies/movies.component';
 import { ActorsComponent } from './components/actors/actors.component';
 import { DirectorsComponent } from './components/directors/directors.component';
 import { LandingPageComponent } from './components/landing-page/landing-page.component';
-import { AdminPanelComponentComponent } from './admin-panel/admin-panel/admin-panel.component.component';
+import { AdminPanelComponent } from './admin-panel/admin-panel/admin-panel.component';
 import { AdminPanelMoviesComponent } from './admin-panel/admin-panel-movies/admin-panel-movies.component';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { UsersComponent } from './components/users/users.component';
@@ -37,41 +36,6 @@ export function tokenGetter() {
   return localStorage.getItem('token');
 }
 
-const routes: Routes = [
-  { path: 'genres', component: GenresComponent },
-  { path: 'countries', component: CountriesComponent },
-  { path: 'actors', component: ActorsComponent },
-  { path: 'directors', component: DirectorsComponent },
-  { path: 'landing-page', component: LandingPageComponent },
-  { path: 'movie-list', component: MovieListComponent },
-  { path: 'users', component: UsersComponent },
-  { path: 'showtimes-list', component: ShowtimesListComponent },
-
-
-  { path: 'movies', component: MoviesComponent },
-  { path: 'admin-panel-showtimes', component: AdminPanelShowtimesComponent },
-  { path: 'admin-panel-movies', component: AdminPanelMoviesComponent },
-  { path: 'showtimes', component: AdminPanelShowtimesComponent },
-  { path: 'admin-panel-users', component: AdminPanelUserAdminComponent },
-  { path: 'seats', component: SeatsComponent },
-  { path: 'booking-details', component: BookingDetailsComponent },
-  { path: 'home', component: HomeComponent },
-
-
-  {
-    path: 'admin',
-    component: AdminPanelComponentComponent,
-    children: [
-      { path: '', redirectTo: 'admin', pathMatch: 'full' }, // Default admin page
-      { path: 'movies', component: AdminPanelMoviesComponent },
-      { path: 'showtimes', component: AdminPanelShowtimesComponent },
-      { path: 'users', component: AdminPanelUserAdminComponent },
-    ]
-  },
-
-  { path: '**', redirectTo: 'landing-page' }
-];
-
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
@@ -90,7 +54,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoginComponent,
     PasswordStrengthComponent,
     SidebarComponent,
-    AdminPanelComponentComponent,
+    AdminPanelComponent,
     AdminPanelShowtimesComponent,
     AdminPanelMoviesComponent,
     AdminPanelUserAdminComponent,
@@ -108,12 +72,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    RouterModule.forRoot(routes, {
-
-      scrollPositionRestoration: 'enabled',
-      anchorScrolling: 'enabled',
-    }),
-
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -130,7 +88,6 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     })
   ],
-
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

@@ -345,9 +345,9 @@
     <a routerLink="/">🎬 WebCinema</a>
   </div>
   <ul class="nav-links">
+    <li *ngIf="isAdmin()"><a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a></li>
     <li><a routerLink="/home" routerLinkActive="active">Home</a></li>
     <li><a routerLink="/movie-list" routerLinkActive="active">Movies</a></li>
-    <!-- <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>  Namjestit da se dashboard samo pojavi kad je admin logiran-->
     <li><a routerLink="/showtimes-list" routerLinkActive="active">Showtimes</a></li>
     <li *ngIf="isLoggedIn">
       <a routerLink="/bookings" class="cart-icon" routerLinkActive="active">
@@ -363,7 +363,6 @@
 <div class="app-container">
   <app-sidebar *ngIf="isAdminRoute" [collapsed]="sidebarCollapsed" (collapsedChange)="onSidebarCollapsedChange($event)">
   </app-sidebar>
-
   <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed && isAdminRoute"
     [class.no-sidebar]="!isAdminRoute">
     <div class="content-wrapper" [@fadeAnimation]>

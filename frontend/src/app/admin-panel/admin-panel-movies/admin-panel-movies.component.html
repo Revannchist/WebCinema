@@ -40,7 +40,7 @@
         <!-- Genre Multi-select Dropdown -->
         <div class="col-md-2">
           <div class="dropdown-container">
-            <div class="selected-options" (click)="isGenreDropdownOpen = !isGenreDropdownOpen">
+            <div class="selected-options" (click)="toggleGenreDropdown($event)">
               <div class="selected-items">
                 <span *ngFor="let genreId of filterParams.genreIds" class="selected-tag">
                   {{ getGenreName(genreId) }}
@@ -67,7 +67,7 @@
         <!-- Actor Multi-select Dropdown -->
         <div class="col-md-2">
           <div class="dropdown-container">
-            <div class="selected-options" (click)="isActorDropdownOpen = !isActorDropdownOpen">
+            <div class="selected-options" (click)="toggleActorDropdown($event)">
               <div class="selected-items">
                 <span *ngFor="let actorId of filterParams.actorIds" class="selected-tag">
                   {{ getActorName(actorId) }}

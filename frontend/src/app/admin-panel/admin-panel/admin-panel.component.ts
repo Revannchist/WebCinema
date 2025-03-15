@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
-  selector: 'app-admin-panel',// Fixed selector
-  templateUrl: './admin-panel.component.component.html',
-  styleUrl: './admin-panel.component.component.css',
+  selector: 'app-admin-panel',
+  templateUrl: './admin-panel.component.html',
+  styleUrl: './admin-panel.component.css',
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -15,6 +15,6 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ]
   
 })
-export class AdminPanelComponentComponent {
+export class AdminPanelComponent {
   sidebarCollapsed = false;
 }

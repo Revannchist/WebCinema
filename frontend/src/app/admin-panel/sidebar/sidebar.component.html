@@ -18,6 +18,14 @@
     </div>
     <span class="menu-label">{{item.label}}</span>
   </a>
+
+  <a (click)="goToHome()" class="menu-item back-to-home-btn">
+    <div class="menu-icon">
+      <i class="fas fa-home"></i>
+    </div>
+    <span class="menu-label">Back to Home</span>
+  </a>
+  
   
   <div class="sidebar-footer" [class.collapsed]="collapsed">
     <div class="user-info">

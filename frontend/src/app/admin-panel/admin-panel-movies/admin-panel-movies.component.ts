@@ -465,6 +465,26 @@ export class AdminPanelMoviesComponent {
     this.filterMovies();
   }
 
+  toggleGenreDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isGenreDropdownOpen = !this.isGenreDropdownOpen;
+    
+    // Close actor dropdown when opening genre dropdown
+    if (this.isGenreDropdownOpen) {
+      this.isActorDropdownOpen = false;
+    }
+  }
+  
+  toggleActorDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isActorDropdownOpen = !this.isActorDropdownOpen;
+    
+    // Close genre dropdown when opening actor dropdown
+    if (this.isActorDropdownOpen) {
+      this.isGenreDropdownOpen = false;
+    }
+  }
+
   //mozda ovo kasnije uradim
   getGenresString(movie: MovieGetDto): string {
     return movie?.moviesGenresIds?.map(genreId => this.getGenreName(genreId)).join(', ') || 'N/A';
