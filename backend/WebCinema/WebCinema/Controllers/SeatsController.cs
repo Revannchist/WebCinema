@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebCinema.Interfaces;
 using WebCinema.Models;
 using WebCinema.Services;
@@ -15,6 +16,7 @@ namespace WebCinema.Controllers
             _seatsService = seatsService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> AddSeats(Seats seats)
         {
@@ -26,6 +28,7 @@ namespace WebCinema.Controllers
             return Ok(createdSeats);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> DeleteSeatsById(int id)
         {
@@ -37,6 +40,7 @@ namespace WebCinema.Controllers
             return Ok(deletedSeats);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> UpdateSeats(int id, Seats seats)
         {
@@ -48,6 +52,7 @@ namespace WebCinema.Controllers
             return Ok(updatedSeats);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetSeatsById(int id)
         {
@@ -59,6 +64,7 @@ namespace WebCinema.Controllers
             return Ok(seats);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllSeats()
         {

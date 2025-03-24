@@ -21,7 +21,7 @@ namespace WebCinema.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> AddShowTime(ShowTimes showTimes, CancellationToken cancellationToken)
         {
@@ -41,7 +41,7 @@ namespace WebCinema.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> DeleteShowTimeById(int id, CancellationToken cancellationToken)
         {
@@ -61,7 +61,7 @@ namespace WebCinema.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> UpdateShowTime(int id, ShowTimesUpdateDto updateDto, CancellationToken cancellationToken)
         {

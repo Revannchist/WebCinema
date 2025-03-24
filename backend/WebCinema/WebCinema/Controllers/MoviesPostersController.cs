@@ -60,6 +60,7 @@ namespace WebCinema.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllMoviePosters(CancellationToken cancellationToken)
         {
@@ -75,6 +76,7 @@ namespace WebCinema.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetPosterByMovieId(int movieId, CancellationToken cancellationToken)
         {
@@ -94,6 +96,7 @@ namespace WebCinema.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetMoviePosterByMovieTitle(string title, CancellationToken cancellationToken)
         {

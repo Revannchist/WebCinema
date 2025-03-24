@@ -20,7 +20,7 @@ namespace WebCinema.Controllers
             _logger = logger;
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> AddBooking(BookingsAddDto bookingDto, CancellationToken cancellationToken)
         {
@@ -53,7 +53,7 @@ namespace WebCinema.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> DeleteBookingsById(int id, CancellationToken cancellationToken)
         {
@@ -79,9 +79,7 @@ namespace WebCinema.Controllers
         }
 
 
-        //[Authorize(Roles = "Admin")]
-        //[Authorize(Roles = "User")]
-
+        [Authorize(Roles = "Admin,User")]
         [HttpPost]
         public async Task<IActionResult> UpdateBookings(int id, BookingsEditDto bookingsDto, CancellationToken cancellationToken)
         {
@@ -110,7 +108,7 @@ namespace WebCinema.Controllers
             }
         }
 
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetBookingsById(int id, CancellationToken cancellationToken)
         {
@@ -135,6 +133,7 @@ namespace WebCinema.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllBookings(CancellationToken cancellationToken)
         {
