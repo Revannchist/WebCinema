@@ -65,6 +65,32 @@ namespace WebCinema
                 new Actors { Id = 5, FirstName = "Joaquin", LastName = "Phoenix" }
                 );
 
+            modelBuilder.Entity<Users>().HasData(
+                new Users //Admin User
+                {
+                    Id = 1,
+                    Username = "adminUser",
+                    Email = "admin@example.com",
+                    Password = "SecurePass123",
+                    FirstName = "Admin",
+                    LastName = "User",
+                    DateOfBirth = new DateTime(1990, 5, 15),
+                    RoleId = 1
+                },
+                new Users //BasicUser
+                {
+                    Id = 2,
+                    Username = "basicUser",
+                    Email = "user@example.com",
+                    Password = "UserPass456",
+                    FirstName = "Basic",
+                    LastName = "User",
+                    DateOfBirth = new DateTime(1995, 8, 22),
+                    RoleId = 2
+                }
+                );
+
+
             // Setup variables
             var seatList = new List<Seats>();
             int seatId = 1;

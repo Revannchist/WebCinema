@@ -528,12 +528,15 @@
                 <input type="file" id="editPosterImage" class="form-control" (change)="onFileSelected($event)"
                   accept="image/jpeg,image/png" #fileInput>
                 <small class="text-muted">Select a new image to update the poster (JPEG or PNG, max 5MB)</small>
-                <div *ngIf="imagePreview" class="mt-2">
+                <div *ngIf="imagePreview" class="mt-2 text-center">
                   <img [src]="imagePreview" style="max-width: 100%; max-height: 200px;">
-                  <button *ngIf="imagePreview && !selectedImage" type="button" class="btn btn-sm btn-danger mt-1"
-                    (click)="clearPosterImage()">Remove Current Poster</button>
+                  <div *ngIf="imagePreview && !selectedImage" class="mt-2">
+                    <button type="button" class="btn btn-sm btn-danger" (click)="clearPosterImage()">
+                      Remove Current Poster
+                    </button>
+                  </div>
                 </div>
-              </div>
+            </div>
 
               <button type="submit" class="btn btn-primary"
                 [disabled]="!movieEditForm.valid || movieToEdit.genreIds.length === 0 || movieToEdit.actorIds.length === 0"

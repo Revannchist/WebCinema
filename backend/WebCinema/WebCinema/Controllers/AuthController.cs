@@ -51,8 +51,9 @@ namespace WebCinema.Controllers
             {
                  new Claim(ClaimTypes.Name, username),
                  new Claim(ClaimTypes.Role, role),
-                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) // Add this line to include user ID
-    };
+                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            };
+
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],

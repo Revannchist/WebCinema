@@ -82,7 +82,6 @@ namespace WebCinema.Controllers
         }
 
         [AllowAnonymous]
-
         [HttpPost]
         public async Task<IActionResult> UpdateMovieBasicInfo(int id, MoviesUpdateBasicDto dto, CancellationToken cancellationToken)
         {

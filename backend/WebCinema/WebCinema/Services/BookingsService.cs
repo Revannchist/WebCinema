@@ -177,6 +177,7 @@ namespace WebCinema.Services
 
             return booking;
         }
+
         public async Task<BookingsResponseDto> UpdateBookingsAsync(int id, BookingsEditDto bookingsDto, CancellationToken cancellationToken = default)
         {
             var existingBooking = await _dbContext.Bookings

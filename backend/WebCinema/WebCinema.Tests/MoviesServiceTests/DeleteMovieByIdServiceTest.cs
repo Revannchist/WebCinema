@@ -195,22 +195,22 @@ namespace WebCinema.Tests.MoviesServiceTests
         }
 
         //Delete Movie with Cancellation Request
-        /*
+        
         [TestMethod]
         public async Task DeleteMovieByIdAsync_CancellationRequested_ThrowsOperationCanceledException()
         {
-            // Arrange
+            //Arrange
             int movieId = 1;
             var cts = new CancellationTokenSource();
             cts.Cancel();
 
-            // Act & Assert
+            //Act & Assert
             await Assert.ThrowsExceptionAsync<OperationCanceledException>(async () =>
             {
                 await _moviesService.DeleteMovieByIdAsync(movieId, cts.Token);
             });
         }
-        */
+        
 
         //Delete Movie DB exception
         /*

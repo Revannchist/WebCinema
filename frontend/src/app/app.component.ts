@@ -75,8 +75,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // Remove the loadCartItemCount method from before since we're now using refreshCartCount
-
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
@@ -86,7 +84,6 @@ export class AppComponent implements OnInit {
     this.sidebarCollapsed = collapsed;
   }
 
-  // Add this method to your AppComponent class
   isAdmin(): boolean {
     const role = this.authService.getUserRole();
     return role === 'Admin' || role === 'admin';
