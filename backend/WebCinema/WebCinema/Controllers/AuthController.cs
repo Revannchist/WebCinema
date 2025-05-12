@@ -36,6 +36,24 @@ namespace WebCinema.Controllers
             return Unauthorized();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ValidateCaptcha([FromBody] CaptchaRequest request)
+        {
+            var secret = _config["Recaptcha:SecretKey"]; // Dodaj u appsettings.json!
+            using var client = new HttpClient();
+            var response = await client.PostAsync(
+                $"https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={request.Token}",
+                null);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var captchaResult = System.Text.Json.JsonSerializer.Deserialize<CaptchaResponse>(responseString);
+
+            if (captchaResult != null && captchaResult.success)
+                return Ok(new { success = true });
+            else
+                return BadRequest(new { success = false, error = "CAPTCHA validation failed" });
+        }
+
         private string GenerateJwtToken(string username)
         {
             var jwtSettings = _config.GetSection("Jwt");
@@ -67,6 +85,21 @@ namespace WebCinema.Controllers
         {
             public string Username { get; set; }
             public string Password { get; set; }
+        }
+
+        public class CaptchaRequest
+        {
+            public string Token { get; set; }
+        }
+
+        public class CaptchaResponse
+        {
+            public bool success { get; set; }
+            public double score { get; set; }
+            public string action { get; set; }
+            public DateTime challenge_ts { get; set; }
+            public string hostname { get; set; }
+            public List<string> error_codes { get; set; }
         }
 
     }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SeatService } from '../../services/seats-service';
 import { ShowtimeService } from '../../services/showtime-service';
@@ -7,13 +7,16 @@ import { GetShowTimeDto } from '../../models/dto/showtime.dto';
 import { BookingService } from '../../services/booking-service';
 import { AuthService } from '../../auth.service';
 import { forkJoin } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
+declare var grecaptcha: any;
 
 @Component({
   selector: 'app-seats',
   templateUrl: './seats.component.html',
   styleUrl: './seats.component.css'
 })
-export class SeatsComponent implements OnInit {
+export class SeatsComponent implements OnInit, AfterViewChecked {
   Math = Math;
   seatsByHall: { [hallName: string]: SeatsDto[] } = {};
   seatMap: { [hallName: string]: { [row: number]: { [col: number]: SeatsDto } } } = {};
@@ -30,13 +33,23 @@ export class SeatsComponent implements OnInit {
   
   reservedSeats: number[] = [];
   
+  showCaptcha = false;
+  captchaPassed = false;
+  captchaError = '';
+  
+  siteKey: string = '6LeL7TYrAAAAAC_DesHJdrLMkZFpe55yvQ4vNRI5'; // zamijeni sa svojim ključem
+  recaptchaWidgetId: any = null;
+  recaptchaRendered = false;
+  
   constructor(
     private seatService: SeatService,
     private showtimeService: ShowtimeService,
     private bookingService: BookingService,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private ngZone: NgZone
   ) { }
   
   ngOnInit(): void {
@@ -48,6 +61,36 @@ export class SeatsComponent implements OnInit {
         this.error = 'No showtime selected';
       }
     });
+  }
+  
+  ngAfterViewChecked(): void {
+    if (this.showCaptcha && !this.recaptchaRendered) {
+      this.renderRecaptcha();
+    }
+  }
+
+  renderRecaptcha() {
+    if (grecaptcha && document.getElementById('custom-recaptcha')) {
+      this.recaptchaWidgetId = grecaptcha.render('custom-recaptcha', {
+        'sitekey': this.siteKey,
+        'callback': (response: string) => {
+          this.ngZone.run(() => {
+            this.onCaptchaResolved(response);
+          });
+        }
+      });
+      this.recaptchaRendered = true;
+    }
+  }
+
+  // Kada korisnik zatvori captcha ili promijeni izbor sjedala, resetiraj captcha
+  resetCaptcha() {
+    if (grecaptcha && this.recaptchaRendered) {
+      grecaptcha.reset(this.recaptchaWidgetId);
+      this.captchaPassed = false;
+      this.captchaError = '';
+      this.recaptchaRendered = false;
+    }
   }
   
   loadShowtime(showtimeId: number): void {
@@ -234,6 +277,7 @@ export class SeatsComponent implements OnInit {
     
     // Update total price
     this.totalPrice = this.calculateTotalPrice();
+    this.resetCaptcha();
   }
   
   selectSeatAndAdjacent(seat: SeatsDto): void {
@@ -455,5 +499,26 @@ export class SeatsComponent implements OnInit {
     sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
     // Preusmjeri na payment stranicu
     this.router.navigate(['/payment']);
+  }
+
+  onCaptchaResolved(token: string) {
+    if (!token) {
+      this.captchaError = 'Molimo potvrdite da niste robot.';
+      return;
+    }
+    this.http.post<any>('https://localhost:7057/api/Auth/ValidateCaptcha', { token }).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.captchaPassed = true;
+          this.captchaError = '';
+          this.showCaptcha = false;
+        } else {
+          this.captchaError = 'CAPTCHA nije prošla. Pokušajte ponovno.';
+        }
+      },
+      error: () => {
+        this.captchaError = 'Greška pri validaciji CAPTCHA. Pokušajte ponovno.';
+      }
+    });
   }
 }

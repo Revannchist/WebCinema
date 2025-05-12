@@ -93,13 +93,30 @@
             </ng-container>
           </div>
         </div>
-        <div class="action-buttons">
-          <button
-            class="btn-confirm"
-            [disabled]="selectedSeats.length === 0"
-            (click)="confirmSelection()">
-            Proceed to Payment (${{ totalPrice.toFixed(2) }})
-          </button>
+        <div class="action-buttons" style="display: flex; flex-direction: column; align-items: center;">
+          <!-- Prikazuj button dok captcha nije prikazana -->
+          <div *ngIf="!showCaptcha && !captchaPassed" style="width: 100%; display: flex; justify-content: center;">
+            <button
+              class="btn-confirm"
+              [disabled]="selectedSeats.length === 0"
+              (click)="showCaptcha = true">
+              Proceed to Payment (${{ totalPrice.toFixed(2) }})
+            </button>
+          </div>
+          <!-- Prikazuj captcha kad je showCaptcha true i captcha nije prošla -->
+          <div *ngIf="showCaptcha && !captchaPassed" style="margin-top: 16px; width: 100%; display: flex; justify-content: center;">
+            <div id="custom-recaptcha"></div>
+            <div *ngIf="captchaError" class="error-message">{{ captchaError }}</div>
+          </div>
+          <!-- Prikazuj button za nastavak kad je captcha prošla -->
+          <div *ngIf="captchaPassed" style="width: 100%; display: flex; justify-content: center;">
+            <button
+              class="btn-confirm"
+              [disabled]="selectedSeats.length === 0"
+              (click)="confirmSelection()">
+              Continue to Payment ({{ totalPrice.toFixed(2) }})
+            </button>
+          </div>
         </div>
       </div>
     </div>
