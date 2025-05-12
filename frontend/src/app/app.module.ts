@@ -31,6 +31,7 @@ import { BookingService } from './services/booking-service';
 import { BookingsComponent } from './components/bookings/bookings.component';
 import { BookingDetailsComponent } from './components/booking-details/booking-details.component';
 import { HomeComponent } from './components/home/home.component';
+import { PaymentComponent } from './components/payment/payment.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -62,7 +63,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     SeatsComponent,
     BookingsComponent,
     BookingDetailsComponent,
-    HomeComponent
+    HomeComponent,
+    PaymentComponent
   ],
   imports: [
     BrowserModule,

@@ -12,8 +12,8 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    [Migration("20250312182445_NewSeats")]
-    partial class NewSeats
+    [Migration("20250507184724_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,38 @@ namespace WebCinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Actors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Timothee",
+                            LastName = "Chalamet"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FirstName = "Rebecca",
+                            LastName = "Ferguson"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            FirstName = "Oscar",
+                            LastName = "Isaac"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            FirstName = "Russel",
+                            LastName = "Crowe"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            FirstName = "Joaquin",
+                            LastName = "Phoenix"
+                        });
                 });
 
             modelBuilder.Entity("WebCinema.Models.BookedSeats", b =>
@@ -146,12 +178,27 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "BiH"
+                            Name = "United States"
                         },
                         new
                         {
                             Id = 2,
+                            Name = "Canada"
+                        },
+                        new
+                        {
+                            Id = 3,
                             Name = "Germany"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "United Kingdom"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "France"
                         });
                 });
 
@@ -174,6 +221,20 @@ namespace WebCinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Directors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Ridley",
+                            LastName = "Scott"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FirstName = "Denis",
+                            LastName = "Villeneuve"
+                        });
                 });
 
             modelBuilder.Entity("WebCinema.Models.Genres", b =>
@@ -216,7 +277,7 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 5,
-                            Name = "Action"
+                            Name = "Science Fiction"
                         },
                         new
                         {
@@ -257,7 +318,7 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 1,
-                            Capacity = 40,
+                            Capacity = 60,
                             HallName = "Hall1",
                             HallType = "Medium",
                             TheatersID = 1
@@ -265,7 +326,7 @@ namespace WebCinema.Migrations
                         new
                         {
                             Id = 2,
-                            Capacity = 60,
+                            Capacity = 90,
                             HallName = "Hall2",
                             HallType = "Big",
                             TheatersID = 1
@@ -1695,6 +1756,32 @@ namespace WebCinema.Migrations
                     b.HasIndex("RolesId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@example.com",
+                            FirstName = "Admin",
+                            LastName = "User",
+                            Password = "SecurePass123",
+                            RegistrationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RoleId = 1,
+                            Username = "adminUser"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateOfBirth = new DateTime(1995, 8, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "user@example.com",
+                            FirstName = "Basic",
+                            LastName = "User",
+                            Password = "UserPass456",
+                            RegistrationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RoleId = 2,
+                            Username = "basicUser"
+                        });
                 });
 
             modelBuilder.Entity("WebCinema.Models.UsersImage", b =>

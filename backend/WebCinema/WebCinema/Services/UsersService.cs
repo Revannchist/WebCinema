@@ -23,8 +23,9 @@ namespace WebCinema.Services
 
         private async Task<bool> IsEmailUniqueAsync(string email, int? excludeUserId = null)
         {
+            var normalizedEmail = email.Trim().ToLower();
             return !await _dbContext.Users
-                .AnyAsync(u => u.Email == email && (!excludeUserId.HasValue || u.Id != excludeUserId));
+                .AnyAsync(u => u.Email.ToLower() == normalizedEmail && (!excludeUserId.HasValue || u.Id != excludeUserId));
         }
 
         private bool IsPasswordValid(string password)
@@ -71,6 +72,7 @@ namespace WebCinema.Services
             {
                 users.RoleId = 2; // ID za User rolu
             }
+            users.Email = users.Email.Trim().ToLower();
 
             var validation = await ValidateUserAsync(users);
             if (!validation.isValid)

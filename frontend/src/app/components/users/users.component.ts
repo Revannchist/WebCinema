@@ -88,68 +88,14 @@ export class UsersComponent implements OnInit {
             this.setupEditModeIfNeeded();
           }
         }
-        this.loadUsers();
+        if (!this.isCreateMode) {
+          this.loadUsers();
+        }
       }
     });
 
     if (this.isCreateMode) {
-      this.userForm.get('username')?.valueChanges.pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        switchMap(username => {
-          if (!username) return [];
-          
-          const testUser = {
-            username: username,
-            email: 'test@test.com',
-            password: 'Test123',
-            firstName: 'Test',
-            lastName: 'Test',
-            dateOfBirth: new Date(),
-            roleId: 2
-          };
-          
-          return this.userService.createUser(testUser).pipe(
-            map(() => null),
-            first(),
-            catchError(error => {
-              if (error.error === 'Username already exists') {
-                this.userForm.get('username')?.setErrors({ usernameTaken: true });
-              }
-              return [];
-            })
-          );
-        })
-      ).subscribe();
-
-      this.userForm.get('email')?.valueChanges.pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        switchMap(email => {
-          if (!email || !this.userForm.get('email')?.valid) return [];
-          
-          const testUser = {
-            username: 'test_' + new Date().getTime(),
-            email: email,
-            password: 'Test123',
-            firstName: 'Test',
-            lastName: 'Test',
-            dateOfBirth: new Date(),
-            roleId: 2
-          };
-          
-          return this.userService.createUser(testUser).pipe(
-            map(() => null),
-            first(),
-            catchError(error => {
-              if (error?.error?.includes('Email already exists')) {
-                this.userForm.get('email')?.setErrors({ emailTaken: true });
-              }
-              return [];
-            })
-          );
-        })
-      ).subscribe();
+      // Remove the problematic valueChanges
     }
   }
   
@@ -235,6 +181,7 @@ export class UsersComponent implements OnInit {
             alert('User successfully updated');
             this.users = [response];
             this.existingPassword = updateData.password;
+            localStorage.setItem('token', response.token);
           },
           error: (error: any) => {
             console.error('Update error:', error);
@@ -259,6 +206,7 @@ export class UsersComponent implements OnInit {
             this.existingPassword = formValue.password;
             this.selectedUserId = response.id;
             this.resetForm();
+            localStorage.setItem('token', response.token);
           },
           error: (error: any) => {
             if (error.error && typeof error.error === 'string') {
@@ -320,13 +268,13 @@ export class UsersComponent implements OnInit {
     return '';
   }
 
-  loadUsers(page: number = 1): void {
-    this.userService.getUsersPaged(page, this.pageSize).subscribe({
-      next: (response) => {
-        this.users = response.Users;
-        this.totalUsers = response.TotalUsers;
-        this.totalPages = Math.ceil(this.totalUsers / this.pageSize);
-        this.currentPage = page;
+  loadUsers(): void {
+    this.userService.getAllUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        this.totalUsers = users.length;
+        this.totalPages = 1;
+        this.currentPage = 1;
       },
       error: (error) => {
         console.error('Error loading users:', error);
@@ -336,13 +284,13 @@ export class UsersComponent implements OnInit {
 
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
-      this.loadUsers(this.currentPage + 1);
+      this.loadUsers();
     }
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
-      this.loadUsers(this.currentPage - 1);
+      this.loadUsers();
     }
   }
 

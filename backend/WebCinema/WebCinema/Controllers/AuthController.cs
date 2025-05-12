@@ -30,7 +30,7 @@ namespace WebCinema.Controllers
             if (user != null && user.Password == model.Password)
             {
                 var token = GenerateJwtToken(user.Username);
-                return Ok(new { token });
+                return Ok(new { token }); // OVO JE KLJUČNO!
             }
 
             return Unauthorized();

@@ -21,6 +21,7 @@ import { BookingDetailsComponent } from './components/booking-details/booking-de
 import { HomeComponent } from './components/home/home.component';
 import { AdminGuard } from './auth.guard';
 import { AuthGuard } from './auth.guard';
+import { PaymentComponent } from './components/payment/payment.component';
 
 const routes: Routes = [
   // Public routes
@@ -28,6 +29,7 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'landing-page', component: LandingPageComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'users', component: UsersComponent },
   { path: 'movie-list', component: MovieListComponent },
   { path: 'showtimes-list', component: ShowtimesListComponent },
 
@@ -45,6 +47,11 @@ const routes: Routes = [
   {
     path: 'booking-details/:id',
     component: BookingDetailsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'payment',
+    component: PaymentComponent,
     canActivate: [AuthGuard]
   },
 

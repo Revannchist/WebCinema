@@ -445,26 +445,15 @@ export class SeatsComponent implements OnInit {
   }
   
   confirmSelection(): void {
-    if (!this.showtime) {
-      alert('No showtime selected');
-      return;
-    }
-    
-    if (this.selectedSeats.length === 0) {
-      alert('Please select at least one seat');
-      return;
-    }
-  
-    // Show confirmation dialog
-    const message = `You have selected ${this.getSelectedSeatsCount()} seats.
-      Total price: $${this.totalPrice.toFixed(2)}
-      Seats: ${this.selectedSeats.join(', ')}
-      Movie: ${this.showtime.movieTitle}
-      Showtime: ${new Date(this.showtime.showDateTime).toLocaleString()}`;
-      
-    // Ask for confirmation before proceeding
-    if (confirm(`${message}\n\nProceed with booking?`)) {
-      this.createBooking();
-    }
+    // Prikupi sve potrebne podatke za payment
+    const paymentData = {
+      selectedSeats: this.selectedSeats,
+      showtime: this.showtime,
+      totalPrice: this.totalPrice
+    };
+    // Spremi podatke u sessionStorage (ili možeš koristiti servis)
+    sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
+    // Preusmjeri na payment stranicu
+    this.router.navigate(['/payment']);
   }
 }

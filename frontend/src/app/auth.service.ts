@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { MyConfig } from './my-config';
+import { environment } from '../environments/environment';
 
 interface AuthResponse {
   token: string;
@@ -15,7 +15,7 @@ interface AuthResponse {
 
 export class AuthService {
 
-  private apiUrl = `${MyConfig.APIurl}/api/Auth`;
+  private apiUrl = `${environment.apiUrl}/api/Auth`;
   private authStatusSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
   public authStatus$ = this.authStatusSubject.asObservable();
 
@@ -48,7 +48,27 @@ export class AuthService {
     try {
       const payload = token.split('.')[1];
       const decodedPayload = JSON.parse(atob(payload));
-      return decodedPayload.role || decodedPayload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      
+      console.log('Decoded JWT payload:', decodedPayload);
+      
+      // Prvo provjeri standardne ključeve
+      const role = decodedPayload.role || 
+                  decodedPayload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+                  decodedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'];
+      
+      console.log('Found role from standard keys:', role);
+      
+      // Ako je roleId u tokenu, konvertiraj ga u ime role
+      if (decodedPayload.roleId === 1) {
+        console.log('Found roleId 1, returning Admin');
+        return 'Admin';
+      } else if (decodedPayload.roleId === 2) {
+        console.log('Found roleId 2, returning User');
+        return 'User';
+      }
+      
+      console.log('Final role value:', role);
+      return role || null;
     } catch (e) {
       console.error('Error decoding token', e);
       return null;

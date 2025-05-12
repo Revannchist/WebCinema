@@ -111,55 +111,6 @@
     </form>
   </div>
 
-  <div class="table-container">
-    <h2>Users Data</h2>
-    <table class="users-table">
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Email</th>
-          <th>Date of Birth</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users">
-          <td>{{ user.username }}</td>
-          <td>{{ user.firstName }}</td>
-          <td>{{ user.lastName }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.dateOfBirth | date:'dd.MM.yyyy' }}</td>
-          <td class="action-buttons">
-            <button class="edit-btn" (click)="editUser(user)">Edit</button>
-            <button class="delete-btn" (click)="deleteUser(user.id)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="pagination" *ngIf="totalPages > 1">
-    <button 
-      class="page-btn" 
-      (click)="previousPage()" 
-      [disabled]="currentPage === 1"
-    >
-      Previous
-    </button>
-    
-    <span class="page-info">
-      Page {{ currentPage }} of {{ totalPages }}
-    </span>
-    
-    <button 
-      class="page-btn" 
-      (click)="nextPage()" 
-      [disabled]="currentPage === totalPages"
-    >
-      Next
-    </button>
-  </div>
+  <!-- Ovdje je bila tablica Users Data, sada je zakomentirana -->
 </div>
  

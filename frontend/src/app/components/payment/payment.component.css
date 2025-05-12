@@ -1,0 +1,219 @@
+#card-element {
+  min-height: 40px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.stripe-card-element {
+  min-height: 40px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+/* Glavni kontejner centriran po sredini ekrana */
+.payment-main-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.payment-box {
+  display: flex;
+  flex-direction: row;
+  background: none;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(35,41,70,0.18);
+  overflow: hidden;
+  min-width: 700px;
+  max-width: 1050px;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.payment-info {
+  background: #232946;
+  color: #fff;
+  padding: 36px 32px 24px 32px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+}
+
+.movie-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+.hall-name {
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+}
+.price-details {
+  margin-bottom: 32px;
+}
+.price-details div {
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+.total-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.cinema-logo {
+  margin-top: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.cinema-logo img {
+  max-width: 110px;
+  height: auto;
+}
+
+.stripe-form-section {
+  padding: 32px 32px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 400px;
+  background: #f5f6fa;
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  box-shadow: none;
+}
+.stripe-form-section h2 {
+  margin-bottom: 18px;
+  font-size: 1.3rem;
+  color: #232946;
+}
+.payment-form label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+.stripe-card-element {
+  min-height: 44px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  margin-bottom: 18px;
+}
+.pay-btn {
+  width: 100%;
+  background: #232946;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.pay-btn:disabled {
+  background: #bcbcbc;
+  cursor: not-allowed;
+}
+.error-message {
+  color: #e63946;
+  margin-bottom: 10px;
+  font-size: 0.98rem;
+}
+.success-message {
+  color: #219653;
+  margin-top: 18px;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.success-message button {
+  width: 100%;
+  background: #232946;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 18px;
+}
+.success-message button:hover {
+  background: #1a1f36;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+@media (max-width: 800px) {
+  .payment-box {
+    flex-direction: column;
+    min-width: 0;
+    max-width: 600px;
+    border-radius: 18px;
+  }
+  .payment-info {
+    border-radius: 18px 18px 0 0;
+  }
+  .stripe-form-section {
+    border-radius: 0 0 18px 18px;
+  }
+  .payment-info, .stripe-form-section {
+    min-width: 0;
+    width: 100%;
+    padding: 24px 12px;
+  }
+  .cinema-logo {
+    justify-content: center;
+  }
+}
+
+.payment-main-container, .stripe-form-section {
+  background: #f5f6fa !important;
+}
+
+body {
+  background: #f5f6fa;
+}
+
+.payment-header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.clapper-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+.webcinema-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+}

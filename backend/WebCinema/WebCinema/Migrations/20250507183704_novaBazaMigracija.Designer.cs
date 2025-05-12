@@ -12,8 +12,8 @@ using WebCinema;
 namespace WebCinema.Migrations
 {
     [DbContext(typeof(WebCinemaDBContext))]
-    [Migration("20250313081019_newSeats3")]
-    partial class newSeats3
+    [Migration("20250507183704_novaBazaMigracija")]
+    partial class novaBazaMigracija
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1756,6 +1756,32 @@ namespace WebCinema.Migrations
                     b.HasIndex("RolesId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateOfBirth = new DateTime(1990, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@example.com",
+                            FirstName = "Admin",
+                            LastName = "User",
+                            Password = "SecurePass123",
+                            RegistrationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RoleId = 1,
+                            Username = "adminUser"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateOfBirth = new DateTime(1995, 8, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "user@example.com",
+                            FirstName = "Basic",
+                            LastName = "User",
+                            Password = "UserPass456",
+                            RegistrationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RoleId = 2,
+                            Username = "basicUser"
+                        });
                 });
 
             modelBuilder.Entity("WebCinema.Models.UsersImage", b =>
