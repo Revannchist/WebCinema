@@ -18,6 +18,7 @@ export class AppComponent implements OnInit {
   showNavbar = false;
   isLoggedIn = false;
   cartItemCount = 0;
+  isDarkMode = false;
 
   navbarRoutes = [
     '/home',
@@ -66,6 +67,15 @@ export class AppComponent implements OnInit {
         this.cartService.updateCartCount(0);
       }
     });
+    // Učitaj temu iz localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      this.isDarkMode = true;
+      document.body.classList.add('dark-theme');
+    } else {
+      this.isDarkMode = false;
+      document.body.classList.remove('dark-theme');
+    }
   }
 
   checkAuthStatus(): void {
@@ -87,5 +97,16 @@ export class AppComponent implements OnInit {
   isAdmin(): boolean {
     const role = this.authService.getUserRole();
     return role === 'Admin' || role === 'admin';
+  }
+
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+    if (this.isDarkMode) {
+      document.body.classList.add('dark-theme');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-theme');
+      localStorage.setItem('theme', 'light');
+    }
   }
 }

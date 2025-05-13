@@ -166,4 +166,9 @@ export class PaymentComponent implements OnInit {
   backToHome(): void {
     this.router.navigate(['/home']);
   }
+
+  // Provjeri je li korisnik u dark modu
+  isDarkMode(): boolean {
+    return document.body.classList.contains('dark-theme');
+  }
 }

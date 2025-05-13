@@ -1,35 +1,37 @@
-<div class="payment-main-container">
-  <div class="payment-box">
-    <!-- LEFT SIDE: Movie and payment info -->
-    <div class="payment-info">
-      <div class="payment-header-logo">
-        <img src="assets/images/logo.png" alt="WebCinema Logo" class="clapper-logo" />
-        <span class="webcinema-title">WebCinema</span>
+<div class="payment-container" [ngClass]="{'dark-bg': isDarkMode()}" >
+  <div class="payment-main-container">
+    <div class="payment-box">
+      <!-- LEFT SIDE: Movie and payment info -->
+      <div class="payment-info">
+        <div class="payment-header-logo">
+          <img src="assets/images/logo.png" alt="WebCinema Logo" class="clapper-logo" />
+          <span class="webcinema-title">WebCinema</span>
+        </div>
+        <div class="movie-title">{{ paymentData?.showtime?.movieTitle || 'Movie Title' }}</div>
+        <div class="hall-name">Hall: {{ paymentData?.showtime?.hallName || 'Hall name' }}</div>
+        <div class="price-details">
+          <div>Price (excl. tax): <b>{{ (paymentData?.totalPrice ? (paymentData.totalPrice / 1.17) : 0) | number:'1.2-2' }} €</b></div>
+          <div>Tax (17%): <b>{{ (paymentData?.totalPrice ? (paymentData.totalPrice - (paymentData.totalPrice / 1.17)) : 0) | number:'1.2-2' }} €</b></div>
+          <div class="total-price">Total: <b>{{ paymentData?.totalPrice || 0 | number:'1.2-2' }} €</b></div>
+        </div>
       </div>
-      <div class="movie-title">{{ paymentData?.showtime?.movieTitle || 'Movie Title' }}</div>
-      <div class="hall-name">Hall: {{ paymentData?.showtime?.hallName || 'Hall name' }}</div>
-      <div class="price-details">
-        <div>Price (excl. tax): <b>{{ (paymentData?.totalPrice ? (paymentData.totalPrice / 1.17) : 0) | number:'1.2-2' }} €</b></div>
-        <div>Tax (17%): <b>{{ (paymentData?.totalPrice ? (paymentData.totalPrice - (paymentData.totalPrice / 1.17)) : 0) | number:'1.2-2' }} €</b></div>
-        <div class="total-price">Total: <b>{{ paymentData?.totalPrice || 0 | number:'1.2-2' }} €</b></div>
-      </div>
-    </div>
-    <!-- RIGHT SIDE: Stripe form -->
-    <div class="stripe-form-section">
-      <h2>Card Payment</h2>
-      <form (ngSubmit)="pay()" class="payment-form">
-        <label>Card details</label>
-        <div id="card-element" class="stripe-card-element"></div>
-        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-        <button type="submit" [disabled]="isProcessing || !stripeReady" class="pay-btn">
-          {{ isProcessing ? 'Processing...' : 'Pay' }}
-        </button>
-      </form>
-      <div *ngIf="!stripe" class="error-message">Stripe is not loaded! Check your internet connection, adblocker and sessionStorage.</div>
-      <div *ngIf="paymentSuccess" class="success-message">
-        <h3>Payment successful!</h3>
-        <p>Your ticket has been downloaded as PDF.</p>
-        <button (click)="backToHome()">Back to Home</button>
+      <!-- RIGHT SIDE: Stripe form -->
+      <div class="stripe-form-section">
+        <h2>Card Payment</h2>
+        <form (ngSubmit)="pay()" class="payment-form">
+          <label>Card details</label>
+          <div id="card-element" class="stripe-card-element"></div>
+          <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+          <button type="submit" [disabled]="isProcessing || !stripeReady" class="pay-btn">
+            {{ isProcessing ? 'Processing...' : 'Pay' }}
+          </button>
+        </form>
+        <div *ngIf="!stripe" class="error-message">Stripe is not loaded! Check your internet connection, adblocker and sessionStorage.</div>
+        <div *ngIf="paymentSuccess" class="success-message">
+          <h3>Payment successful!</h3>
+          <p>Your ticket has been downloaded as PDF.</p>
+          <button (click)="backToHome()">Back to Home</button>
+        </div>
       </div>
     </div>
   </div>

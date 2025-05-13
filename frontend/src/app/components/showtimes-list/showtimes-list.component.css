@@ -180,3 +180,26 @@
   font-size: 0.9rem;
   color: #6c757d;
 }
+
+body.dark-theme .showtime-box:hover,
+body.dark-theme .movie-card .showtime-box:hover,
+body.dark-theme .card .showtime-box:hover,
+body.dark-theme .showtime-date-group .showtime-box:hover,
+body.dark-theme [class*="showtime-box"]:hover,
+body.dark-theme [style*="showtime-box"]:hover,
+body.dark-theme .showtime-box:hover *,
+body.dark-theme [class*="showtime-box"]:hover * {
+  background: #0d6efd !important;
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+::ng-deep body.dark-theme .showtime-box:hover {
+  background: #0d6efd !important;
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}

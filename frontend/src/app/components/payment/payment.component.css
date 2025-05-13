@@ -217,3 +217,45 @@ body {
   font-family: inherit;
   letter-spacing: 0.5px;
 }
+
+.dark-bg {
+  background: #181818 !important;
+  color: #fff !important;
+}
+.dark-bg .payment-box,
+.dark-bg .payment-main-container {
+  background: #232323 !important;
+  color: #fff !important;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.28);
+}
+.dark-bg .payment-info {
+  background: #232946 !important;
+  color: #fff !important;
+}
+.dark-bg .stripe-form-section {
+  background: #232323 !important;
+  color: #fff !important;
+}
+.dark-bg .total-price {
+  color: #4da3ff !important;
+}
+.dark-bg .pay-btn {
+  background: #232946 !important;
+  color: #fff !important;
+  border: none;
+}
+.dark-bg .pay-btn[disabled] {
+  opacity: 0.6;
+}
+.dark-bg .error-message {
+  color: #ff6b6b !important;
+  background: #1a1a1a !important;
+}
+.dark-bg .stripe-form-section h2 {
+  color: #fff !important;
+}
+.dark-bg .stripe-card-element {
+  background: #fff !important;
+  color: #222 !important;
+}

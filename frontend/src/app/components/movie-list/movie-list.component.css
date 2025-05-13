@@ -256,3 +256,34 @@
   color: #6c757d;
   font-size: 14px;
 }
+
+.dark-theme .card {
+  background-color: #141516 !important;
+  color: #fff !important;
+  border: 1.5px solid #232323 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+}
+.dark-theme .card-body {
+  background-color: #141516 !important;
+  color: #fff !important;
+}
+.dark-theme .card-title {
+  color: #fff !important;
+}
+.dark-theme .card-text {
+  color: #fff !important;
+}
+.dark-theme .list-unstyled li,
+.dark-theme .list-unstyled li strong {
+  color: #fff !important;
+}
+.dark-theme .poster-container {
+  background-color: #232323 !important;
+}
+
+.dark-theme .filters {
+  background-color: #232323 !important;
+  color: #fff !important;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}

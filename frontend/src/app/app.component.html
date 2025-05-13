@@ -341,8 +341,25 @@
 
 <!-- Navigation Bar -->
 <nav *ngIf="showNavbar" class="navbar">
-  <div class="logo">
+  <div class="logo" style="display: flex; align-items: center; gap: 10px;">
     <a routerLink="/">🎬 WebCinema</a>
+    <!-- Dark/Light mode toggle -->
+    <div class="theme-toggle" (click)="toggleTheme()" [class.dark]="isDarkMode" style="cursor:pointer; display: flex; align-items: center;">
+      <div class="toggle-slider">
+        <span *ngIf="!isDarkMode" class="toggle-text">DAY MODE</span>
+        <span *ngIf="isDarkMode" class="toggle-text">NIGHT MODE</span>
+        <span class="toggle-icon">
+          <ng-container *ngIf="!isDarkMode">
+            <!-- Sun icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5" stroke="#222" stroke-width="2"/><path d="M12 1V3" stroke="#222" stroke-width="2" stroke-linecap="round"/><path d="M12 21V23" stroke="#222" stroke-width="2" stroke-linecap="round"/><path d="M4.22 4.22L5.64 5.64" stroke="#222" stroke-width="2" stroke-linecap="round"/><path d="M18.36 18.36L19.78 19.78" stroke="#222" stroke-width="2" stroke-linecap="round"/><path d="M1 12H3" stroke="#222" stroke-width="2" stroke-linecap="round"/><path d="M21 12H23" stroke="#222" stroke-width="2" stroke-linecap="round"/><path d="M4.22 19.78L5.64 18.36" stroke="#222" stroke-width="2" stroke-linecap="round"/><path d="M18.36 5.64L19.78 4.22" stroke="#222" stroke-width="2" stroke-linecap="round"/></svg>
+          </ng-container>
+          <ng-container *ngIf="isDarkMode">
+            <!-- Moon icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" stroke="#fff" stroke-width="2" fill="#111"/></svg>
+          </ng-container>
+        </span>
+      </div>
+    </div>
   </div>
   <ul class="nav-links">
     <li *ngIf="isAdmin()"><a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a></li>

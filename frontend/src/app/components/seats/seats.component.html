@@ -10,13 +10,13 @@
     </div>
     <div class="booking-info">
       <div class="seats-counter">
-        <button class="counter-btn"
+        <button class="counter-btn minus"
                 (click)="updateMaxSeats(-1)"
-                [disabled]="maxSeats <= 1">-</button>
+                [disabled]="maxSeats <= 1"></button>
         <span>{{ selectedSeats.length }} / {{ maxSeats }}</span>
-        <button class="counter-btn"
+        <button class="counter-btn plus"
                 (click)="updateMaxSeats(1)"
-                [disabled]="maxSeats >= MAX_ALLOWED_SEATS">+</button>
+                [disabled]="maxSeats >= MAX_ALLOWED_SEATS"></button>
       </div>
       <div *ngIf="maxSeats === MAX_ALLOWED_SEATS" class="max-seats-warning">
         <p>Maximum seats reached ({{ MAX_ALLOWED_SEATS }})</p>
