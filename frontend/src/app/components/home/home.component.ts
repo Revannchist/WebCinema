@@ -104,4 +104,8 @@ export class HomeComponent implements OnInit {
   closeTrailerModal() {
     this.showTrailerModal = false;
   }
+
+  get isDarkMode(): boolean {
+    return document.body.classList.contains('dark-theme');
+  }
 }
