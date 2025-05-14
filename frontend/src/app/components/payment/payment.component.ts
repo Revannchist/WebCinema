@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { loadStripe, Stripe, StripeElements, StripeCardElement } from '@stripe/stripe-js';
 import JSBarcode from 'jsbarcode';
 import { AuthService } from '../../auth.service';
+import { PaymentService } from '../../services/payment-service';
+import { BookingService } from '../../services/booking-service';
 
 @Component({
   selector: 'app-payment',
@@ -21,13 +23,26 @@ export class PaymentComponent implements OnInit {
   card: StripeCardElement | null = null;
   errorMessage: string = '';
   stripeReady: boolean = false;
+  bookingId: number | null = null;
 
-  constructor(private router: Router, private ngZone: NgZone, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private ngZone: NgZone,
+    private authService: AuthService,
+    private paymentService: PaymentService,
+    private bookingService: BookingService
+  ) {}
 
   async ngOnInit() {
     const data = sessionStorage.getItem('paymentData');
-    if (data) {
-      this.paymentData = JSON.parse(data);
+    const bookingIdStr = sessionStorage.getItem('bookingId');
+    console.log('paymentData iz sessionStorage:', data);
+    console.log('bookingId iz sessionStorage:', bookingIdStr);
+    this.paymentData = data ? JSON.parse(data) : null;
+    this.bookingId = bookingIdStr && !isNaN(+bookingIdStr) ? +bookingIdStr : null;
+    if (!this.bookingId) {
+      this.errorMessage = 'Booking ID nije pronađen! Vratite se na Bookings ili sjedala i pokušajte ponovno.';
+      return;
     }
     this.stripe = await loadStripe('pk_test_51RMaUIR5a4PC69xEBzUKYLKwBGUQBlAm0WeEl9aCqFTAYGyb5gkdLJlPkI0CLFhD9peSI0rHialNWVhFzKzoU0f600UUv4QHS3');
     console.log('Stripe:', this.stripe);
@@ -76,11 +91,42 @@ export class PaymentComponent implements OnInit {
       });
       return;
     }
-    // Ovdje bi inače išao backend poziv za stvarno plaćanje, ali za test je dovoljno da je validacija prošla
-    this.ngZone.run(() => {
+    if (!this.bookingId) {
+      this.errorMessage = 'Booking ID nije pronađen!';
       this.isProcessing = false;
-      this.paymentSuccess = true;
-      this.downloadTicketPDF();
+      return;
+    }
+    const paymentDto = {
+      BookingId: this.bookingId,
+      PaymentMethod: 'Card',
+      TransactionID: 0,
+      PaymentAmount: this.paymentData.totalPrice,
+      PaymentStatus: 'Success',
+      PaymentDateTime: new Date()
+    };
+    this.paymentService.addPayment(paymentDto).subscribe({
+      next: () => {
+        // Pripremi BookingsEditDto za update
+        const editDto = {
+          ShowTimesId: this.paymentData.showtime.id,
+          BookedSeatsIds: this.paymentData.selectedSeats,
+          TicketQuantity: this.paymentData.selectedSeats.length,
+          TotalPrice: this.paymentData.totalPrice,
+          BookingStatus: 'Paid',
+          BookingDate: new Date()
+        };
+        this.bookingService.updateBooking(this.bookingId || 0, editDto).subscribe(() => {
+          this.ngZone.run(() => {
+            this.isProcessing = false;
+            this.paymentSuccess = true;
+            this.downloadTicketPDF();
+          });
+        });
+      },
+      error: (err) => {
+        this.errorMessage = 'Greška pri spremanju uplate!';
+        this.isProcessing = false;
+      }
     });
   }
 

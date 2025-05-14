@@ -24,8 +24,9 @@ export class BookingService {
         });
     }
 
-    updateBooking(bookingData: any): Observable<any> {
-        return this.http.post(`${MyConfig.APIurl}/api/Bookings/UpdateBookings`, bookingData);
+    updateBooking(id: number, bookingData: any): Observable<any> {
+        const params = new HttpParams().set('id', id.toString());
+        return this.http.post(`${MyConfig.APIurl}/api/Bookings/UpdateBookings`, bookingData, { params });
     }
 
     getBookingById(bookingId: number): Observable<any> {

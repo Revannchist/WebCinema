@@ -434,19 +434,20 @@ export class SeatsComponent implements OnInit, AfterViewChecked {
     this.bookingService.addBooking(bookingData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        
-        // to reflect the change in the UI
         this.reservedSeats = [...this.reservedSeats, ...this.selectedSeats];
-        
-        // Clear the selection
+        // Spremi bookingId i podatke za payment
+        sessionStorage.setItem('bookingId', response.id);
+        sessionStorage.setItem('paymentData', JSON.stringify({
+          selectedSeats: this.selectedSeats,
+          showtime: this.showtime,
+          totalPrice: this.totalPrice
+        }));
+        // Očisti selekciju
         this.selectedSeats = [];
         this.selectedGroups = {};
         this.totalPrice = 0;
-        
-        alert(`Booking initiated! Your booking ID is: ${response.id}`);
-        
-        //this.router.navigate(['/booking-confirmation', response.id]); //ovo kad djeno pravio placanje
-        this.router.navigate(['/bookings', response.id]); //privremena ruta nakon sto user selektira sjedista 
+        // Preusmjeri na payment
+        this.router.navigate(['/payment']);
       },
       error: (err) => {
         this.isLoading = false;
@@ -489,16 +490,63 @@ export class SeatsComponent implements OnInit, AfterViewChecked {
   }
   
   confirmSelection(): void {
-    // Prikupi sve potrebne podatke za payment
-    const paymentData = {
-      selectedSeats: this.selectedSeats,
-      showtime: this.showtime,
-      totalPrice: this.totalPrice
+    if (!this.showtime) {
+      this.error = 'Cannot create booking: No showtime selected';
+      return;
+    }
+    if (this.selectedSeats.length === 0) {
+      this.error = 'Cannot create booking: No seats selected';
+      return;
+    }
+    const userId = this.authService.getCurrentUserId();
+    if (userId === null) {
+      alert('Please log in to complete your booking.');
+      this.router.navigate(['/login'], { 
+        queryParams: { 
+          returnUrl: this.router.url 
+        } 
+      });
+      return;
+    }
+    const bookingData = {
+      usersId: userId,
+      showTimesId: this.showtime.id,
+      bookedSeatsIds: this.selectedSeats,
+      ticketQuantity: this.selectedSeats.length,
+      totalPrice: this.totalPrice,
+      bookingStatus: "Pending",
+      bookingDate: new Date().toISOString()
     };
-    // Spremi podatke u sessionStorage (ili možeš koristiti servis)
-    sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
-    // Preusmjeri na payment stranicu
-    this.router.navigate(['/payment']);
+    this.isLoading = true;
+    this.bookingService.addBooking(bookingData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.reservedSeats = [...this.reservedSeats, ...this.selectedSeats];
+        sessionStorage.setItem('bookingId', response.id);
+        sessionStorage.setItem('paymentData', JSON.stringify({
+          selectedSeats: this.selectedSeats,
+          showtime: this.showtime,
+          totalPrice: this.totalPrice
+        }));
+        this.selectedSeats = [];
+        this.selectedGroups = {};
+        this.totalPrice = 0;
+        this.router.navigate(['/payment']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error creating booking:', err);
+        if (err && err.error) {
+          this.error = `Booking error: ${err.error}`;
+          alert(this.error);
+          if (this.showtime) {
+            this.loadSeatsAndReservations(this.showtime.id);
+          }
+        } else {
+          this.error = 'Failed to create booking. Please try again.';
+        }
+      }
+    });
   }
 
   onCaptchaResolved(token: string) {

@@ -47,6 +47,9 @@ export class ShowtimesListComponent implements OnInit {
   uniqueMovieIds: number[] = [];
 
   ngOnInit(): void {
+    // Očisti stare podatke o plaćanju i bookingu
+    sessionStorage.removeItem('paymentData');
+    sessionStorage.removeItem('bookingId');
     this.loadShowtimes();
     this.loadGenres();
 

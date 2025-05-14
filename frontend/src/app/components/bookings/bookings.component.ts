@@ -101,7 +101,23 @@ export class BookingsComponent implements OnInit {
   
   
   proceedToCheckout(bookingId: number): void {
-    this.router.navigate(['/checkout', bookingId]);
+    console.log('Spremam bookingId:', bookingId);
+    sessionStorage.setItem('bookingId', bookingId.toString());
+    const booking = this.bookings.find(b => b.id === bookingId);
+    console.log('Booking pronađen:', booking);
+    if (booking) {
+      sessionStorage.setItem('paymentData', JSON.stringify({
+        selectedSeats: booking.bookedSeats,
+        showtime: {
+          movieTitle: booking.movieTitle,
+          hallName: booking.hallName,
+          showDateTime: booking.showDateTime,
+          ticketPrice: booking.totalPrice / booking.ticketQuantity
+        },
+        totalPrice: booking.totalPrice
+      }));
+    }
+    this.router.navigate(['/payment']);
   }
   
   getBookingStatusClass(status: string): string {
