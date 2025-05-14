@@ -10,4 +10,8 @@ export class PaymentService {
   addPayment(paymentData: any): Observable<any> {
     return this.http.post(`${MyConfig.APIurl}/api/Payments/AddPayment`, paymentData);
   }
+
+  createPaymentIntent(data: { amount: number }): Observable<any> {
+    return this.http.post(`${MyConfig.APIurl}/api/Stripe/CreatePaymentIntent`, data);
+  }
 } 

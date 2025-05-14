@@ -80,52 +80,61 @@ export class PaymentComponent implements OnInit {
       this.errorMessage = 'Stripe nije inicijaliziran.';
       return;
     }
-    const { paymentMethod, error } = await this.stripe.createPaymentMethod({
-      type: 'card',
-      card: this.card,
-    });
-    if (error) {
-      this.ngZone.run(() => {
-        this.errorMessage = error.message || 'Greška pri plaćanju.';
-        this.isProcessing = false;
+    // 1. Zatraži PaymentIntent s backend-a
+    this.paymentService.createPaymentIntent({ amount: this.paymentData.totalPrice }).subscribe(async (res: any) => {
+      const clientSecret = res.clientSecret;
+      // 2. Potvrdi plaćanje s karticom
+      const { paymentIntent, error } = await this.stripe!.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: this.card!,
+        }
       });
-      return;
-    }
-    if (!this.bookingId) {
-      this.errorMessage = 'Booking ID nije pronađen!';
-      this.isProcessing = false;
-      return;
-    }
-    const paymentDto = {
-      BookingId: this.bookingId,
-      PaymentMethod: 'Card',
-      TransactionID: 0,
-      PaymentAmount: this.paymentData.totalPrice,
-      PaymentStatus: 'Success',
-      PaymentDateTime: new Date()
-    };
-    this.paymentService.addPayment(paymentDto).subscribe({
-      next: () => {
-        // Pripremi BookingsEditDto za update
-        const editDto = {
-          ShowTimesId: this.paymentData.showtime.id,
-          BookedSeatsIds: this.paymentData.selectedSeats,
-          TicketQuantity: this.paymentData.selectedSeats.length,
-          TotalPrice: this.paymentData.totalPrice,
-          BookingStatus: 'Paid',
-          BookingDate: new Date()
-        };
-        this.bookingService.updateBooking(this.bookingId || 0, editDto).subscribe(() => {
-          this.ngZone.run(() => {
-            this.isProcessing = false;
-            this.paymentSuccess = true;
-            this.downloadTicketPDF();
-          });
+      if (error) {
+        this.ngZone.run(() => {
+          this.errorMessage = error.message || 'Greška pri plaćanju!';
+          this.isProcessing = false;
         });
-      },
-      error: (err) => {
-        this.errorMessage = 'Greška pri spremanju uplate!';
-        this.isProcessing = false;
+        return;
+      }
+      if (paymentIntent && paymentIntent.status === 'succeeded') {
+        // Plaćanje prošlo, sada šalji podatke u bazu!
+        const paymentDto = {
+          BookingId: this.bookingId,
+          PaymentMethod: 'Card',
+          TransactionID: 0,
+          PaymentAmount: this.paymentData.totalPrice,
+          PaymentStatus: 'Success',
+          PaymentDateTime: new Date()
+        };
+        this.paymentService.addPayment(paymentDto).subscribe({
+          next: () => {
+            // Pripremi BookingsEditDto za update
+            const editDto = {
+              ShowTimesId: this.paymentData.showtime.id,
+              BookedSeatsIds: this.paymentData.selectedSeats,
+              TicketQuantity: this.paymentData.selectedSeats.length,
+              TotalPrice: this.paymentData.totalPrice,
+              BookingStatus: 'Paid',
+              BookingDate: new Date()
+            };
+            this.bookingService.updateBooking(this.bookingId || 0, editDto).subscribe(() => {
+              this.ngZone.run(() => {
+                this.isProcessing = false;
+                this.paymentSuccess = true;
+                this.downloadTicketPDF();
+              });
+            });
+          },
+          error: (err) => {
+            this.errorMessage = 'Greška pri spremanju uplate!';
+            this.isProcessing = false;
+          }
+        });
+      } else {
+        this.ngZone.run(() => {
+          this.errorMessage = 'Plaćanje nije uspjelo!';
+          this.isProcessing = false;
+        });
       }
     });
   }
