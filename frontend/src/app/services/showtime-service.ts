@@ -30,4 +30,4 @@ export class ShowtimeService {
     deleteShowTime(id: number): Observable<void> {
         return this.http.post<void>(`${MyConfig.APIurl}/api/ShowTimes/DeleteShowTimeById?id=${id}`, [{}]);
     }
-}
+} 

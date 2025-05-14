@@ -91,4 +91,4 @@ export class MovieService {
     deleteMovie(id: number): Observable<any> {
         return this.http.post(`${MyConfig.APIurl}/api/Movies/DeleteMovieById?id=${id}`, [{}]);
     }
-}
+} 

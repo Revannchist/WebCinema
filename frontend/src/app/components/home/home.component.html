@@ -1,1 +1,81 @@
-<p>home works!</p>
+<div class="home-container">
+  <!-- HERO SEKCIJA -->
+  <section class="hero-movie-section" *ngIf="heroMovie">
+    <div class="hero-movie-content">
+      <div class="hero-movie-text">
+        <h2 class="hero-title">FIND MOVIES<br><span class="highlight">TV SHOWS AND MORE</span></h2>
+        <p class="hero-desc">{{ heroMovie.description.split('.').slice(0,2).join('.') + '.' }}</p>
+      </div>
+      <div class="hero-movie-poster-wrapper">
+        <div class="hero-movie-poster" (click)="openTrailerModal()">
+          <img *ngIf="heroMoviePosterUrl; else noPoster" [src]="heroMoviePosterUrl" [alt]="heroMovie.title" />
+          <ng-template #noPoster>
+            <div class="no-poster">Nema slike</div>
+          </ng-template>
+          <div class="play-overlay">
+            <span class="play-icon"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- MODAL ZA TRAILER -->
+    <div class="modal-backdrop" *ngIf="showTrailerModal" (click)="closeTrailerModal()"></div>
+    <div class="trailer-modal" *ngIf="showTrailerModal">
+      <button class="close-modal" (click)="closeTrailerModal()">×</button>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/wJO_vIDZn-I?si=pFfJYMs_n4KFBvSo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <!-- SEPARATOR ISPOD HERO SEKCIJE -->
+  <hr class="section-separator" />
+
+  <!-- OSTATK HOME STRANICE -->
+
+  <!-- HORIZONTALNI SCROLL SVIH FILMOVA -->
+  <section class="all-movies-section">
+    <h2 class="all-movies-title">Svi filmovi</h2>
+    <div class="all-movies-scroll">
+      <div class="movie-card-horizontal card" *ngFor="let movie of allMovies">
+        <div class="movie-card-poster">
+          <img *ngIf="allMoviePosters[movie.id]; else noPoster" [src]="allMoviePosters[movie.id]" [alt]="movie.title" />
+          <ng-template #noPoster>
+            <div class="poster-placeholder">Nema slike</div>
+          </ng-template>
+        </div>
+        <div class="movie-card-body">
+          <h5 class="movie-card-title">{{ movie.title }}</h5>
+          <p class="movie-card-desc">{{ movie.description }}</p>
+          <ul class="movie-card-list">
+            <li><strong>Release Date:</strong> {{ movie.releaseDate | date }}</li>
+            <li><strong>Duration:</strong> {{ movie.duration }} minutes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEPARATOR ISPOD SLIDERA -->
+  <hr class="section-separator" />
+
+  <!-- FOOTER -->
+  <footer class="webcinema-footer">
+    <div class="footer-section">
+      <h3>About Us</h3>
+      <p>WebCinema is your go-to movie destination offering the latest releases, comfortable seating, and an unforgettable cinematic experience.</p>
+    </div>
+    <div class="footer-section">
+      <h3>Contact Us</h3>
+      <p>Phone: +1 (555) 829-3746</p>
+    </div>
+    <div class="footer-section">
+      <h3>Address</h3>
+      <p>WebCinemaTheaters<br>123 Movie Lane, Film City, CA 90210</p>
+      <h3>Opening Hours</h3>
+      <p>Monday – Sunday: 10:00 AM – 12:00 AM</p>
+    </div>
+    <div class="footer-section">
+      <h3>Now Showing</h3>
+      <p>Check out our latest blockbusters, indie films, and special screenings every week.</p>
+    </div>
+  </footer>
+</div>

@@ -191,3 +191,23 @@ body, .dark-theme, .dark-theme * {
   background: #181818 !important;
   color: #fff !important;
 }
+
+.dark-theme ::-webkit-scrollbar {
+  height: 12px;
+  background: #232323;
+  border-radius: 8px;
+}
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 8px;
+}
+.dark-theme ::-webkit-scrollbar-track {
+  background: #232323;
+  border-radius: 8px;
+}
+
+/* Firefox */
+.dark-theme {
+  scrollbar-color: #555 #232323;
+  scrollbar-width: thin;
+}

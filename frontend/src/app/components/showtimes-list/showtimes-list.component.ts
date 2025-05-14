@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ShowtimeService } from '../../services/showtime-service';
-import { GetShowTimeDto } from '../../models/dto/showtime.dto';
 import { MovieService } from '../../services/movie-service';
+import { GetShowTimeDto } from '../../models/dto/showtime.dto';
 import { MoviePosterService } from '../../services/movie-poster-service';
 import { MovieGetDto } from '../../models/dto/movie.dto';
 import { MoviePosterResponseDto } from '../../models/dto/move-poster.dto';
