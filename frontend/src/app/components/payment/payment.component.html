@@ -18,13 +18,18 @@
       <!-- RIGHT SIDE: Stripe form -->
       <div class="stripe-form-section">
         <h2>Card Payment</h2>
-        <form (ngSubmit)="pay()" class="payment-form">
+        <form class="payment-form">
           <label>Card details</label>
           <div id="card-element" class="stripe-card-element"></div>
           <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-          <button type="submit" [disabled]="isProcessing || !stripeReady" class="pay-btn">
-            {{ isProcessing ? 'Processing...' : 'Pay' }}
-          </button>
+          <div class="payment-buttons">
+            <button class="btn btn-primary" type="button" (click)="pay()" [disabled]="isProcessing">
+              {{ isProcessing ? 'Processing...' : 'Pay Now' }}
+            </button>
+            <button class="btn btn-secondary" type="button" (click)="bookNow()" [disabled]="isProcessing">
+              Book Now
+            </button>
+          </div>
         </form>
         <div *ngIf="!stripe" class="error-message">Stripe is not loaded! Check your internet connection, adblocker and sessionStorage.</div>
         <div *ngIf="paymentSuccess" class="success-message">

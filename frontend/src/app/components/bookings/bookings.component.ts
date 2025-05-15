@@ -109,6 +109,7 @@ export class BookingsComponent implements OnInit {
       sessionStorage.setItem('paymentData', JSON.stringify({
         selectedSeats: booking.bookedSeats,
         showtime: {
+          id: booking.showTimesId,
           movieTitle: booking.movieTitle,
           hallName: booking.hallName,
           showDateTime: booking.showDateTime,

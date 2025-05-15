@@ -95,12 +95,18 @@
         </div>
         <div class="action-buttons" style="display: flex; flex-direction: column; align-items: center;">
           <!-- Prikazuj button dok captcha nije prikazana -->
-          <div *ngIf="!showCaptcha && !captchaPassed" style="width: 100%; display: flex; justify-content: center;">
+          <div *ngIf="!showCaptcha && !captchaPassed" style="width: 100%; display: flex; justify-content: center; gap: 10px;">
             <button
               class="btn-confirm"
               [disabled]="selectedSeats.length === 0"
               (click)="showCaptcha = true">
               Proceed to Payment (${{ totalPrice.toFixed(2) }})
+            </button>
+            <button
+              class="btn-confirm btn-book-now"
+              [disabled]="selectedSeats.length === 0"
+              (click)="bookNow()">
+              Book Now
             </button>
           </div>
           <!-- Prikazuj captcha kad je showCaptcha true i captcha nije prošla -->
@@ -118,6 +124,7 @@
             </button>
           </div>
         </div>
+        <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
       </div>
     </div>
   </div>

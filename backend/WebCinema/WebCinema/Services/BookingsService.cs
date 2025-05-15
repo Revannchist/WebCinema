@@ -134,6 +134,7 @@ namespace WebCinema.Services
                 .Select(b => new BookingsDto
                 {
                     Id = b.Id,
+                    ShowTimesId = b.ShowTimesId,
                     UserName = b.User.Username,
                     MovieTitle = b.ShowTimes.Movies.Title,
                     HallName = b.ShowTimes.Halls.HallName,
@@ -163,6 +164,7 @@ namespace WebCinema.Services
                 .Select(b => new BookingsDto
                 {
                     Id = b.Id,
+                    ShowTimesId = b.ShowTimesId,
                     UserName = b.User.Username,
                     MovieTitle = b.ShowTimes.Movies.Title,
                     HallName = b.ShowTimes.Halls.HallName,

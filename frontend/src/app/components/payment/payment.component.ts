@@ -226,4 +226,41 @@ export class PaymentComponent implements OnInit {
   isDarkMode(): boolean {
     return document.body.classList.contains('dark-theme');
   }
+
+  async bookNow() {
+    if (!this.bookingId) {
+      this.errorMessage = 'Booking ID nije pronađen!';
+      return;
+    }
+
+    this.isProcessing = true;
+    this.errorMessage = '';
+
+    // Pripremi BookingsEditDto za update
+    const editDto = {
+      ShowTimesId: this.paymentData.showtime.id,
+      BookedSeatsIds: this.paymentData.selectedSeats,
+      TicketQuantity: this.paymentData.selectedSeats.length,
+      TotalPrice: this.paymentData.totalPrice,
+      BookingStatus: 'Pending',
+      BookingDate: new Date()
+    };
+
+    this.bookingService.updateBooking(this.bookingId, editDto).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.isProcessing = false;
+          this.paymentSuccess = true;
+          // Preusmjeri na korpu ili početnu stranicu
+          this.router.navigate(['/cart']);
+        });
+      },
+      error: (err) => {
+        this.ngZone.run(() => {
+          this.errorMessage = 'Greška pri spremanju rezervacije!';
+          this.isProcessing = false;
+        });
+      }
+    });
+  }
 }

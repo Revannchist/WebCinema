@@ -3,6 +3,7 @@
     public class BookingsDto
     {
         public int Id { get; set; }
+        public int ShowTimesId { get; set; }
         public string UserName { get; set; }
         public string MovieTitle { get; set; }
         public string HallName { get; set; }

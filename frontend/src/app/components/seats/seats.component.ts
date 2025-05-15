@@ -8,6 +8,7 @@ import { BookingService } from '../../services/booking-service';
 import { AuthService } from '../../auth.service';
 import { forkJoin } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { CartService } from '../../services/cart-service';
 
 declare var grecaptcha: any;
 
@@ -41,6 +42,8 @@ export class SeatsComponent implements OnInit, AfterViewChecked {
   recaptchaWidgetId: any = null;
   recaptchaRendered = false;
   
+  successMessage: string = '';
+  
   constructor(
     private seatService: SeatService,
     private showtimeService: ShowtimeService,
@@ -49,7 +52,8 @@ export class SeatsComponent implements OnInit, AfterViewChecked {
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cartService: CartService
   ) { }
   
   ngOnInit(): void {
@@ -551,7 +555,7 @@ export class SeatsComponent implements OnInit, AfterViewChecked {
 
   onCaptchaResolved(token: string) {
     if (!token) {
-      this.captchaError = 'Molimo potvrdite da niste robot.';
+      this.captchaError = 'Please verify that you are not a robot.';
       return;
     }
     this.http.post<any>('https://localhost:7057/api/Auth/ValidateCaptcha', { token }).subscribe({
@@ -561,12 +565,66 @@ export class SeatsComponent implements OnInit, AfterViewChecked {
           this.captchaError = '';
           this.showCaptcha = false;
         } else {
-          this.captchaError = 'CAPTCHA nije prošla. Pokušajte ponovno.';
+          this.captchaError = 'CAPTCHA not passed. Please try again.';
         }
       },
       error: () => {
-        this.captchaError = 'Greška pri validaciji CAPTCHA. Pokušajte ponovno.';
+        this.captchaError = 'Error validating CAPTCHA. Please try again.';
       }
     });
+  }
+
+  bookNow() {
+    if (!this.showtime) {
+      this.error = 'Cannot create booking: No showtime selected';
+      return;
+    }
+    if (this.selectedSeats.length === 0) {
+      this.error = 'Cannot create booking: No seats selected';
+      return;
+    }
+    const userId = this.authService.getCurrentUserId();
+    if (userId === null) {
+      alert('Please log in to complete your booking.');
+      return;
+    }
+    const bookingData = {
+      usersId: userId,
+      showTimesId: this.showtime.id,
+      bookedSeatsIds: this.selectedSeats,
+      ticketQuantity: this.selectedSeats.length,
+      totalPrice: this.totalPrice,
+      bookingStatus: "Pending",
+      bookingDate: new Date().toISOString()
+    };
+    this.isLoading = true;
+    this.bookingService.addBooking(bookingData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.reservedSeats = [...this.reservedSeats, ...this.selectedSeats];
+        this.error = null;
+        this.successMessage = "Booked successfully!";
+        this.selectedSeats = [];
+        this.selectedGroups = {};
+        this.totalPrice = 0;
+        this.cartService.refreshCartCount();
+        setTimeout(() => {
+          this.successMessage = '';
+          window.location.reload();
+        }, 3000);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.error = 'Error booking. Please try again.';
+      }
+    });
+  }
+
+  animateCart() {
+    const cartIcon = document.querySelector('.cart-icon');
+    if (cartIcon) {
+      cartIcon.classList.add('cart-animate');
+      setTimeout(() => cartIcon.classList.remove('cart-animate'), 700);
+    }
   }
 }
