@@ -443,3 +443,71 @@ td {
   }
 }
 
+/* DARK THEME ZA ADMIN KARTICE I TABLICE */
+:host-context(body.dark-theme) .form-container,
+:host-context(body.dark-theme) .table-container {
+  background: #181818 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+}
+
+:host-context(body.dark-theme) .form-container h2,
+:host-context(body.dark-theme) .table-container h2 {
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) input,
+:host-context(body.dark-theme) .filter-input,
+:host-context(body.dark-theme) .search-input {
+  background: #222 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+
+:host-context(body.dark-theme) input::placeholder,
+:host-context(body.dark-theme) .filter-input::placeholder,
+:host-context(body.dark-theme) .search-input::placeholder {
+  color: #bbb !important;
+}
+
+:host-context(body.dark-theme) .users-table,
+:host-context(body.dark-theme) table {
+  background: #222 !important;
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) .users-table th,
+:host-context(body.dark-theme) table th {
+  background: #181818 !important;
+  color: #fff !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+:host-context(body.dark-theme) .users-table td,
+:host-context(body.dark-theme) table td {
+  border-bottom: 1px solid #333 !important;
+}
+
+:host-context(body.dark-theme) .users-table tr:hover,
+:host-context(body.dark-theme) table tr:hover {
+  background: #232323 !important;
+}
+
+:host-context(body.dark-theme) .edit-btn {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+:host-context(body.dark-theme) .delete-btn {
+  background-color: #dc3545 !important;
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) .edit-btn:hover {
+  background-color: #e0a800 !important;
+}
+
+:host-context(body.dark-theme) .delete-btn:hover {
+  background-color: #c82333 !important;
+}
+
