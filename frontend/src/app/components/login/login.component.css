@@ -126,3 +126,34 @@ input.invalid {
 .register-link a:hover {
   color: #d60048;
 }
+
+/* TAMNA TEMA ZA LOGIN FORMU - ISPRAVNO ZA ANGULAR */
+:host-context(body.dark-theme) .login-card {
+  background: #111 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+}
+
+:host-context(body.dark-theme) .login-card h2 {
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) .login-card input {
+  background: #222 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+
+:host-context(body.dark-theme) .login-card input::placeholder {
+  color: #bbb !important;
+}
+
+:host-context(body.dark-theme) .login-btn {
+  background: #e6004c !important;
+  color: #fff !important;
+}
+
+:host-context(body.dark-theme) .register-link p,
+:host-context(body.dark-theme) .register-link a {
+  color: #bbb !important;
+}
