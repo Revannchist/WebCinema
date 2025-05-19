@@ -189,7 +189,7 @@
       <div class="form-inline">
         <label class="me-2">Items per page:</label>
 
-        <select class="form-control" [(ngModel)]="filterParams.pageSize" (ngModelChange)="loadMovies()">
+        <select class="form-control" [(ngModel)]="filterParams.pageSize" (ngModelChange)="loadMovies()" [ngClass]="{'dark-select': isDarkTheme()}">
           <option [value]="10">10</option>
           <option [value]="25">25</option>
           <option [value]="50">50</option>

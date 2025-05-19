@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using WebCinema.Interfaces;
 using WebCinema.Models;
@@ -13,11 +14,15 @@ namespace WebCinema.Controllers
     {
         private readonly IMoviesService _moviesService;
         private readonly ILogger<MoviesController> _logger;
+        private readonly WebCinemaDBContext _dbContext;
 
-        public MoviesController(IMoviesService moviesService, ILogger<MoviesController> logger)
+
+        public MoviesController(IMoviesService moviesService, ILogger<MoviesController> logger, WebCinemaDBContext dbContext)
         {
             _moviesService = moviesService;
             _logger = logger;
+            _dbContext = dbContext;
+
         }
 
         [Authorize(Roles = "Admin")]
@@ -39,6 +44,25 @@ namespace WebCinema.Controllers
                 return StatusCode(499, "Request canceled");
             }
 
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> GetMoviesStatistics(CancellationToken cancellationToken)
+        {
+            // Za svaki film dohvatiti broj bookinga i broj prodanih karata (suma TicketQuantity)
+            var stats = await _dbContext.Movies
+                .Select(m => new
+                {
+                    Title = m.Title,
+                    Booked = _dbContext.Bookings
+                        .Count(b => b.ShowTimes.Movies.Id == m.Id),
+                    Sold = _dbContext.Bookings
+                        .Where(b => b.ShowTimes.Movies.Id == m.Id)
+                        .Sum(b => (int?)b.TicketQuantity) ?? 0
+                })
+                .ToListAsync(cancellationToken);
+
+            return Ok(stats);
         }
 
         [Authorize(Roles = "Admin")]

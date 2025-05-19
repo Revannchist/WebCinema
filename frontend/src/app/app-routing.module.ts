@@ -8,6 +8,7 @@ import { ActorsComponent } from './components/actors/actors.component';
 import { DirectorsComponent } from './components/directors/directors.component';
 import { LandingPageComponent } from './components/landing-page/landing-page.component';
 import { AdminPanelComponent} from './admin-panel/admin-panel/admin-panel.component';
+import { AdminDashboardComponent } from './admin-panel/admin-dashboard/admin-dashboard.component';
 import { AdminPanelMoviesComponent } from './admin-panel/admin-panel-movies/admin-panel-movies.component';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { UsersComponent } from './components/users/users.component';
@@ -62,7 +63,7 @@ const routes: Routes = [
     canActivate: [AdminGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: AdminPanelComponent },
+      { path: 'dashboard', component: AdminDashboardComponent },
       { path: 'movies', component: AdminPanelMoviesComponent },
       { path: 'showtimes', component: AdminPanelShowtimesComponent },
       { path: 'users', component: AdminPanelUserAdminComponent },

@@ -211,3 +211,23 @@ body, .dark-theme, .dark-theme * {
   scrollbar-color: #555 #232323;
   scrollbar-width: thin;
 }
+
+body.dark-theme .pagination .page-link,
+body.dark-theme .pagination .page-link a,
+body.dark-theme .pagination .page-link span {
+  background-color: #232323 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-theme .pagination .page-item.active .page-link,
+body.dark-theme .pagination .page-item.active .page-link a,
+body.dark-theme .pagination .page-item.active .page-link span {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border-color: #007bff !important;
+}
+body.dark-theme .pagination .page-item.disabled .page-link {
+  background-color: #232323 !important;
+  color: #666 !important;
+  border-color: #444 !important;
+}

@@ -32,6 +32,8 @@ import { BookingsComponent } from './components/bookings/bookings.component';
 import { BookingDetailsComponent } from './components/booking-details/booking-details.component';
 import { HomeComponent } from './components/home/home.component';
 import { PaymentComponent } from './components/payment/payment.component';
+import { NgChartsModule } from 'ng2-charts';
+import { AdminDashboardComponent } from './admin-panel/admin-dashboard/admin-dashboard.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -64,7 +66,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     BookingsComponent,
     BookingDetailsComponent,
     HomeComponent,
-    PaymentComponent
+    PaymentComponent,
+    AdminDashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -74,6 +77,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    NgChartsModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

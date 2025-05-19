@@ -505,6 +505,8 @@ export class AdminPanelMoviesComponent {
     }
   }
 
-
+  isDarkTheme(): boolean {
+    return document.body.classList.contains('dark-theme');
+  }
 
 }

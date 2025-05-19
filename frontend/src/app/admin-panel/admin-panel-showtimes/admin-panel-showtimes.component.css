@@ -267,3 +267,52 @@ td {
   max-height: 200px;
   overflow-y: auto;
 }
+
+/* Dark mode za paginaciju i select */
+body.dark-theme .pagination .page-link,
+body.dark-theme .page-link,
+body.dark-theme select.form-control,
+body.dark-theme .form-control,
+body.dark-theme .page-item.disabled .page-link,
+body.dark-theme .page-item.active .page-link {
+  background-color: #232323 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-theme .pagination .page-item.active .page-link {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border-color: #007bff !important;
+}
+body.dark-theme .pagination .page-item.disabled .page-link {
+  color: #666 !important;
+}
+body.dark-theme .form-inline label,
+body.dark-theme label {
+  color: #fff !important;
+}
+
+.dark-theme .pagination .page-link,
+.dark-theme .pagination .page-link a,
+.dark-theme .pagination .page-link span {
+  background-color: #232323 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+.dark-theme .pagination .page-item.active .page-link,
+.dark-theme .pagination .page-item.active .page-link a,
+.dark-theme .pagination .page-item.active .page-link span {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border-color: #007bff !important;
+}
+::ng-deep body.dark-theme .pagination .page-link {
+  background-color: #232323 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+::ng-deep body.dark-theme .pagination .page-item.active .page-link {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border-color: #007bff !important;
+}
