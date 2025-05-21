@@ -69,7 +69,9 @@
               <div class="card-body">
                 <!-- Movie Title with Genre/Duration (if available) -->
                 <div class="movie-header">
-                  <h3 class="card-title mb-1">{{ movieGroup.value[0].movieTitle }}</h3>
+                  <h3 class="card-title mb-1">
+                    <a [routerLink]="['/movie', movieGroup.key]" class="movie-link">{{ movieGroup.value[0].movieTitle }}</a>
+                  </h3>
                   <div class="movie-metadata text-muted mb-3">
                     <!-- Add movie metadata if available in your data model -->
                     <span *ngIf="getMovieGenre(+movieGroup.key)">{{ getMovieGenre(+movieGroup.key) }} | </span>

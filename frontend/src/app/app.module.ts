@@ -34,6 +34,7 @@ import { HomeComponent } from './components/home/home.component';
 import { PaymentComponent } from './components/payment/payment.component';
 import { NgChartsModule } from 'ng2-charts';
 import { AdminDashboardComponent } from './admin-panel/admin-dashboard/admin-dashboard.component';
+import { MovieDetailsComponent } from './components/movie-details/movie-details.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -67,7 +68,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     BookingDetailsComponent,
     HomeComponent,
     PaymentComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
+    MovieDetailsComponent
   ],
   imports: [
     BrowserModule,

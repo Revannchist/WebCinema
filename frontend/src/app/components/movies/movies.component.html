@@ -116,7 +116,13 @@
   </thead>
   <tbody>
     <tr *ngFor="let movie of filteredMovies">
-      <td>{{ movie?.title || 'N/A' }}</td>
+      <td>
+        <a [routerLink]="['/movie', movie.id]" class="movie-link">
+          <span class="truncate-container" [attr.data-fulltext]="movie?.title || 'N/A'">
+            <span class="truncate-text">{{ movie?.title || 'N/A' }}</span>
+          </span>
+        </a>
+      </td>
       <td>{{ movie?.description || 'N/A' }}</td>
       <td>{{ movie?.releaseDate | date:'MM-dd--yyyy' }}</td>
       <td>{{ movie?.duration ? movie?.duration + ' min' : 'N/A' }}</td>

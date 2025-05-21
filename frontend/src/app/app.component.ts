@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
     '/booking-details',
     '/checkout',
     '/login',
-    '/register'
+    '/movie'
   ];
 
   constructor(

@@ -35,7 +35,7 @@
   <section class="all-movies-section">
     <h2 class="all-movies-title">Svi filmovi</h2>
     <div class="all-movies-scroll">
-      <div class="movie-card-horizontal card" *ngFor="let movie of allMovies">
+      <a *ngFor="let movie of allMovies" [routerLink]="['/movie', movie.id]" class="movie-card-horizontal card" style="text-decoration: none; color: inherit;">
         <div class="movie-card-poster">
           <img *ngIf="allMoviePosters[movie.id]; else noPoster" [src]="allMoviePosters[movie.id]" [alt]="movie.title" />
           <ng-template #noPoster>
@@ -50,7 +50,7 @@
             <li><strong>Duration:</strong> {{ movie.duration }} minutes</li>
           </ul>
         </div>
-      </div>
+      </a>
     </div>
   </section>
 

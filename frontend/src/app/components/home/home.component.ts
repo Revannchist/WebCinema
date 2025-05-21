@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
   loadHeroMovie(): void {
     this.movieService.getAllMovies().subscribe({
       next: (movies: any) => {
-        const found = (movies.items || []).find((m: Movie) => m.title.trim().toUpperCase() === 'MINECRAFT FILM') || null;
+        const found = (movies.items || []).find((m: Movie) => m.id === 1) || null;
         this.heroMovie = found;
         if (found) {
           this.moviePosterService.getPosterByMovieId(found.id).subscribe({

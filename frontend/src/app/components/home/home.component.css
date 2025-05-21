@@ -580,4 +580,17 @@ body.dark-theme .pagination .page-item.active .page-link span {
   border-color: #007bff !important;
 }
 
+body.dark-theme .hero-movie-text,
+body.dark-theme .hero-title,
+body.dark-theme .hero-desc,
+body.dark-theme .movie-card-list li strong,
+body.dark-theme .movie-card-desc,
+body.dark-theme .movie-card-list li,
+body.dark-theme .map-title,
+body.dark-theme .footer-section h3,
+body.dark-theme .footer-section p,
+body.dark-theme .footer-section strong {
+  color: #fff !important;
+}
+
 

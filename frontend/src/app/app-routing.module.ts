@@ -23,6 +23,7 @@ import { HomeComponent } from './components/home/home.component';
 import { AdminGuard } from './auth.guard';
 import { AuthGuard } from './auth.guard';
 import { PaymentComponent } from './components/payment/payment.component';
+import { MovieDetailsComponent } from './components/movie-details/movie-details.component';
 
 const routes: Routes = [
   // Public routes
@@ -33,6 +34,7 @@ const routes: Routes = [
   { path: 'users', component: UsersComponent },
   { path: 'movie-list', component: MovieListComponent },
   { path: 'showtimes-list', component: ShowtimesListComponent },
+  { path: 'movie/:id', component: MovieDetailsComponent },
 
   // Auth protected routes (user must be logged in)
   {

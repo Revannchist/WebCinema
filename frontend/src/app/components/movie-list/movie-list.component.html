@@ -56,29 +56,31 @@
   <!-- Movies Grid -->
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col" *ngFor="let movie of movies">
-      <div class="card h-100">
-        <div class="poster-container">
-          <!-- Movie poster with full display -->
-          <img *ngIf="moviePosters[movie.id]" [src]="moviePosters[movie.id]?.image" class="card-img-top"
-            [alt]="movie.title + ' poster'">
-    
-          <!-- Placeholder if no poster -->
-          <div *ngIf="!moviePosters[movie.id]" class="poster-placeholder">
-            <span>No Poster Available</span>
+      <a [routerLink]="['/movie', movie.id]" class="movie-link">
+        <div class="card h-100">
+          <div class="poster-container">
+            <!-- Movie poster with full display -->
+            <img *ngIf="moviePosters[movie.id]" [src]="moviePosters[movie.id]?.image" class="card-img-top"
+              [alt]="movie.title + ' poster'">
+      
+            <!-- Placeholder if no poster -->
+            <div *ngIf="!moviePosters[movie.id]" class="poster-placeholder">
+              <span>No Poster Available</span>
+            </div>
+          </div>
+      
+          <div class="card-body">
+            <h5 class="card-title">{{movie.title}}</h5>
+            <p class="card-text">{{movie.description}}</p>
+            <ul class="list-unstyled">
+              <li><strong>Release Date:</strong> {{movie.releaseDate | date}}</li>
+              <li><strong>Duration:</strong> {{movie.duration}} minutes</li>
+              <li><strong>Language:</strong> {{movie.language}}</li>
+              <li><strong>Age Rating:</strong> {{movie.ageRating}}</li>
+            </ul>
           </div>
         </div>
-    
-        <div class="card-body">
-          <h5 class="card-title">{{movie.title}}</h5>
-          <p class="card-text">{{movie.description}}</p>
-          <ul class="list-unstyled">
-            <li><strong>Release Date:</strong> {{movie.releaseDate | date}}</li>
-            <li><strong>Duration:</strong> {{movie.duration}} minutes</li>
-            <li><strong>Language:</strong> {{movie.language}}</li>
-            <li><strong>Age Rating:</strong> {{movie.ageRating}}</li>
-          </ul>
-        </div>
-      </div>
+      </a>
     </div>
   </div>
 
