@@ -35,6 +35,7 @@ const routes: Routes = [
   { path: 'movie-list', component: MovieListComponent },
   { path: 'showtimes-list', component: ShowtimesListComponent },
   { path: 'movie/:id', component: MovieDetailsComponent },
+  { path: 'profile', component: UsersComponent, canActivate: [AuthGuard] },
 
   // Auth protected routes (user must be logged in)
   {

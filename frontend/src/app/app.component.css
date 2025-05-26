@@ -133,3 +133,17 @@
 .login-btn {
   cursor: pointer;
 }
+
+.profile-link img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f39c12;
+  background: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.profile-link img:hover {
+  box-shadow: 0 0 0 3px #f39c1244;
+  border-color: #e67e22;
+}

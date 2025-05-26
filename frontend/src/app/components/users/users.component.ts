@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged, switchMap, map, first, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-users',
@@ -34,7 +35,8 @@ export class UsersComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) {
     this.translate.use('en');
     this.initializeEmptyForm();
@@ -58,6 +60,22 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.router.url.startsWith('/profile')) {
+      const currentUserId = this.authService.getCurrentUserId();
+      if (currentUserId) {
+        this.userService.getUserById(currentUserId).subscribe({
+          next: (user: UserDisplayDto) => {
+            this.users = [user];
+            this.editUser(user);
+          },
+          error: (error) => {
+            console.error('Error loading current user:', error);
+          }
+        });
+      }
+      return;
+    }
+
     this.route.queryParams.subscribe(params => {
       const userId = params['userId'];
       if (userId) {

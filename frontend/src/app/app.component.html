@@ -373,6 +373,11 @@
     </li>
     <li *ngIf="!isLoggedIn"><a routerLink="/login" class="login-btn">Login</a></li>
     <li *ngIf="isLoggedIn"><a (click)="logout()" class="login-btn">Logout</a></li>
+    <li *ngIf="isLoggedIn">
+      <a routerLink="/profile" class="profile-link" style="display: flex; align-items: center;">
+        <img src="assets/images/default-profile.png" alt="Profilna slika" style="width:32px; height:32px; border-radius:50%; object-fit:cover; margin-right:8px; border:2px solid #f39c12; background:#fff;" />
+      </a>
+    </li>
   </ul>
 </nav>
 
