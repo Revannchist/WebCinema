@@ -13,12 +13,11 @@ Features
 
     Responsive UI optimized for desktop
 
-Tech Stack
-Layer	Technology
-Frontend	Angular
-Backend	ASP.NET Core
-Database	SQL Server
-Authentication	JWT (JSON Web Tokens)
+Tech Stack:
+Frontend: Angular
+Backend: ASP.NET Core
+Database: SQL Server
+Authentication:	JWT
 
 
 --Getting Started
