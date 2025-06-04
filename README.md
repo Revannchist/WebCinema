@@ -14,35 +14,42 @@ Features
     Responsive UI optimized for desktop
 
 Tech Stack:
-Frontend: Angular
-Backend: ASP.NET Core
-Database: SQL Server
-Authentication:	JWT
 
+    Frontend: Angular
 
---Getting Started
+    Backend: ASP.NET Core
 
--Backend Setup
+    Database: SQL Server
+
+    Authentication: JWT
+
+<br>
+<br>
+
+Getting Started
+
+<br>
+- Backend Setup
 
   Open the backend project folder.
 
   Create a new migration (replace "migration_name" with a descriptive name):
 
-    Add-Migration "migration_name"
+        Add-Migration "migration_name"
 
   Apply the migration to update the database.
 
   Run the backend server to expose the API endpoints.
 
-
--Frontend Setup
+<br>
+- Frontend Setup
 
   Open the frontend project folder.
 
   Install the required npm packages:
   If you have Angular v20 installed, run:
 
-    npm install
+        npm install
 
 If you do not have Angular v20 or face dependency conflicts, run:
 
